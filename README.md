@@ -1,6 +1,3 @@
-Sure! Here's a clean and professional `README.md` section that describes how to clone and start your Spring Boot Maven app, includes the directory structure, and explains the role of DTOs, mappers, and other relevant details:
-
-````markdown
 # Brainmap Spring Boot Application
 
 ## Getting Started
