@@ -25,7 +25,7 @@ spring.datasource.username=your_db_username
 spring.datasource.password=your_password
 ```
 
-Replace the placeholder values with your actual database connection details, such as URL, username, password, and driver class.
+Replace the placeholder values with your actual database connection details(username, password).
 
 ### Build and Run the Application
 
