@@ -1,4 +1,4 @@
-# Brainmap Spring Boot Application
+# Brainmap Spring Boot Backend
 
 ## Getting Started
 
