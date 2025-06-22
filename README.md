@@ -56,6 +56,8 @@ src/main/java/com/app/brainmap/
 │   └── impl/                    # Mapper implementations to convert between DTOs and Entities
 │
 ├── repositories/                # Spring Data JPA repositories for data access
+│
+├── controllers                  # REST controllers handling HTTP requests and responses
 ```
 
 ### Key Concepts
