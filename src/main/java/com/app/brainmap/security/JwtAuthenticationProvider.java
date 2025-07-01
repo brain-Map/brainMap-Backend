@@ -3,6 +3,7 @@ package com.app.brainmap.security;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -14,7 +15,9 @@ import java.util.Collections;
 
 @Component
 public class JwtAuthenticationProvider implements AuthenticationProvider {
-    private final String jwtSecret = "Hpxhzd2ipHmKblQozmCMeMbIwWK4Ggoxcczqa4jJgRbzt/7hTWiee35FtU5YyzxHi/D9tde4ul8CPcBUiIps3Q==";
+
+    @Value("${jwt.secret}")
+    private String jwtSecret;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
