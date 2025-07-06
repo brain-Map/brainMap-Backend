@@ -4,34 +4,21 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "community_comments")
+@Table(name = "community_reply")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder
-public class CommunityComment {
+public class CommunityReply {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID communityCommentId;
+    private UUID replyId;
 
-    @ManyToOne
-    @JoinColumn(name = "post", nullable = false)
-    private CommunityPost post;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id", nullable = false)
-    private User author;
-
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CommunityReply> replies = new ArrayList<>();
-
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @Column(nullable = false)
@@ -39,6 +26,14 @@ public class CommunityComment {
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_id", nullable = false)
+    private CommunityComment comment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
 
     @PrePersist
     protected void prePersist() {
@@ -51,4 +46,5 @@ public class CommunityComment {
     protected void onUpdate(){
         this.updatedAt = LocalDateTime.now();
     }
+
 }
