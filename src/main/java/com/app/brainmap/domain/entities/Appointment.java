@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "appointments")
@@ -14,8 +15,8 @@ import java.time.LocalDateTime;
 @Builder
 public class Appointment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long appoinmentId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID appoinmentId;
 
     @ManyToOne
     @JoinColumn(name = "sender_id")

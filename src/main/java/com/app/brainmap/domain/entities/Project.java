@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 @Entity
@@ -15,8 +16,8 @@ import java.time.LocalDateTime;
 @Builder
 public class Project {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long projectId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID projectId;
 
     private String title;
 
