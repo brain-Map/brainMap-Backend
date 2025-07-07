@@ -31,11 +31,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 return;
             }
-        } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Authorization header is missing or invalid");
-            return;
         }
+        /*TODO: Uncomment the else block below once Authentication is implemented.*/
+//        else {
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            response.getWriter().write("Authorization header is missing or invalid");
+//            return;
+//        }
 
         filterChain.doFilter(request, response);
     }
