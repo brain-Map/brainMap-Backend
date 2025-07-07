@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "services")
@@ -14,8 +15,8 @@ import java.util.List;
 @Builder
 public class Service {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long serviceId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID serviceId;
 
     private String serviceName;
 

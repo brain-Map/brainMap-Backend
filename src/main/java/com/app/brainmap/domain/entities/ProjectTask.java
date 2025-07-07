@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "project_tasks")
@@ -14,8 +15,8 @@ import java.time.LocalDateTime;
 @Builder
 public class ProjectTask {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long taskId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID taskId;
 
     @ManyToOne
     private Project project;
