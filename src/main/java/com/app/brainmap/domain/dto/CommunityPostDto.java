@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -13,5 +15,10 @@ import java.util.UUID;
 @Builder
 public class CommunityPostDto {
     private UUID id;
+    private String title;
     private String content;
+    private Set<CommunityTagResponse> tags;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private CommunityPostAuthorDto author;
 }
