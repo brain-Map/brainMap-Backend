@@ -1,16 +1,17 @@
 package com.app.brainmap.controllers;
 
 import com.app.brainmap.domain.dto.CommunityTagResponse;
+import com.app.brainmap.domain.dto.CreateCommunityTagRequest;
 import com.app.brainmap.domain.entities.CommunityTag;
 import com.app.brainmap.mappers.CommunityTagMapper;
 import com.app.brainmap.services.CommunityTagService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/v1/tags")
@@ -26,5 +27,19 @@ public class CommunityTagController {
         List<CommunityTagResponse> tagResponses = tags.stream().map(communityTagMapper::toTagResponse).toList();
 
         return ResponseEntity.ok(tagResponses);
+    }
+
+    @PostMapping
+    public ResponseEntity<List<CommunityTagResponse>> createTags(@RequestBody CreateCommunityTagRequest createCommunityTagRequest){
+        List<CommunityTag> savedTags = communityTagService.createTags(createCommunityTagRequest.getNames());
+        List<CommunityTagResponse> createdTagResponses = savedTags.stream().map(communityTagMapper::toTagResponse).toList();
+
+        return new ResponseEntity<>(createdTagResponses, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<Void> deleteTag(@PathVariable UUID id){
+        communityTagService.deleteTag(id);
+        return ResponseEntity.noContent().build();
     }
 }

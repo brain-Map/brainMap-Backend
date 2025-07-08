@@ -6,10 +6,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
 public interface CommunityTagRepository extends JpaRepository<CommunityTag, UUID> {
     @Query("SELECT t FROM CommunityTag t LEFT JOIN FETCH t.posts")
     List<CommunityTag> findAllWithPostCount();
+
+    List<CommunityTag> findByNameIn(Set<String> names);
 }
