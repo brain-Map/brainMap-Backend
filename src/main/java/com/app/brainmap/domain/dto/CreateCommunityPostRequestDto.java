@@ -1,5 +1,6 @@
 package com.app.brainmap.domain.dto;
 
+import com.app.brainmap.domain.CommunityPostType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -25,9 +26,11 @@ public class CreateCommunityPostRequestDto {
     @Size(max = 5000, message = "Content cannot exceed {max} characters")
     private String content;
 
+    private String type;
+
     @Builder.Default
     @Size(max = 8, message = "You can only add up to {max} tags")
-    private Set<UUID> tagIds = new HashSet<>();
+    private Set<String> tags = new HashSet<>();
 
 
 }

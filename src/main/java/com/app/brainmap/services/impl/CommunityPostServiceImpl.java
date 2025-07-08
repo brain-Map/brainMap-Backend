@@ -1,5 +1,6 @@
 package com.app.brainmap.services.impl;
 
+import com.app.brainmap.domain.CommunityPostType;
 import com.app.brainmap.domain.CreateCommunityPostRequest;
 import com.app.brainmap.domain.entities.CommunityPost;
 import com.app.brainmap.domain.entities.CommunityTag;
@@ -8,7 +9,6 @@ import com.app.brainmap.repositories.CommunityPostRepository;
 import com.app.brainmap.services.CommunityPostService;
 import com.app.brainmap.services.CommunityTagService;
 import jakarta.transaction.Transactional;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +37,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         newPost.setTitle(request.getTitle());
         newPost.setContent(request.getContent());
         newPost.setAuthor(user);
+        newPost.setType(request.getType());
 
         Set<UUID> tagIds = request.getTagsIds();
         List<CommunityTag> tags = communityTagService.getTagsByIds(tagIds);

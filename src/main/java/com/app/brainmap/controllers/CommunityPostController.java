@@ -8,8 +8,11 @@ import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.mappers.CommunityPostMapper;
 import com.app.brainmap.security.JwtUserDetails;
 import com.app.brainmap.services.CommunityPostService;
+import com.app.brainmap.services.CommunityTagService;
 import com.app.brainmap.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -22,10 +25,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path = "/api/v1/posts")
 @RequiredArgsConstructor
+@Slf4j
 public class CommunityPostController {
 
     private final CommunityPostMapper communityPostMapper;
     private final CommunityPostService communityPostService;
+    private final CommunityTagService communityTagService;
     private final UserService userService;
 
     @GetMapping
@@ -41,6 +46,7 @@ public class CommunityPostController {
 
     @PostMapping
     public ResponseEntity<CommunityPostDto> createPost(@RequestBody CreateCommunityPostRequestDto requestDto) {
+        log.info(requestDto.toString());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails userDetails = (authentication != null && authentication.getPrincipal() != null)
                 ? authentication.getPrincipal() instanceof JwtUserDetails
@@ -50,7 +56,8 @@ public class CommunityPostController {
 
         UUID userId = userDetails.getUserId();
         User user = userService.getUserById(userId);
-        CreateCommunityPostRequest createCommunityPostRequest = communityPostMapper.toCreateCommunityPostRequest(requestDto);
+        CreateCommunityPostRequest createCommunityPostRequest = communityPostMapper.toCreateCommunityPostRequest(requestDto, communityTagService);
+        log.info("Creating post with title: {}", createCommunityPostRequest);
         CommunityPost createdPost = communityPostService.createPost(user, createCommunityPostRequest);
         CommunityPostDto createdPostDto = communityPostMapper.toDto(createdPost);
 
