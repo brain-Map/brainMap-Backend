@@ -1,5 +1,6 @@
 package com.app.brainmap.domain.dto;
 
+import com.app.brainmap.domain.CommunityPostType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,4 +22,5 @@ public class CommunityPostDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private CommunityPostAuthorDto author;
+    private CommunityPostType type;
 }

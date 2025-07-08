@@ -29,7 +29,7 @@ public class CommunityPost {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     @Enumerated(EnumType.STRING)
     private CommunityPostType type;
 
@@ -55,6 +55,18 @@ public class CommunityPost {
         LocalDateTime now = LocalDateTime.now();
         this.createdAt = now;
         this.updatedAt = now;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        CommunityPost that = (CommunityPost) o;
+        return Objects.equals(communityPostId, that.communityPostId) && Objects.equals(author, that.author) && Objects.equals(title, that.title) && Objects.equals(content, that.content) && type == that.type && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt) && Objects.equals(comments, that.comments) && Objects.equals(tags, that.tags);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(communityPostId, author, title, content, type, createdAt, updatedAt, comments, tags);
     }
 
     @PreUpdate

@@ -16,6 +16,7 @@ import java.util.UUID;
 public class CreateCommunityPostRequest {
     private String title;
     private String content;
+    private CommunityPostType type;
 
     @Builder.Default
     private Set<UUID> tagsIds = new HashSet<>();

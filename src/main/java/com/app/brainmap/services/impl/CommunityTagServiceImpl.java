@@ -45,6 +45,33 @@ public class CommunityTagServiceImpl implements CommunityTagService {
 
         return savedTags;
     }
+    @Transactional
+    @Override
+    public Set<UUID> createTagsForPost(Set<String> tagNames) {
+        List<CommunityTag> existingTags = communityTagRepository.findByNameIn(tagNames);
+        Set<String> existingTagNames = existingTags.stream()
+                .map(CommunityTag::getName)
+                .collect(Collectors.toSet());
+        List<CommunityTag> newTags = tagNames.stream()
+                .filter(name -> !existingTagNames.contains(name))
+                .map(name -> CommunityTag.builder()
+                        .name(name)
+                        .posts(new HashSet<>())
+                        .build())
+                .toList();
+        List<CommunityTag> savedTags = new ArrayList<>();
+        if(!newTags.isEmpty()) {
+            savedTags = communityTagRepository.saveAll(newTags);
+        }
+
+        savedTags.addAll(existingTags);
+
+        return savedTags.stream()
+                .map(CommunityTag::getTagId)
+                .collect(Collectors.toSet());
+    }
+
+
 
     @Transactional
     @Override

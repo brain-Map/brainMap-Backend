@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -41,5 +42,12 @@ public class CommunityTagController {
     public ResponseEntity<Void> deleteTag(@PathVariable UUID id){
         communityTagService.deleteTag(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(path = "/test")
+    public ResponseEntity<Set<UUID>> createTagsForPost(@RequestBody CreateCommunityTagRequest createCommunityTagRequest){
+        Set<UUID> savedTags = communityTagService.createTagsForPost(createCommunityTagRequest.getNames());
+
+        return new ResponseEntity<>(savedTags, HttpStatus.CREATED);
     }
 }

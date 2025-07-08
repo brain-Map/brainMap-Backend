@@ -10,6 +10,7 @@ public interface CommunityTagService {
 
     List<CommunityTag> getTags();
     List<CommunityTag> createTags(Set<String> tagNames);
+    Set<UUID> createTagsForPost(Set<String> tagNames);
     void deleteTag(UUID id);
     CommunityTag getTagById(UUID id);
     List<CommunityTag> getTagsByIds(Set<UUID> ids);
