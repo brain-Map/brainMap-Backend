@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
+import java.util.UUID;
 
 @Component
 public class JwtAuthenticationProvider implements AuthenticationProvider {
@@ -27,7 +28,8 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
             Algorithm algorithm = Algorithm.HMAC256(jwtSecret);
             DecodedJWT decodedJWT = JWT.require(algorithm).build().verify(token);
 
-            String userId = decodedJWT.getSubject();
+            String  subject = decodedJWT.getSubject();
+            UUID userId = UUID.fromString(subject);
             String email = decodedJWT.getClaim("email").asString();
 
             JwtUserDetails userDetails = new JwtUserDetails(userId, email);
