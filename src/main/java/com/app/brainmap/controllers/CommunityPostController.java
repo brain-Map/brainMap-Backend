@@ -46,7 +46,6 @@ public class CommunityPostController {
 
     @PostMapping
     public ResponseEntity<CommunityPostDto> createPost(@RequestBody CreateCommunityPostRequestDto requestDto) {
-        log.info(requestDto.toString());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails userDetails = (authentication != null && authentication.getPrincipal() != null)
                 ? authentication.getPrincipal() instanceof JwtUserDetails
@@ -57,7 +56,6 @@ public class CommunityPostController {
         UUID userId = userDetails.getUserId();
         User user = userService.getUserById(userId);
         CreateCommunityPostRequest createCommunityPostRequest = communityPostMapper.toCreateCommunityPostRequest(requestDto, communityTagService);
-        log.info("Creating post with title: {}", createCommunityPostRequest);
         CommunityPost createdPost = communityPostService.createPost(user, createCommunityPostRequest);
         CommunityPostDto createdPostDto = communityPostMapper.toDto(createdPost);
 
