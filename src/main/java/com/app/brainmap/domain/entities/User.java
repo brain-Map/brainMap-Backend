@@ -1,13 +1,11 @@
 package com.app.brainmap.domain.entities;
 
+import com.app.brainmap.domain.UserRoleType;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -19,7 +17,6 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
@@ -37,6 +34,13 @@ public class User {
 
     @Column(name = "mobile_number", nullable = true)
     private String mobileNumber;
+
+    @Column
+    private Date birthDate;
+
+    @Column(name = "user_role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserRoleType userRole;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
