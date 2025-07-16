@@ -1,7 +1,6 @@
 package com.app.brainmap.services;
 
 import com.app.brainmap.domain.CreateUser;
-import com.app.brainmap.domain.dto.CreateUserDto;
 import com.app.brainmap.domain.entities.User;
 
 import java.util.UUID;

@@ -29,19 +29,19 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDto> createUser(@RequestBody CreateUserDto createUserDto) {
-        log.info("Creating user: {}", createUserDto);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserDetails userDetails = (authentication != null && authentication.getPrincipal() != null)
-                ? authentication.getPrincipal() instanceof JwtUserDetails
-                ? (JwtUserDetails) authentication.getPrincipal()
-                : null
-                : null;
+        JwtUserDetails userDetails = null;
+        if (authentication != null && authentication.getPrincipal() instanceof JwtUserDetails) {
+            userDetails = (JwtUserDetails) authentication.getPrincipal();
+        }
 
         UUID userId = userDetails.getUserId();
+        String email = userDetails.getEmail();
         CreateUser createUserRequest = userMapper.toCreateUser(createUserDto);
         User createdUser = userService.createUser(createUserRequest, userId);
+
         UserDto createdUserDto = userMapper.toDto(createdUser);
-//
+
         return new ResponseEntity<>(createdUserDto, HttpStatus.CREATED);
 
     }
