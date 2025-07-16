@@ -1,5 +1,6 @@
 package com.app.brainmap.domain.entities;
 
+import com.app.brainmap.domain.ProjectPriority;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,6 +31,13 @@ public class Project {
 
     private String status;
     private LocalDateTime createdAt;
+
+    @Column(name= "due_date", nullable = true, updatable = true)
+    private LocalDateTime dueDate;
+
+    @Column(name = "priority", nullable = true, updatable = true)
+    private ProjectPriority priority;
+
 
     @PrePersist
     public void prePersist() {
