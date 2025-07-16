@@ -7,11 +7,10 @@ import java.util.UUID;
 
 public record ProjectDto(
         UUID id,
-        LocalDateTime created_at,
         String description,
         String status,
         String title,
-        LocalDateTime due_date,
+        LocalDateTime dueDate,
         String priority
 ) {
 }

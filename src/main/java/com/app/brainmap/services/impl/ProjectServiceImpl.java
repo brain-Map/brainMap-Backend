@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -24,7 +26,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project createProject(Project project) {
-        if(null != project.getProjectId()){
+        if(null != project.getId()){
             throw new IllegalArgumentException("Project Id must be null");
         }
 
@@ -45,5 +47,28 @@ public class ProjectServiceImpl implements ProjectService {
 
         ));
 
+    }
+
+    @Override
+    public Project updateProject(UUID id, Project project) {
+
+        if(project.getId() == null){
+            throw new IllegalArgumentException("Project must have and id");
+        }
+
+        if(!Objects.equals(project.getId(), id)){
+            throw new IllegalArgumentException("Attempting to change project ID, this is not permitted!");
+        }
+
+        Project existingProject =  projectRepositiory.findById(id).orElseThrow(()->
+                new IllegalArgumentException("project not found"));
+
+        existingProject.setTitle(project.getTitle());
+        existingProject.setDescription(project.getDescription());
+        existingProject.setCreatedAt(LocalDateTime.now());
+        existingProject.setPriority(project.getPriority());
+        existingProject.setStatus(project.getStatus());
+        existingProject.setDueDate(project.getDueDate());
+        return projectRepositiory.save(existingProject);
     }
 }
