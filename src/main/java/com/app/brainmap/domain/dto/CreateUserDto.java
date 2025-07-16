@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -29,4 +29,5 @@ public class CreateUserDto {
     private String mobileNumber;
     private String userRole;
     private Date birthDate;
+    private Set<SocialLinkDto> socialLinks;
 }
