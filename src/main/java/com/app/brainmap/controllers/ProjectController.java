@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -38,6 +39,13 @@ public class ProjectController {
         );
         return projectMapper.toDto(createProject);
     }
+
+    @GetMapping("/{project_id}")
+    public Optional<ProjectDto> getProject(@PathVariable("project_id") UUID projectId) {
+        return projectService.getProject(projectId).map(projectMapper::toDto);
+
+    }
+
 
     @PutMapping(path="/{project_id}")
     public ProjectDto updateProject(
