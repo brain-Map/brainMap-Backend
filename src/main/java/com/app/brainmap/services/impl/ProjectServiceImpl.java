@@ -6,6 +6,7 @@ import com.app.brainmap.services.ProjectService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -16,6 +17,10 @@ public class ProjectServiceImpl implements ProjectService {
         this.projectRepositiory = projectRepositiory;
     }
 
+    @Override
+    public List<Project> listProject() {
+        return projectRepositiory.findAll();
+    }
 
     @Override
     public Project createProject(Project project) {
@@ -23,7 +28,7 @@ public class ProjectServiceImpl implements ProjectService {
             throw new IllegalArgumentException("Project Id must be null");
         }
 
-        if(null == project.getTitle() || project.getTitle().isBlank()){
+//        if(null == project.getTitle() || project.getTitle().isBlank()){
 //            throw new IllegalArgumentException("Project title must not be null or empty");
 //        }
 
