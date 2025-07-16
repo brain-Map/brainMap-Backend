@@ -10,5 +10,7 @@ public interface ProjectService {
     List<Project> listProject();
     Project createProject(Project project);
     Project updateProject(UUID projectId, Project project);
+    void deleteProject(UUID projectId);
+
 
 }

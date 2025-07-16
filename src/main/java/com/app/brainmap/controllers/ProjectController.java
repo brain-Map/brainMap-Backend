@@ -54,4 +54,10 @@ public class ProjectController {
         return projectMapper.toDto(updateProject);
 
     }
+
+    @DeleteMapping(path="/{project_id}")
+    public void deleteProject(@PathVariable("project_id") UUID id){
+//        log.info("Deleting project with id: {}", id);
+        projectService.deleteProject(id);
+    }
 }

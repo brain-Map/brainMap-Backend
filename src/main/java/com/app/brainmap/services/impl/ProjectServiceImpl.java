@@ -71,4 +71,9 @@ public class ProjectServiceImpl implements ProjectService {
         existingProject.setDueDate(project.getDueDate());
         return projectRepositiory.save(existingProject);
     }
+
+    @Override
+    public void deleteProject(UUID projectId) {
+        projectRepositiory.deleteById(projectId);
+    }
 }
