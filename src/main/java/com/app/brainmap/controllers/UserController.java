@@ -37,7 +37,7 @@ public class UserController {
 
         UUID userId = userDetails.getUserId();
         String email = userDetails.getEmail();
-        CreateUser createUserRequest = userMapper.toCreateUser(createUserDto, userService);
+        CreateUser createUserRequest = userMapper.toCreateUser(createUserDto);
         User createdUser = userService.createUser(createUserRequest, userId);
 
         UserDto createdUserDto = userMapper.toDto(createdUser);
