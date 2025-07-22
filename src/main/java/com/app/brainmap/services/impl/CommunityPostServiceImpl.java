@@ -22,8 +22,19 @@ public class CommunityPostServiceImpl implements CommunityPostService {
     private final CommunityPostRepository communityPostRepository;
 
     @Override
+    public List<CommunityPost> getAllPosts() {
+        return communityPostRepository.findAll();
+    }
+
+    @Override
+    public CommunityPost getPostById(UUID id) {
+        return communityPostRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Post not found with id: " + id));
+    }
+
+    @Override
     @Transactional
-    public List<CommunityPost> getAllPosts(UUID tagId) {
+    public List<CommunityPost> getAllPostsByTag(UUID tagId) {
         CommunityTag tag = communityTagService.getTagById(tagId);
 
         return communityPostRepository.findAllByTags(tag);
@@ -44,5 +55,38 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         newPost.setTags(new HashSet<>(tags));
 
         return communityPostRepository.save(newPost);
+    }
+
+    @Override
+    public Void deletePostById(UUID postId, UUID userId) throws IllegalArgumentException {
+        CommunityPost post = communityPostRepository.findById(postId)
+                .orElseThrow(() -> new NoSuchElementException("Post not found with id: " + postId));
+
+        if (!post.getAuthor().getId().equals(userId)) {
+            throw new IllegalArgumentException("You are not authorized to delete this post");
+        }
+
+        communityPostRepository.delete(post);
+        return null;
+    }
+
+    @Override
+    public CommunityPost updatePostById(UUID postId, UUID userId, CreateCommunityPostRequest request) {
+        CommunityPost post = communityPostRepository.findById(postId)
+                .orElseThrow(() -> new NoSuchElementException("Post not found with id: " + postId));
+
+        if (!post.getAuthor().getId().equals(userId)) {
+            throw new IllegalArgumentException("You are not authorized to update this post");
+        }
+
+        post.setTitle(request.getTitle());
+        post.setContent(request.getContent());
+        post.setType(request.getType());
+
+        Set<UUID> tagIds = request.getTagsIds();
+        List<CommunityTag> tags = communityTagService.getTagsByIds(tagIds);
+        post.setTags(new HashSet<>(tags));
+
+        return communityPostRepository.save(post);
     }
 }
