@@ -14,6 +14,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path = "/project-member/projects")
 @Slf4j
+@CrossOrigin(origins = "http://localhost:3000")
 public class ProjectController {
     private final ProjectService projectService;
     private final ProjectMapper projectMapper;

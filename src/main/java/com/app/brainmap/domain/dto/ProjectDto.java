@@ -8,6 +8,7 @@ import java.util.UUID;
 public record ProjectDto(
         UUID id,
         String description,
+        String createdAt,
         String status,
         String title,
         LocalDateTime dueDate,
