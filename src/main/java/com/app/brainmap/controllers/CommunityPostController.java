@@ -10,7 +10,6 @@ import com.app.brainmap.security.JwtUserDetails;
 import com.app.brainmap.services.CommunityPostService;
 import com.app.brainmap.services.CommunityTagService;
 import com.app.brainmap.services.UserService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -34,10 +33,24 @@ public class CommunityPostController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<CommunityPostDto>> getAllPosts(
+    public ResponseEntity<List<CommunityPostDto>> getAllPosts() {
+        List<CommunityPost> posts = communityPostService.getAllPosts();
+        List<CommunityPostDto> postDtos = posts.stream().map(communityPostMapper::toDto).toList();
+
+        return ResponseEntity.ok(postDtos);
+    }
+
+    @GetMapping(path = "/{postId}")
+    public ResponseEntity<CommunityPostDto> getPostById(@PathVariable UUID postId) {
+        CommunityPost post = communityPostService.getPostById(postId);
+        CommunityPostDto postDto = communityPostMapper.toDto(post);
+        return ResponseEntity.ok(postDto);
+    }
+    @GetMapping(path = "/tags")
+    public ResponseEntity<List<CommunityPostDto>> getAllPostsByTag(
             @RequestParam(required = false) UUID tagId
     ) {
-        List<CommunityPost> posts = communityPostService.getAllPosts(tagId);
+        List<CommunityPost> posts = communityPostService.getAllPostsByTag(tagId);
         List<CommunityPostDto> postDtos = posts.stream().map(communityPostMapper::toDto).toList();
 
         return ResponseEntity.ok(postDtos);
@@ -54,12 +67,54 @@ public class CommunityPostController {
                 : null;
 
         UUID userId = userDetails.getUserId();
+        log.info("UserId Create post: {}", userId);
         User user = userService.getUserById(userId);
+        log.info("User details: {}", user);
         CreateCommunityPostRequest createCommunityPostRequest = communityPostMapper.toCreateCommunityPostRequest(requestDto, communityTagService);
         CommunityPost createdPost = communityPostService.createPost(user, createCommunityPostRequest);
         CommunityPostDto createdPostDto = communityPostMapper.toDto(createdPost);
 
         return new ResponseEntity<>(createdPostDto, HttpStatus.CREATED);
 
+    }
+
+    @DeleteMapping(path = "/{postId}")
+    public ResponseEntity<Void> deletePostById(@PathVariable UUID postId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails userDetails = (authentication != null && authentication.getPrincipal() != null)
+                ? authentication.getPrincipal() instanceof JwtUserDetails
+                ? (JwtUserDetails) authentication.getPrincipal()
+                : null
+                : null;
+
+        UUID userId = userDetails.getUserId();
+        log.info("UserId: {}", userId);
+
+        communityPostService.deletePostById(postId, userId);
+
+        return ResponseEntity.noContent().build();
+    }
+    @PutMapping(path = "/{postId}")
+    public ResponseEntity<CommunityPostDto> updatePostById(
+            @PathVariable UUID postId,
+            @RequestBody CreateCommunityPostRequestDto requestDto
+    ) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails userDetails = (authentication != null && authentication.getPrincipal() != null)
+                ? authentication.getPrincipal() instanceof JwtUserDetails
+                ? (JwtUserDetails) authentication.getPrincipal()
+                : null
+                : null;
+
+        UUID userId = userDetails.getUserId();
+        log.info("UserId Update post: {}", userId);
+        User user = userService.getUserById(userId);
+        log.info("User details: {}", user);
+
+        CreateCommunityPostRequest createCommunityPostRequest = communityPostMapper.toCreateCommunityPostRequest(requestDto, communityTagService);
+        CommunityPost updatedPost = communityPostService.updatePostById(postId, userId, createCommunityPostRequest);
+        CommunityPostDto updatedPostDto = communityPostMapper.toDto(updatedPost);
+
+        return ResponseEntity.ok(updatedPostDto);
     }
 }

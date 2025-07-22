@@ -13,5 +13,5 @@ import java.util.UUID;
 @Builder
 public class CommunityPostAuthorDto {
     private UUID id;
-    private String name;
+    private String username;
 }
