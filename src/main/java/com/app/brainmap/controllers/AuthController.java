@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping(path = "/api/v1/auth")
 public class AuthController {
@@ -25,6 +27,14 @@ public class AuthController {
 
     @GetMapping("/test")
     public ResponseEntity<String> testEndpoint() {
-        return ResponseEntity.ok("Test endpoint is working!");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails userDetails = (authentication != null && authentication.getPrincipal() != null)
+                ? authentication.getPrincipal() instanceof JwtUserDetails
+                ? (JwtUserDetails) authentication.getPrincipal()
+                : null
+                : null;
+
+        UUID userId = userDetails.getUserId();
+        return ResponseEntity.ok("Test endpoint is working! and userId: " + userId);
     }
 }

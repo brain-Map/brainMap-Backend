@@ -15,7 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class CommunityPostDto {
-    private UUID id;
+    private UUID communityPostId;
     private String title;
     private String content;
     private Set<CommunityTagResponse> tags;

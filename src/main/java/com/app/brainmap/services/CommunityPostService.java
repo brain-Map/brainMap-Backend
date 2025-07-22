@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CommunityPostService {
-    List<CommunityPost> getAllPosts(UUID tagId);
+    List<CommunityPost> getAllPosts();
+    CommunityPost getPostById(UUID id);
+    List<CommunityPost> getAllPostsByTag(UUID tagId);
     CommunityPost createPost(User user, CreateCommunityPostRequest request);
+    Void deletePostById(UUID postId, UUID userId ) throws IllegalArgumentException;
+    CommunityPost updatePostById(UUID postId, UUID userId, CreateCommunityPostRequest request);
 }
