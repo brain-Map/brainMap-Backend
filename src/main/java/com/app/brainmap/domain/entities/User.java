@@ -45,6 +45,8 @@ public class User {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+
+
 //    Make it easy to get user posts using user.getPosts();
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommunityPost> posts = new ArrayList<>();
@@ -58,8 +60,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSocialLink> socialLinks = new ArrayList<>();
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, optional = true)
-    private DomainExperts domainExpert;
 
     @Override
     public boolean equals(Object o) {
@@ -78,4 +78,7 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
+    public void setSocialLinks(List<UserSocialLink> socialLinks) {
+
+    }
 }

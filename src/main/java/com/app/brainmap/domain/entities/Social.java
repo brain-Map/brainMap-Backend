@@ -4,28 +4,29 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "services")
+@Table(name = "socials")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder
-public class Service {
+public class Social {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "service_id", updatable = false, nullable = false)
-    private UUID serviceId;
+    @Column(name = "social_id", updatable = false, nullable = false)
+    private UUID socialId;
 
-    @Column(name = "title",columnDefinition = "TEXT",  nullable = false)
-    private String title;
+    @Column(name = "platform")
+    private String platform;
 
-    @Column(name = "description", nullable = false, columnDefinition = "TEXT")
-    private String description;
+    @Column(name = "link")
+    private String link;
 
 
     @ManyToOne

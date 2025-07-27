@@ -28,7 +28,7 @@ public class Project {
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
-    private User owner;
+    private User user;
 
     private String status;
     private LocalDateTime createdAt;
