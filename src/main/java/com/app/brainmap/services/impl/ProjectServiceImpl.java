@@ -40,10 +40,10 @@ public class ProjectServiceImpl implements ProjectService {
                 null,
                 project.getTitle(),
                 project.getDescription(),
-                null,
+                project.getUser(),
                 "active",
                 now,
-                now,
+                project.getDueDate(),
                 project.getPriority()
 
         ));

@@ -4,6 +4,7 @@ import com.app.brainmap.domain.ProjectPriority;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -34,14 +35,15 @@ public class Project {
     private LocalDateTime createdAt;
 
     @Column(name= "due_date", nullable = true, updatable = true)
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
 
     @Column(name = "priority", nullable = true, updatable = true)
     private ProjectPriority priority;
-
 
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
     }
+
+
 }
