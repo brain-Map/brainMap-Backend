@@ -1,6 +1,5 @@
 package com.app.brainmap.services.impl;
 
-import com.app.brainmap.domain.CommunityPostType;
 import com.app.brainmap.domain.CreateCommunityPostRequest;
 import com.app.brainmap.domain.entities.CommunityPost;
 import com.app.brainmap.domain.entities.CommunityTag;

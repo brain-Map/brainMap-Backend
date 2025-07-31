@@ -8,30 +8,29 @@ import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "services")
+@Table(name = "properties")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder
-public class Service {
+public class Property {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "service_id", updatable = false, nullable = false)
-    private UUID serviceId;
+    @Column(name = "property_id", updatable = false, nullable = false)
+    private UUID propertyId;
 
-    @Column(name = "title",columnDefinition = "TEXT",  nullable = false)
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT", nullable = false)
     private String description;
 
 
     @ManyToOne
-    @JoinColumn(name = "expert_id", nullable = false)
-    private User expert;
-
+    @JoinColumn(name = "project_id", nullable = false)
+    private Project project;
 
 
 }

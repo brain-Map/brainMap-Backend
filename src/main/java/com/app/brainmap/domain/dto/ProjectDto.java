@@ -1,17 +1,19 @@
 package com.app.brainmap.domain.dto;
 
+import com.app.brainmap.domain.entities.User;
 import org.w3c.dom.Text;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 public record ProjectDto(
         UUID id,
         String description,
-        String createdAt,
-        String status,
+        UUID ownerId,
+        String userName,
         String title,
-        LocalDateTime dueDate,
+        LocalDate dueDate,
         String priority
+
 ) {
 }
