@@ -45,6 +45,14 @@ public class UserController {
         return new ResponseEntity<>(createdUserDto, HttpStatus.CREATED);
 
     }
+    @GetMapping("/search")
+    public ResponseEntity<UserDto> searchUser(@RequestParam UUID id) {
+        User user = userService.getUserById(id);
+        UserDto userDto = userMapper.toDto(user);
+        log.info("User found: {}", userDto);
+        return ResponseEntity.ok(userDto);
+    }
+
     @GetMapping("/test")
     public ResponseEntity<String> testEndpoint() {
         return ResponseEntity.ok("Users Test endpoint is working!");
