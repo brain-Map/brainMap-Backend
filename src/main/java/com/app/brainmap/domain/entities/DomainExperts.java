@@ -26,14 +26,10 @@ public class DomainExperts {
     @Column(name = "domain", nullable = false, updatable = true)
     private String domain;
 
-    @Column(name = "location", nullable = false, updatable = true)
-    private String location;
 
     @Column(name = "rating", nullable = false, updatable = true)
     private String rating;
 
-    @Column(name = "about", nullable = true, updatable = true)
-    private String about;
 
     @OneToOne
     @JoinColumn(name = "wallet_id", nullable = false, updatable = true)
