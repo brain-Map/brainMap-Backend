@@ -66,7 +66,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
             throw new IllegalArgumentException("You are not authorized to delete this post");
         }
 
-        communityPostRepository.delete(post);
+        communityPostRepository.deleteById(postId);
         return null;
     }
 
