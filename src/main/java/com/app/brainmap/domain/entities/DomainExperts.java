@@ -36,19 +36,9 @@ public class DomainExperts {
     private String about;
 
     @OneToOne
-    @MapsId  // This tells JPA that this entity uses the same ID as the user
-    @JoinColumn(name = "id") // FK and PK
-    private User user;
+    @JoinColumn(name = "wallet_id", nullable = false, updatable = true)
+    private Wallet wallet;
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        DomainExperts that = (DomainExperts) o;
-        return Objects.equals(id, that.id) && Objects.equals(status, that.status) && Objects.equals(domain, that.domain) && Objects.equals(location, that.location) && Objects.equals(rating, that.rating) && Objects.equals(about, that.about) && Objects.equals(user, that.user);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, status, domain, location, rating, about, user);
-    }
+
 }
