@@ -35,6 +35,18 @@ public class User {
     @Column(name = "mobile_number", nullable = true)
     private String mobileNumber;
 
+    @Column(name = "address", columnDefinition = "varchar(255) default 'Add your address'")
+    private String address;
+
+    @Column(name = "work_place", columnDefinition = "varchar(255) default 'Add your work place'")
+    private String workPlace;
+
+    @Column(name = "about" , columnDefinition = "text")
+    private String about;
+
+    @Column(name = "location", nullable = false, updatable = true)
+    private String location;
+
     @Column
     private Date birthDate;
 

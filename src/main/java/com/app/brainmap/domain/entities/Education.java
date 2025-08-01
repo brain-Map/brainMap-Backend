@@ -38,8 +38,8 @@ public class Education {
     private String status;
 
     @ManyToOne
-    @JoinColumn(name = "expert_id")
-    private User expert;
+    @JoinColumn(name = "mentor_id")
+    private User mentor;
 
 
 }
