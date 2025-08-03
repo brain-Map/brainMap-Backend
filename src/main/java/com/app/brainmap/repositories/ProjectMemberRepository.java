@@ -1,13 +1,12 @@
 package com.app.brainmap.repositories;
 
-import com.app.brainmap.domain.entities.User;
+
+import com.app.brainmap.domain.entities.ProjectMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, UUID> {
-//    Optional<User> findById(UUID id);
+public interface ProjectMemberRepository extends JpaRepository<ProjectMember, UUID> {
 }

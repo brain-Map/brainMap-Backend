@@ -35,6 +35,9 @@ public class User {
     @Column(name = "mobile_number", nullable = true)
     private String mobileNumber;
 
+    @Column(name = "work_place", columnDefinition = "varchar(255) default 'Add your work place'")
+    private String workPlace;
+
     private Date dateOfBirth;
 
     @Column(name = "user_role", nullable = false)
