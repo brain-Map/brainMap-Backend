@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -24,19 +25,30 @@ public class Notes {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "note", columnDefinition = "TEXT", nullable = false)
-    private String note;
+    @Column(name = "description", columnDefinition = "TEXT", nullable = false)
+    private String description;
 
     @Column(name = "created_date", nullable = false, updatable = false)
-    private LocalDate createdDate;
+    private LocalDateTime createdAt;
 
     @Column(name = "created_time", nullable = false, updatable = false)
-    private LocalTime createdTime;
+    private LocalDateTime updatedAt;
 
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @PrePersist
+    protected void prePersist() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate(){
+        this.updatedAt = LocalDateTime.now();
+    }
 
 }

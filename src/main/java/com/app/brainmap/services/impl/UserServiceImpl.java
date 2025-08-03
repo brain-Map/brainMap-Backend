@@ -1,13 +1,17 @@
 package com.app.brainmap.services.impl;
 
 import com.app.brainmap.domain.CreateUser;
+import com.app.brainmap.domain.UserRoleType;
+import com.app.brainmap.domain.entities.DomainExperts;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.domain.entities.UserSocialLink;
+import com.app.brainmap.repositories.DomainExpertRepository;
 import com.app.brainmap.repositories.UserRepository;
 import com.app.brainmap.repositories.UserSocialLinkRepository;
 import com.app.brainmap.services.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,10 +21,12 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserSocialLinkRepository userSocialLinkRepository;
+    private final DomainExpertRepository domainExpertRepository;
 
     @Override
     public User getUserById(UUID id) {
@@ -40,7 +46,11 @@ public class UserServiceImpl implements UserService {
         user.setEmail(request.getEmail());
         user.setUserRole(request.getUserRole());
         user.setMobileNumber(request.getMobileNumber());
-
+        user.setCity(request.getCity());
+        user.setBio(request.getBio());
+        user.setUserRole(request.getUserRole());
+        user.setGender(request.getGender());
+        user.setDateOfBirth(request.getDateOfBirth());
         user = userRepository.save(user);
 
         // Map and save social links
@@ -56,6 +66,15 @@ public class UserServiceImpl implements UserService {
 
             userSocialLinkRepository.saveAll(socialLinks);
             user.setSocialLinks(socialLinks);
+        }
+
+        if (user.getUserRole() == UserRoleType.MENTOR) {
+            DomainExperts domainExperts = new DomainExperts();
+            domainExperts.setUser(user);
+            domainExperts.setAvailability(request.getAvailability());
+            domainExperts.setExperience(request.getExperience());
+
+            domainExpertRepository.save(domainExperts);
         }
 
         return user;

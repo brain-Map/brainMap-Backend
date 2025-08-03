@@ -35,20 +35,10 @@ public class User {
     @Column(name = "mobile_number", nullable = true)
     private String mobileNumber;
 
-    @Column(name = "address", columnDefinition = "varchar(255) default 'Add your address'")
-    private String address;
-
     @Column(name = "work_place", columnDefinition = "varchar(255) default 'Add your work place'")
     private String workPlace;
 
-    @Column(name = "about" , columnDefinition = "text")
-    private String about;
-
-    @Column(name = "location" , columnDefinition = "varchar(255) default 'Add your location'")
-    private String location;
-
-    @Column
-    private Date birthDate;
+    private Date dateOfBirth;
 
     @Column(name = "user_role", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -56,6 +46,10 @@ public class User {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    private String city;
+    private String gender;
+    private String bio;
 
 
 
@@ -90,7 +84,4 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
-    public void setSocialLinks(List<UserSocialLink> socialLinks) {
-
-    }
 }
