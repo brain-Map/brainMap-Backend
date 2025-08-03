@@ -17,9 +17,12 @@ import java.util.UUID;
 public class ProjectMember {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
-    private UUID Id;
+    private UUID id;
 
 
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id") // uses same column as primary key
+    private User user;
 }

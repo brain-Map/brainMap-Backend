@@ -29,8 +29,8 @@ public class Service {
 
 
     @ManyToOne
-    @JoinColumn(name = "expert_id", nullable = false)
-    private User expert;
+    @JoinColumn(name = "mentor_id", nullable = false)
+    private User mentor;
 
 
 

@@ -35,6 +35,9 @@ public class User {
     @Column(name = "mobile_number")
     private String mobileNumber;
 
+    @Column(name = "work_place", columnDefinition = "varchar(255) default 'Add your work place'")
+    private String workPlace;
+
     private Date dateOfBirth;
 
     @Column(name = "user_role", nullable = false)
@@ -43,6 +46,9 @@ public class User {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "address", nullable = true, columnDefinition = "TEXT")
+    private String address;
 
     private String city;
     private String gender;

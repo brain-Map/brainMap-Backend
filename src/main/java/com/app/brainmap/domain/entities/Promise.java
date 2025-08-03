@@ -39,8 +39,8 @@ public class Promise {
     private User member;
 
     @ManyToOne
-    @JoinColumn(name = "expert_id", nullable = false)
-    private User expert;
+    @JoinColumn(name = "mentor_id", nullable = false)
+    private User mentor;
 
     @ManyToOne
     @JoinColumn(name = "transaction_id", nullable = false)

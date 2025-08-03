@@ -30,7 +30,6 @@ public class DomainExperts {
     private String experience;
     private String availability;
 
-
     @OneToOne
     @JoinColumn(name = "wallet_id", nullable = true)
     private Wallet wallet;
