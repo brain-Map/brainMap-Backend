@@ -35,8 +35,8 @@ public class UserController {
             userDetails = (JwtUserDetails) authentication.getPrincipal();
         }
 
+
         UUID userId = userDetails.getUserId();
-        String email = userDetails.getEmail();
         CreateUser createUserRequest = userMapper.toCreateUser(createUserDto);
         User createdUser = userService.createUser(createUserRequest, userId);
 
