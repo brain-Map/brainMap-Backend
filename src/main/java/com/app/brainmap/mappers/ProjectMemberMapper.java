@@ -11,9 +11,8 @@ import org.mapstruct.ReportingPolicy;
 public interface ProjectMemberMapper {
 
 
-//    @Mapping(source = "user.username", target = "userName")
     @Mapping(source = "user.id", target = "id")
-    @Mapping(source = "user.about", target = "about")
+    @Mapping(source = "user.bio", target = "about")
     @Mapping(source = "user.address", target = "address")
     @Mapping(source = "user.firstName", target = "firstName")
     @Mapping(source = "user.lastName", target = "lastName")
@@ -22,7 +21,6 @@ public interface ProjectMemberMapper {
     @Mapping(source = "user.username", target = "username")
     @Mapping(source = "user.userRole", target = "userRole")
     @Mapping(source = "user.workPlace", target = "workPlace")
-    @Mapping(source = "user.location", target = "location")
     ProjectMemberDto toDto(ProjectMember projectMember);
 
     ProjectMember toEntity(ProjectMemberDto dto);
