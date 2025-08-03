@@ -35,8 +35,7 @@ public class User {
     @Column(name = "mobile_number", nullable = true)
     private String mobileNumber;
 
-    @Column
-    private Date birthDate;
+    private Date dateOfBirth;
 
     @Column(name = "user_role", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -44,6 +43,10 @@ public class User {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    private String city;
+    private String gender;
+    private String bio;
 
 
 
@@ -78,7 +81,4 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
-    public void setSocialLinks(List<UserSocialLink> socialLinks) {
-
-    }
 }
