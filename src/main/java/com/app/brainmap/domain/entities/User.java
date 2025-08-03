@@ -44,7 +44,7 @@ public class User {
     @Column(name = "about" , columnDefinition = "text")
     private String about;
 
-    @Column(name = "location", nullable = false, updatable = true)
+    @Column(name = "location" , columnDefinition = "varchar(255) default 'Add your location'")
     private String location;
 
     @Column
