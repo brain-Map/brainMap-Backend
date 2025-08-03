@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -27,17 +28,32 @@ public class Review {
     @Column(name = "review", nullable = false)
     private String review;
 
-    @Column(name = "created_date", nullable = false, updatable = false)
-    private LocalDate createdDate;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-    @Column(name = "created_time", nullable = false, updatable = false)
-    private LocalTime createdTime;
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
 
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
     private User member;
 
+    @ManyToOne
+    @JoinColumn(name = "expert_id", nullable = false)
+    private User expert;
+
+    @PrePersist
+    protected void prePersist() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate(){
+        this.updatedAt = LocalDateTime.now();
+    }
 
 
 }
