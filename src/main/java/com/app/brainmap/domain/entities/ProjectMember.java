@@ -20,8 +20,6 @@ public class ProjectMember {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    @Column(name = "interset_field")
-    private String intersetField;
 
     @OneToOne
     @MapsId
