@@ -1,5 +1,6 @@
 package com.app.brainmap.domain.dto;
 
+import com.app.brainmap.domain.UserRoleType;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,8 +27,16 @@ public class CreateUserDto {
     @NotBlank(message = "Email cannot be empty")
     private String email;
 
-    private String mobileNumber;
+    @NotBlank(message = "User Role cannot be empty")
     private String userRole;
-    private Date birthDate;
+
+    private String mobileNumber;
+    private Date dateOfBirth;
     private Set<SocialLinkDto> socialLinks;
+    private String city;
+    private String availability;
+    private String experience;
+    private String gender;
+    private String qualification;
+    private String bio;
 }
