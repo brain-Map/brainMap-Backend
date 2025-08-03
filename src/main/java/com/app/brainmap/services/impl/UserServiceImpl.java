@@ -1,6 +1,7 @@
 package com.app.brainmap.services.impl;
 
 import com.app.brainmap.domain.CreateUser;
+import com.app.brainmap.domain.UpdateUser;
 import com.app.brainmap.domain.UserRoleType;
 import com.app.brainmap.domain.entities.DomainExperts;
 import com.app.brainmap.domain.entities.User;
@@ -14,10 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -37,25 +35,39 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User createUser(CreateUser request, UUID userId) {
+    public User createUser(CreateUser request) {
         User user = new User();
-        user.setId(userId);
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
+        user.setId(request.getUserId());
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setUserRole(request.getUserRole());
-        user.setMobileNumber(request.getMobileNumber());
-        user.setCity(request.getCity());
+        user = userRepository.save(user);
+        return user;
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    @Transactional
+    public User updateUser(UUID id, UpdateUser request) {
+        User user = getUserById(id);
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
         user.setBio(request.getBio());
-        user.setUserRole(request.getUserRole());
-        user.setGender(request.getGender());
+        user.setMobileNumber(request.getMobileNumber());
         user.setDateOfBirth(request.getDateOfBirth());
+        user.setCity(request.getCity());
+        user.setGender(request.getGender());
+
         user = userRepository.save(user);
 
         // Map and save social links
         if (request.getSocialLinks() != null && !request.getSocialLinks().isEmpty()) {
             User finalUser = user;
+            List<UserSocialLink> existingLinks = userSocialLinkRepository.findAllByUserId(finalUser.getId());
             List<UserSocialLink> socialLinks = request.getSocialLinks().stream()
                     .map(linkDto -> UserSocialLink.builder()
                             .platform(linkDto.getPlatform())
@@ -64,8 +76,20 @@ public class UserServiceImpl implements UserService {
                             .build())
                     .toList();
 
-            userSocialLinkRepository.saveAll(socialLinks);
-            user.setSocialLinks(socialLinks);
+            List<UserSocialLink> savedList = userSocialLinkRepository.saveAll(socialLinks);
+            // Remove existing links that are not in the new list
+            existingLinks.forEach(existingLink -> {
+                if (savedList.stream().noneMatch(newLink -> newLink.getId().equals(existingLink.getId()))) {
+                    userSocialLinkRepository.delete(existingLink);
+                }
+            });
+            // Set the updated social links to the user
+            if (user.getSocialLinks() != null) {
+                user.getSocialLinks().clear();
+                user.getSocialLinks().addAll(socialLinks);
+            } else {
+                user.setSocialLinks(new ArrayList<>(socialLinks));
+            }
         }
 
         if (user.getUserRole() == UserRoleType.MENTOR) {
@@ -79,11 +103,6 @@ public class UserServiceImpl implements UserService {
 
         return user;
 
-    }
-
-    @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
     }
 
 
