@@ -1,8 +1,10 @@
 package com.app.brainmap.mappers;
 
 import com.app.brainmap.domain.CreateUser;
+import com.app.brainmap.domain.UpdateUser;
 import com.app.brainmap.domain.UserRoleType;
 import com.app.brainmap.domain.dto.CreateUserDto;
+import com.app.brainmap.domain.dto.UpdateUserDto;
 import com.app.brainmap.domain.dto.UserDto;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.services.UserService;
@@ -15,8 +17,11 @@ public interface UserMapper {
     UserDto toDto(User user);
 
     @Mapping(target = "userRole", source = "userRole", qualifiedByName = "stringToUserRoleType")
-    @Mapping(target = "socialLinks", source = "socialLinks")
+    @Mapping(target = "userId", expression = "java(java.util.UUID.fromString(dto.getUserId()))")
     CreateUser toCreateUser(CreateUserDto dto);
+
+    @Mapping(target = "socialLinks", source = "socialLinks")
+    UpdateUser toUpdateUser(UpdateUserDto dto);
 
     @Named("stringToUserRoleType")
     default UserRoleType stringToUserRoleType(String role) {
