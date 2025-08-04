@@ -20,19 +20,19 @@ public class User {
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @Column(name = "first_name", nullable = false)
+    @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "username", nullable = false, length = 20)
+    @Column(name = "username", length = 20)
     private String username;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", unique = true)
     private String email;
 
-    @Column(name = "mobile_number", nullable = true)
+    @Column(name = "mobile_number")
     private String mobileNumber;
 
     @Column(name = "work_place", columnDefinition = "varchar(255) default 'Add your work place'")
@@ -56,7 +56,7 @@ public class User {
 
 
 
-//    Make it easy to get user posts using user.getPosts();
+    //    Make it easy to get user posts using user.getPosts();
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommunityPost> posts = new ArrayList<>();
 

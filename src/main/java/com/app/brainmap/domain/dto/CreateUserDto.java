@@ -15,11 +15,6 @@ import java.util.*;
 @Builder
 public class CreateUserDto {
 
-    @NotBlank(message = "First name cannot be empty")
-    private String firstName;
-
-    @NotBlank(message = "Last name cannot be empty")
-    private String lastName;
 
     @NotBlank(message = "Username cannot be empty")
     private String username;
@@ -30,13 +25,6 @@ public class CreateUserDto {
     @NotBlank(message = "User Role cannot be empty")
     private String userRole;
 
-    private String mobileNumber;
-    private Date dateOfBirth;
-    private Set<SocialLinkDto> socialLinks;
-    private String city;
-    private String availability;
-    private String experience;
-    private String gender;
-    private String qualification;
-    private String bio;
+    @NotBlank(message = "UserId cannot be empty")
+    private String userId;
 }

@@ -2,7 +2,9 @@ package com.app.brainmap.controllers;
 
 
 import com.app.brainmap.domain.CreateUser;
+import com.app.brainmap.domain.UpdateUser;
 import com.app.brainmap.domain.dto.CreateUserDto;
+import com.app.brainmap.domain.dto.UpdateUserDto;
 import com.app.brainmap.domain.dto.UserDto;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.mappers.UserMapper;
@@ -29,6 +31,19 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDto> createUser(@RequestBody CreateUserDto createUserDto) {
+
+        log.info("Creating new user: {}", createUserDto);
+        CreateUser createUserRequest = userMapper.toCreateUser(createUserDto);
+        User createdUser = userService.createUser(createUserRequest);
+
+        UserDto createdUserDto = userMapper.toDto(createdUser);
+        log.info("Created new user: {}", createdUserDto);
+        return new ResponseEntity<>(createdUserDto, HttpStatus.CREATED);
+
+    }
+
+    @PutMapping
+    public ResponseEntity<UserDto> updateUser(@RequestBody UpdateUserDto updateUserDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails userDetails = null;
         if (authentication != null && authentication.getPrincipal() instanceof JwtUserDetails) {
@@ -37,8 +52,8 @@ public class UserController {
 
 
         UUID userId = userDetails.getUserId();
-        CreateUser createUserRequest = userMapper.toCreateUser(createUserDto);
-        User createdUser = userService.createUser(createUserRequest, userId);
+        UpdateUser updateUserRequest = userMapper.toUpdateUser(updateUserDto);
+        User createdUser = userService.updateUser(userId, updateUserRequest);
 
         UserDto createdUserDto = userMapper.toDto(createdUser);
 
