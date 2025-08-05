@@ -17,8 +17,12 @@ import java.util.UUID;
 public class ProjectMember {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
+
+
+
 
 
     @OneToOne

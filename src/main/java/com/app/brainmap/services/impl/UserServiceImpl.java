@@ -4,6 +4,7 @@ import com.app.brainmap.domain.CreateUser;
 import com.app.brainmap.domain.UpdateUser;
 import com.app.brainmap.domain.UserRoleType;
 import com.app.brainmap.domain.entities.DomainExperts;
+import com.app.brainmap.domain.entities.ProjectMember;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.domain.entities.UserSocialLink;
 import com.app.brainmap.repositories.DomainExpertRepository;
@@ -99,6 +100,11 @@ public class UserServiceImpl implements UserService {
             domainExperts.setExperience(request.getExperience());
 
             domainExpertRepository.save(domainExperts);
+        }
+
+        if (user.getUserRole() == UserRoleType.PROJECT_MEMBER) {
+            ProjectMember projectMember = new ProjectMember();
+            projectMember.setUser(user);
         }
 
         return user;
