@@ -16,10 +16,16 @@ import java.util.UUID;
 @Setter
 @Builder
 public class DomainExperts {
+
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id") // uses same column as primary key
+    private User user;
 
     @Column(name = "status", nullable = true)
     private Integer status;
@@ -34,9 +40,6 @@ public class DomainExperts {
     @JoinColumn(name = "wallet_id", nullable = true)
     private Wallet wallet;
 
-    @OneToOne
-    @JoinColumn(name = "mentor_id", nullable = false)
-    private User user;
 
 
 
