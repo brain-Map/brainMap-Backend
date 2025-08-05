@@ -8,6 +8,7 @@ import com.app.brainmap.domain.entities.ProjectMember;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.domain.entities.UserSocialLink;
 import com.app.brainmap.repositories.DomainExpertRepository;
+import com.app.brainmap.repositories.ProjectMemberRepository;
 import com.app.brainmap.repositories.UserRepository;
 import com.app.brainmap.repositories.UserSocialLinkRepository;
 import com.app.brainmap.services.UserService;
@@ -26,6 +27,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserSocialLinkRepository userSocialLinkRepository;
     private final DomainExpertRepository domainExpertRepository;
+    private final ProjectMemberRepository projectMemberRepository;
 
     @Override
     public User getUserById(UUID id) {
@@ -105,6 +107,7 @@ public class UserServiceImpl implements UserService {
         if (user.getUserRole() == UserRoleType.PROJECT_MEMBER) {
             ProjectMember projectMember = new ProjectMember();
             projectMember.setUser(user);
+            projectMemberRepository.save(projectMember);
         }
 
         return user;
