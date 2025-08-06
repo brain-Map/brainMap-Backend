@@ -34,4 +34,6 @@ public interface UserMapper {
             throw new IllegalArgumentException("Invalid user role: " + role);
         }
     }
+
+
 }

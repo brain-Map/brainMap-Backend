@@ -8,5 +8,6 @@ import java.util.UUID;
 public interface ProjectMemberService {
 
     Optional<ProjectMember> getProjectMember(UUID id);
+    ProjectMember updateAboutProjectMember(UUID id, String about);
 
 }
