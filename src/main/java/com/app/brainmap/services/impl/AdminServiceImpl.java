@@ -19,8 +19,8 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public AdminDashboardStatusDto getAdminDashboardStatus() {
         long userCount = userRepository.count();
-        long activeProjects = projectRepositiory.count();
-        long pendingDomainExperts = domainExpertRepository.count();
+        long activeProjects = projectRepositiory.countByStatus("active");
+        long pendingDomainExperts = domainExpertRepository.countByStatus(null);
 
         return AdminDashboardStatusDto.builder()
                 .userCount(userCount)
