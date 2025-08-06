@@ -1,5 +1,6 @@
 package com.app.brainmap.domain.entities;
 
+import com.app.brainmap.domain.InquiryStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,12 +28,17 @@ public class Inquiry {
     @Column(columnDefinition = "TEXT")
     private String message;
 
-    private String status;
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private InquiryStatus status;
 
     private LocalDateTime createdAt;
 
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
+        if(this.status == null) {
+            this.status = InquiryStatus.PENDING; // Default status
+        }
     }
 }

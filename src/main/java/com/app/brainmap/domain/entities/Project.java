@@ -1,5 +1,6 @@
 package com.app.brainmap.domain.entities;
 
+import com.app.brainmap.domain.ProjctStatus;
 import com.app.brainmap.domain.ProjectPriority;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,7 +32,10 @@ public class Project {
     @JoinColumn(name = "owner_id")
     private User user;
 
-    private String status;
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ProjctStatus status;
+
     private LocalDateTime createdAt;
 
     @Column(name= "due_date", nullable = true, updatable = true)
@@ -43,6 +47,9 @@ public class Project {
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
+        if (this.status == null){
+            this.status = ProjctStatus.ACTIVE;
+        }
     }
 
 

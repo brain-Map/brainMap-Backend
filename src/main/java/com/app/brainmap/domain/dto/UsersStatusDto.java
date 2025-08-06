@@ -1,6 +1,5 @@
 package com.app.brainmap.domain.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,9 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AdminDashboardStatusDto {
-    private long userCount;
-    private long activeProjects;
-    private long pendingDomainExperts;
-    private long openIsquiries;
+public class UsersStatusDto {
+    private Long totalUsers;
+    private Long members;
+    private Long domainExperts;
+    private Long activeUsers;
 }

@@ -41,7 +41,7 @@ public class ProjectServiceImpl implements ProjectService {
                 project.getTitle(),
                 project.getDescription(),
                 project.getUser(),
-                "active",
+                project.getStatus(),
                 now,
                 project.getDueDate(),
                 project.getPriority()
