@@ -45,6 +45,17 @@ public class UserServiceImpl implements UserService {
         user.setEmail(request.getEmail());
         user.setUserRole(request.getUserRole());
         user = userRepository.save(user);
+
+        if (user.getUserRole() == UserRoleType.MENTOR) {
+            DomainExperts domainExperts = new DomainExperts();
+            domainExperts.setUser(user);
+            domainExpertRepository.save(domainExperts);
+        }
+        if (user.getUserRole() == UserRoleType.PROJECT_MEMBER) {
+            ProjectMember projectMember = new ProjectMember();
+            projectMember.setUser(user);
+            projectMemberRepository.save(projectMember);
+        }
         return user;
     }
 
