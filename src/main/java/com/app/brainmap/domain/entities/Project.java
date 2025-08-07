@@ -32,7 +32,7 @@ public class Project {
     @JoinColumn(name = "owner_id")
     private User user;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private ProjctStatus status;
 
