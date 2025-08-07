@@ -38,8 +38,11 @@ public class Task {
 
 
     @ManyToOne
-    @JoinColumn(name = "project_id", nullable = false)
-    private Project project;
+    @JoinColumn(name = "kanban_id",
+            foreignKey = @ForeignKey(name = "fk_kanban_task",
+                    foreignKeyDefinition = "FOREIGN KEY (kanban_id) REFERENCES kanaban_boards(kanban_id) ON DELETE CASCADE"))
+    private KanbanBoard kanbanBoard;
+
 
 
 }

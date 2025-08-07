@@ -4,6 +4,7 @@ import com.app.brainmap.domain.entities.User;
 import org.w3c.dom.Text;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record ProjectDto(
@@ -13,6 +14,7 @@ public record ProjectDto(
         String userName,
         String title,
         LocalDate dueDate,
+        LocalDateTime createdAt,
         String priority
 
 ) {

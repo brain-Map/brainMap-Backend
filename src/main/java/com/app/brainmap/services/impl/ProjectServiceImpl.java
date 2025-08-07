@@ -1,8 +1,12 @@
 package com.app.brainmap.services.impl;
 
+import com.app.brainmap.domain.entities.KanbanBoard;
+import com.app.brainmap.domain.entities.KanbanColumn;
 import com.app.brainmap.domain.entities.Project;
+import com.app.brainmap.repositories.KanbanBoardRepository;
 import com.app.brainmap.repositories.ProjectRepositiory;
 import com.app.brainmap.services.ProjectService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,9 +19,11 @@ import java.util.UUID;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepositiory projectRepositiory;
+    private final KanbanBoardRepository kanbanBoardRepository;
 
-    public ProjectServiceImpl(ProjectRepositiory projectRepositiory) {
+    public ProjectServiceImpl(ProjectRepositiory projectRepositiory, KanbanBoardRepository kanbanBoardRepository) {
         this.projectRepositiory = projectRepositiory;
+        this.kanbanBoardRepository = kanbanBoardRepository;
     }
 
     @Override
@@ -36,7 +42,7 @@ public class ProjectServiceImpl implements ProjectService {
 //        }
 
         LocalDateTime now = LocalDateTime.now();
-        return projectRepositiory.save(new Project(
+        Project savedProject= projectRepositiory.save(new Project(
                 null,
                 project.getTitle(),
                 project.getDescription(),
@@ -44,9 +50,29 @@ public class ProjectServiceImpl implements ProjectService {
                 project.getStatus(),
                 now,
                 project.getDueDate(),
-                project.getPriority()
+                project.getPriority(),
+                null
 
         ));
+
+
+        // Create the kanban board for the project
+        KanbanBoard kanbanBoard = KanbanBoard.builder()
+                .project(savedProject)
+                .build();
+
+        // Create default columns
+        List<KanbanColumn> defaultColumns = List.of(
+                KanbanColumn.builder().type("To Do").kanbanBoard(kanbanBoard).build(),
+                KanbanColumn.builder().type("In Progress").kanbanBoard(kanbanBoard).build(),
+                KanbanColumn.builder().type("Done").kanbanBoard(kanbanBoard).build()
+        );
+
+        kanbanBoard.setColumns(defaultColumns);
+        // Save the kanban board (columns will be saved via cascade)
+        kanbanBoardRepository.save(kanbanBoard);
+
+        return savedProject;
 
     }
 
@@ -82,4 +108,10 @@ public class ProjectServiceImpl implements ProjectService {
     public void deleteProject(UUID projectId) {
         projectRepositiory.deleteById(projectId);
     }
+
+    @Override
+    public Optional<KanbanBoard> getKanbanBoardDetails(UUID projectId) {
+        return kanbanBoardRepository.findByProjectId(projectId);
+    }
+
 }

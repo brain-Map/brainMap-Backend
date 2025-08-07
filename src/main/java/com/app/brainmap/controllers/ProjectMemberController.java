@@ -1,15 +1,19 @@
 package com.app.brainmap.controllers;
 
 
+import com.app.brainmap.domain.dto.MessageResponse;
 import com.app.brainmap.domain.dto.ProjectDto;
 import com.app.brainmap.domain.dto.ProjectMemberDto;
+import com.app.brainmap.domain.entities.Project;
+import com.app.brainmap.domain.entities.ProjectMember;
+import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.mappers.ProjectMemberMapper;
+import com.app.brainmap.mappers.UserMapper;
 import com.app.brainmap.services.ProjectMemberService;
+import com.app.brainmap.services.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -21,9 +25,11 @@ public class ProjectMemberController {
     private final ProjectMemberService projectMemberService;
     private final ProjectMemberMapper projectMemberMapper;
 
+
     public ProjectMemberController(ProjectMemberService projectMemberService, ProjectMemberMapper projectMemberMapper) {
         this.projectMemberService = projectMemberService;
         this.projectMemberMapper = projectMemberMapper;
+
     }
 
 
@@ -37,5 +43,19 @@ public class ProjectMemberController {
         return projectMemberService.getProjectMember(userId).map(projectMemberMapper::toDto);
 
     }
+
+    @PutMapping("/update-about/{project_id}")
+    public ResponseEntity<MessageResponse> updateAbout(
+            @PathVariable("project_id") UUID id,
+            @RequestBody ProjectMemberDto projectMemberDto
+    ) {
+
+        String aboutprojectmember = projectMemberDto.about();
+
+        projectMemberService.updateAboutProjectMember(id, aboutprojectmember);
+
+        return ResponseEntity.ok(new MessageResponse("About updated successfully"));
+    }
+
 
 }

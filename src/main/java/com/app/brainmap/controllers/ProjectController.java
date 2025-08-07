@@ -1,10 +1,13 @@
 package com.app.brainmap.controllers;
 
+import com.app.brainmap.domain.dto.KanbanBoardDto;
 import com.app.brainmap.domain.dto.ProjectDto;
 import com.app.brainmap.domain.entities.Project;
+import com.app.brainmap.mappers.KanbanBoardMapper;
 import com.app.brainmap.mappers.ProjectMapper;
 import com.app.brainmap.services.ProjectService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,11 +21,13 @@ import java.util.UUID;
 public class ProjectController {
     private final ProjectService projectService;
     private final ProjectMapper projectMapper;
+    private final KanbanBoardMapper kanbanBoardMapper;
 
 
-    public ProjectController(ProjectService projectService, ProjectMapper projectMapper) {
+    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, KanbanBoardMapper kanbanBoardMapper) {
         this.projectService = projectService;
         this.projectMapper = projectMapper;
+        this.kanbanBoardMapper = kanbanBoardMapper;
     }
 
     @GetMapping
@@ -69,4 +74,16 @@ public class ProjectController {
 //        log.info("Deleting project with id: {}", id);
         projectService.deleteProject(id);
     }
+
+
+
+    @GetMapping("/kanban-board/{project_id}")
+    public ResponseEntity<KanbanBoardDto> getKanbanBoardDetails(@PathVariable("project_id") UUID projectId) {
+        return projectService.getKanbanBoardDetails(projectId)
+                .map(kanbanBoardMapper::toDto)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
 }

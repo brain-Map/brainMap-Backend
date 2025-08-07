@@ -21,5 +21,6 @@ public interface ProjectMemberMapper {
     @Mapping(source = "user.userRole", target = "userRole")
     ProjectMemberDto toDto(ProjectMember projectMember);
 
+//    @Mapping(target = "about", source = "user.bio")
     ProjectMember toEntity(ProjectMemberDto dto);
 }
