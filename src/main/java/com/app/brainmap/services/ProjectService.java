@@ -1,5 +1,6 @@
 package com.app.brainmap.services;
 
+import com.app.brainmap.domain.entities.KanbanBoard;
 import com.app.brainmap.domain.entities.Project;
 
 import java.util.List;
@@ -14,6 +15,7 @@ public interface ProjectService {
     Optional<Project> getProject(UUID id);
     Project updateProject(UUID projectId, Project project);
     void deleteProject(UUID projectId);
+    Optional<KanbanBoard> getKanbanBoardDetails(UUID projectId);
 
 
 }

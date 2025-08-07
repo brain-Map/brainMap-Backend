@@ -52,5 +52,9 @@ public class Project {
         }
     }
 
+    @OneToOne(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private KanbanBoard kanbanBoard;
+
+
 
 }
