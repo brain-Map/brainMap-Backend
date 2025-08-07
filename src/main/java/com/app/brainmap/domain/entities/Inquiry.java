@@ -28,7 +28,7 @@ public class Inquiry {
     @Column(columnDefinition = "TEXT")
     private String message;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private InquiryStatus status;
 
