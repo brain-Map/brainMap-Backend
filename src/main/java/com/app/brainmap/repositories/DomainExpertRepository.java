@@ -8,4 +8,5 @@ import java.util.UUID;
 
 @Repository
 public interface DomainExpertRepository extends JpaRepository<DomainExperts, UUID> {
+    long countByStatus(Integer status);
 }
