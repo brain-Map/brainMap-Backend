@@ -1,6 +1,7 @@
 package com.app.brainmap.domain.entities;
 
 import com.app.brainmap.domain.UserRoleType;
+import com.app.brainmap.domain.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -44,9 +45,14 @@ public class User {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
+
     private String city;
     private String gender;
     private String bio;
+
 
 
 
@@ -79,6 +85,10 @@ public class User {
     @PrePersist
     protected void onCreate(){
         this.createdAt = LocalDateTime.now();
+
+        if (this.status == null) {
+            this.status = UserStatus.INACTIVE;
+        }
     }
 
 }

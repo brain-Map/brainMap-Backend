@@ -125,5 +125,13 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public Long userCount() {
+        try {
+            return userRepository.count();
+        } catch (Exception e) {
+            throw new RuntimeException("error retrieving user count", e);
+        }
+    }
 
 }
