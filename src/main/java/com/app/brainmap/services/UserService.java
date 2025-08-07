@@ -12,4 +12,5 @@ public interface UserService {
     User createUser(CreateUser request);
     List<User> getAllUsers();
     User updateUser(UUID id, UpdateUser request);
+    Long userCount();
 }
