@@ -4,6 +4,7 @@ import com.app.brainmap.domain.entities.KanbanBoard;
 import com.app.brainmap.domain.entities.KanbanColumn;
 import com.app.brainmap.domain.entities.Project;
 import com.app.brainmap.repositories.KanbanBoardRepository;
+import com.app.brainmap.repositories.KanbanColumnRepository;
 import com.app.brainmap.repositories.ProjectRepositiory;
 import com.app.brainmap.services.ProjectService;
 import jakarta.transaction.Transactional;
@@ -20,10 +21,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepositiory projectRepositiory;
     private final KanbanBoardRepository kanbanBoardRepository;
+    private final KanbanColumnRepository kanbanColumnRepository;
 
-    public ProjectServiceImpl(ProjectRepositiory projectRepositiory, KanbanBoardRepository kanbanBoardRepository) {
+    public ProjectServiceImpl(ProjectRepositiory projectRepositiory, KanbanBoardRepository kanbanBoardRepository, KanbanColumnRepository kanbanColumnRepository) {
         this.projectRepositiory = projectRepositiory;
         this.kanbanBoardRepository = kanbanBoardRepository;
+        this.kanbanColumnRepository = kanbanColumnRepository;
     }
 
     @Override
@@ -113,5 +116,28 @@ public class ProjectServiceImpl implements ProjectService {
     public Optional<KanbanBoard> getKanbanBoardDetails(UUID projectId) {
         return kanbanBoardRepository.findByProjectId(projectId);
     }
+
+    @Override
+    public boolean updateKanbanColumn(UUID projectId, KanbanColumn kanbanColumn) {
+
+        Optional<KanbanBoard> kanbanBoardOpt = kanbanBoardRepository.findByProjectId(projectId);
+
+        if (kanbanBoardOpt.isEmpty()) {
+            return false;
+        }
+
+        KanbanBoard kanbanBoard = kanbanBoardOpt.get();
+
+        // If you just want the ID
+//        UUID kanbanId = kanbanBoard.getKanbanId();
+
+        // Link column to board
+        kanbanColumn.setKanbanBoard(kanbanBoard);
+
+        kanbanColumnRepository.save(kanbanColumn);
+
+        return true;
+    }
+
 
 }
