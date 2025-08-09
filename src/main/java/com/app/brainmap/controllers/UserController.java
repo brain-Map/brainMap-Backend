@@ -18,7 +18,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/api/v1/users")
@@ -29,6 +31,13 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
 
+    @GetMapping
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+
+        List<UserDto> userDtos = users.stream().map(userMapper::toDto).toList();
+        return new ResponseEntity<>(userDtos, HttpStatus.OK);
+    }
     @PostMapping
     public ResponseEntity<UserDto> createUser(@RequestBody CreateUserDto createUserDto) {
 
@@ -67,6 +76,7 @@ public class UserController {
         log.info("User found: {}", userDto);
         return ResponseEntity.ok(userDto);
     }
+
 
     @GetMapping("/test")
     public ResponseEntity<String> testEndpoint() {
