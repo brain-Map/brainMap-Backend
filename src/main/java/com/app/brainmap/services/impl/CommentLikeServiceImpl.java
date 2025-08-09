@@ -36,9 +36,9 @@ public class CommentLikeServiceImpl implements CommentLikeService {
                 .orElseThrow(() -> new NoSuchElementException("Comment not found with id: " + commentId));
         
         // Verify that the comment belongs to the specified post
-        if (!comment.getPost().getCommunityPostId().equals(postId)) {
-            throw new IllegalArgumentException("Comment does not belong to the specified post");
-        }
+        // if (!comment.getPost().getCommunityPostId().equals(postId)) {
+        //     throw new IllegalArgumentException("Comment does not belong to the specified post");
+        // }
         
         // Get the user
         User user = userService.getUserById(userId);

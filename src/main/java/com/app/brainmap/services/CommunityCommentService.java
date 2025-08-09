@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CommunityCommentService {
-    CommunityCommentDto createComment(CreateCommunityCommentRequestDto dto);
+    CommunityCommentDto createComment(UUID postId, CreateCommunityCommentRequestDto dto);
     List<CommunityCommentDto> getCommentsByPost(UUID postId);
 }

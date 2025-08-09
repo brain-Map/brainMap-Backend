@@ -14,9 +14,11 @@ public interface CommunityCommentMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "post", ignore = true)   // set in service
     @Mapping(target = "author", ignore = true) // set in service
+    @Mapping(target = "replies", ignore = true) // initialize as empty list
     CommunityComment fromRequest(CreateCommunityCommentRequestDto dto);
 
     @Mapping(source = "communityCommentId", target = "id")
+    @Mapping(source = "post.communityPostId", target = "postId")  // Map post ID from post entity
     @Mapping(source = "author.id", target = "authorId")
     @Mapping(source = "author.username", target = "authorName") // adjust field names
     CommunityCommentDto toDto(CommunityComment comment);

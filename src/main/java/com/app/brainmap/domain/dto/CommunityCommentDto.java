@@ -9,6 +9,7 @@ import java.util.UUID;
 public class CommunityCommentDto {
     private UUID id;
     private String content;
+    private UUID postId; // ID of the post this comment belongs to
     private UUID authorId;
     private String authorName; // optional for displaying
     private LocalDateTime createdAt;

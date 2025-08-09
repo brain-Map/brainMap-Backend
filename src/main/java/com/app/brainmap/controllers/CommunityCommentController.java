@@ -4,6 +4,7 @@ import com.app.brainmap.domain.dto.CreateCommunityCommentRequestDto;
 import com.app.brainmap.domain.dto.CommunityCommentDto;
 import com.app.brainmap.services.CommunityCommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,12 +19,15 @@ public class CommunityCommentController {
     private final CommunityCommentService commentService;
 
     @PostMapping("/{postId}/comments")
-    public ResponseEntity<CommunityCommentDto> createComment(@RequestBody CreateCommunityCommentRequestDto dto) {
-        return ResponseEntity.ok(commentService.createComment(dto));
+    public ResponseEntity<CommunityCommentDto> createComment(
+            @PathVariable("postId") UUID postId,
+            @RequestBody CreateCommunityCommentRequestDto dto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(commentService.createComment(postId, dto));
     }
 
-    @GetMapping("${postId}/comments")
-    public ResponseEntity<List<CommunityCommentDto>> getCommentsByPost(@PathVariable UUID postId) {
+    @GetMapping("/{postId}/comments")
+    public ResponseEntity<List<CommunityCommentDto>> getCommentsByPost(@PathVariable("postId") UUID postId) {
         return ResponseEntity.ok(commentService.getCommentsByPost(postId));
     }
 }

@@ -1,12 +1,14 @@
 package com.app.brainmap.controllers;
 
 import com.app.brainmap.domain.CreateCommunityPostRequest;
+import com.app.brainmap.domain.dto.CommunityCommentDto;
 import com.app.brainmap.domain.dto.CommunityPostDto;
 import com.app.brainmap.domain.dto.CreateCommunityPostRequestDto;
 import com.app.brainmap.domain.entities.CommunityPost;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.mappers.CommunityPostMapper;
 import com.app.brainmap.security.JwtUserDetails;
+import com.app.brainmap.services.CommunityCommentService;
 import com.app.brainmap.services.CommunityPostService;
 import com.app.brainmap.services.CommunityTagService;
 import com.app.brainmap.services.UserService;
@@ -31,6 +33,7 @@ public class CommunityPostController {
     private final CommunityPostService communityPostService;
     private final CommunityTagService communityTagService;
     private final UserService userService;
+    private final CommunityCommentService commentService;
 
     @GetMapping
     public ResponseEntity<List<CommunityPostDto>> getAllPosts() {
@@ -42,8 +45,16 @@ public class CommunityPostController {
 
     @GetMapping(path = "/{postId}")
     public ResponseEntity<CommunityPostDto> getPostById(@PathVariable UUID postId) {
+        log.info("Fetching post with ID: {}", postId);
+        
         CommunityPost post = communityPostService.getPostById(postId);
         CommunityPostDto postDto = communityPostMapper.toDto(post);
+        
+        // Fetch comments for this post
+        List<CommunityCommentDto> comments = commentService.getCommentsByPost(postId);
+        postDto.setComments(comments);
+        
+        log.info("Returning post with {} comments", comments.size());
         return ResponseEntity.ok(postDto);
     }
     @GetMapping(path = "/tags")
