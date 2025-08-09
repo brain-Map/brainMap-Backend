@@ -108,7 +108,6 @@ public class UserServiceImpl implements UserService {
 
         if (user.getUserRole() == UserRoleType.MENTOR) {
             DomainExperts domainExperts = new DomainExperts();
-            domainExperts.setUser(user);
             domainExperts.setAvailability(request.getAvailability());
             domainExperts.setExperience(request.getExperience());
 
@@ -117,7 +116,6 @@ public class UserServiceImpl implements UserService {
 
         if (user.getUserRole() == UserRoleType.PROJECT_MEMBER) {
             ProjectMember projectMember = new ProjectMember();
-            projectMember.setUser(user);
             projectMemberRepository.save(projectMember);
         }
 
