@@ -1,9 +1,6 @@
 package com.app.brainmap.controllers;
 
-import com.app.brainmap.domain.dto.AdminDashboardStatusDto;
-import com.app.brainmap.domain.dto.AdminUserListDto;
-import com.app.brainmap.domain.dto.UserDto;
-import com.app.brainmap.domain.dto.UsersStatusDto;
+import com.app.brainmap.domain.dto.*;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.services.AdminService;
 import com.app.brainmap.services.UserService;
@@ -24,6 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 public class AdminController {
     private final AdminService adminService;
+    private final UserService userService;
 
     @GetMapping("/dashboard/overview")
     public ResponseEntity<AdminDashboardStatusDto> getDashboardStatus() {
@@ -53,4 +51,9 @@ public class AdminController {
                 .header("content-type", "application/json")
                 .body(adminService.getAllUsers(page, size, sortBy));
     }
-}
+
+    @GetMapping("/project-count")
+    public List<UserProjectCountDto> getUsersWithProjectCount() {
+        return userService.getUsersWithProjectCount();
+    }
+}   

@@ -3,6 +3,7 @@ package com.app.brainmap.services.impl;
 import com.app.brainmap.domain.CreateUser;
 import com.app.brainmap.domain.UpdateUser;
 import com.app.brainmap.domain.UserRoleType;
+import com.app.brainmap.domain.dto.UserProjectCountDto;
 import com.app.brainmap.domain.entities.DomainExperts;
 import com.app.brainmap.domain.entities.ProjectMember;
 import com.app.brainmap.domain.entities.User;
@@ -134,6 +135,11 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             throw new RuntimeException("error retrieving user count", e);
         }
+    }
+
+    @Override
+    public List<UserProjectCountDto> getUsersWithProjectCount() {
+        return List.of();
     }
 
 }
