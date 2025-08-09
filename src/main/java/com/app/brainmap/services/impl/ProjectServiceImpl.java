@@ -51,8 +51,8 @@ public class ProjectServiceImpl implements ProjectService {
                 now,
                 project.getDueDate(),
                 project.getPriority(),
+                null,
                 null
-
         ));
 
 
