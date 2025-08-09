@@ -107,7 +107,9 @@ public class UserServiceImpl implements UserService {
         }
 
         if (user.getUserRole() == UserRoleType.MENTOR) {
-            DomainExperts domainExperts = new DomainExperts();
+            User tempUser = user;
+            DomainExperts domainExperts = domainExpertRepository.findById(user.getId())
+                    .orElseThrow(() -> new NoSuchElementException("Domain Expert not found with id: " + tempUser.getId()));
             domainExperts.setAvailability(request.getAvailability());
             domainExperts.setExperience(request.getExperience());
 
@@ -115,7 +117,9 @@ public class UserServiceImpl implements UserService {
         }
 
         if (user.getUserRole() == UserRoleType.PROJECT_MEMBER) {
-            ProjectMember projectMember = new ProjectMember();
+            User tempUser = user;
+            ProjectMember projectMember = projectMemberRepository.findById(user.getId())
+                    .orElseThrow(() -> new NoSuchElementException("Project Member not found with id: " + tempUser.getId()));
             projectMemberRepository.save(projectMember);
         }
 
