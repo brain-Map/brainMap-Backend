@@ -54,7 +54,8 @@ public class User {
     private String bio;
 
 
-
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserProject> userProjects = new ArrayList<>();
 
     //    Make it easy to get user posts using user.getPosts();
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)

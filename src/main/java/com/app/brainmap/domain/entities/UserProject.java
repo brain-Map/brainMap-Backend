@@ -12,15 +12,19 @@ import lombok.*;
 @Builder
 public class UserProject {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @EmbeddedId
+    private UserProjectId id;
 
     @ManyToOne
+    @MapsId("userId")
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
+    @MapsId("projectId")
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
+
+    @Column(name = "position", nullable = false)
+    private String position;
 }
