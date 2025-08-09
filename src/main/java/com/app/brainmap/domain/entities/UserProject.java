@@ -1,5 +1,6 @@
 package com.app.brainmap.domain.entities;
 
+import com.app.brainmap.domain.ProjectPositionType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,5 +27,6 @@ public class UserProject {
     private Project project;
 
     @Column(name = "position", nullable = false)
-    private String position;
+    @Enumerated(EnumType.STRING)
+    private ProjectPositionType position;
 }
