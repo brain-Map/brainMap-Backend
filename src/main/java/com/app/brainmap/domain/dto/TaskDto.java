@@ -5,11 +5,12 @@ import java.time.LocalTime;
 import java.util.UUID;
 
 public record TaskDto(
+        UUID taskId,
         UUID kanbanId,
         UUID kanbanColumnId,
         String title,
         String description,
-        LocalDate createDate,
-        LocalTime createTime
+        LocalDate createdDate,
+        LocalTime createdTime
 ) {
 }

@@ -9,6 +9,8 @@ import com.app.brainmap.services.ProjectService;
 import com.app.brainmap.services.TaskService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(path="/api/tasks")
 public class TaskController {
@@ -19,6 +21,14 @@ public class TaskController {
     public TaskController(TaskService taskService, TaskMapper taskMapper) {
         this.taskService = taskService;
         this.taskMapper = taskMapper;
+    }
+
+    @GetMapping
+    public List<TaskDto> listTasks() {
+        return taskService.listTasks()
+                .stream()
+                .map(taskMapper::toDto)
+                .toList();
     }
 
     @PostMapping
