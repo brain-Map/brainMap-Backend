@@ -18,9 +18,9 @@ public interface ReviewMapper {
     @Mapping(source = "promise", target = "promiseId", qualifiedByName = "mapPromiseToPromiseId")
     ReviewDto toDto(Review review);
 
-    @Mapping(target = "member", ignore = true)
-    @Mapping(target = "mentor", ignore = true)
-    @Mapping(target = "promise", ignore = true)
+    @Mapping(target = "member.id", ignore = true, source = "memberId")
+    @Mapping(target = "mentor.id", ignore = true ,source = "mentorId")
+    @Mapping(target = "promise.promiseId", ignore = true, source = "promiseId")
     Review toEntity(ReviewDto dto);
 
     @Named("mapUserToUserId")
