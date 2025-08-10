@@ -1,6 +1,5 @@
 package com.app.brainmap.domain.entities;
 
-import com.app.brainmap.domain.ProjectPositionType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;

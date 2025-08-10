@@ -1,5 +1,7 @@
 package com.app.brainmap.domain.entities.DomainExpert;
 
+import com.app.brainmap.domain.entities.PaymentSession;
+import com.app.brainmap.domain.entities.Review;
 import com.app.brainmap.domain.entities.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -87,5 +89,11 @@ public class ServiceBooking {
     private String reason;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @OneToOne(mappedBy = "serviceBooking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private PaymentSession paymentSession;
+
+    @OneToOne(mappedBy = "serviceBooking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Review review;
 
 }

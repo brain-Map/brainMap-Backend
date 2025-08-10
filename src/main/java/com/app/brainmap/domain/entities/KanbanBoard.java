@@ -32,7 +32,7 @@ public class KanbanBoard {
     private List<KanbanColumn> columns = new ArrayList<>();
 
     @OneToMany(mappedBy = "kanbanBoard", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Task> tasks;
+    private List<Task> tasks = new ArrayList<>();
 
 
 

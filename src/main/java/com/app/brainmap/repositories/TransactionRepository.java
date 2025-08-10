@@ -71,7 +71,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
            "AND t.createdAt <= :cutoffDate " +
            "AND (t.status = 'SUCCESS' OR t.status = 'COMPLETED')")
     List<Transaction> findUnreleasedTransactionsOlderThan(@Param("cutoffDate") java.time.LocalDateTime cutoffDate);
-     * Find all transaction details (non-paginated) with eager loading
+     /* Find all transaction details (non-paginated) with eager loading
      */
     @Query("SELECT DISTINCT t FROM Transaction t " +
            "LEFT JOIN FETCH t.sender " +

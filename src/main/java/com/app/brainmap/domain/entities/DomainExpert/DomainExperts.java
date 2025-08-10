@@ -3,11 +3,9 @@ package com.app.brainmap.domain.entities.DomainExpert;
 import com.app.brainmap.domain.DomainExpertStatus;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.domain.entities.Wallet;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -31,15 +29,15 @@ public class DomainExperts {
     @JoinColumn(name = "id") // uses same column as primary key
     private User user;
 
-    @Column(name = "status", nullable = true)
+    @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private DomainExpertStatus status = DomainExpertStatus.UNVERIFIED;
 
-    @Column(name = "domain", nullable = true)
+    @Column(name = "domain")
     private String domain;
 
-    @OneToOne
-    @JoinColumn(name = "wallet_id", nullable = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "wallet_id")
     private Wallet wallet;
 
     @Column(name = "work_experience", columnDefinition = "TEXT")
