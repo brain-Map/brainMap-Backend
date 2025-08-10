@@ -1,5 +1,6 @@
 package com.app.brainmap.controllers;
 
+import com.app.brainmap.domain.dto.MessageResponse;
 import com.app.brainmap.domain.dto.ReviewDto;
 import com.app.brainmap.services.ReviewService;
 import org.springframework.http.ResponseEntity;
@@ -44,8 +45,8 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReview(@PathVariable UUID id) {
+    public ResponseEntity<MessageResponse> deleteReview(@PathVariable UUID id) {
         reviewService.deleteReview(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new MessageResponse("Review Deleted successfully"));
     }
 }

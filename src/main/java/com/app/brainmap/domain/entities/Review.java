@@ -37,7 +37,7 @@ public class Review {
     @JoinColumn(name = "member_id", nullable = false)
     private User member;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne
     @JoinColumn(name = "promise_id", nullable = false, foreignKey = @ForeignKey(name = "fk_promise_review", foreignKeyDefinition = "FOREIGN KEY (promise_id) REFERENCES promises(promise_id) ON DELETE CASCADE"))
     private Promise promise;
 

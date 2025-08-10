@@ -76,22 +76,6 @@ public class ReviewServiceImpl implements ReviewService {
         existing.setRate(reviewDto.rate());
         existing.setReview(reviewDto.review());
 
-        if (!existing.getMember().getUserId().equals(reviewDto.memberId())) {
-            User member = userRepository.findById(reviewDto.memberId())
-                    .orElseThrow(() -> new IllegalArgumentException("Member not found"));
-            existing.setMember(member);
-        }
-        if (!existing.getMentor().getUserId().equals(reviewDto.mentorId())) {
-            User mentor = userRepository.findById(reviewDto.mentorId())
-                    .orElseThrow(() -> new IllegalArgumentException("Mentor not found"));
-            existing.setMentor(mentor);
-        }
-        if (!existing.getPromise().getPromiseId().equals(reviewDto.promiseId())) {
-            Promise promise = promiseRepository.findById(reviewDto.promiseId())
-                    .orElseThrow(() -> new IllegalArgumentException("Promise not found"));
-            existing.setPromise(promise);
-        }
-
         Review saved = reviewRepository.save(existing);
         return reviewMapper.toDto(saved);
     }
