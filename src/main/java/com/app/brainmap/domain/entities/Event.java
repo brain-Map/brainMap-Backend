@@ -38,8 +38,8 @@ public class Event {
 
 
     @ManyToOne
-    @JoinColumn(name = "project_id")
-    private Project project;
+    @JoinColumn(name = "user_id")
+    private User user;
 
 
 }
