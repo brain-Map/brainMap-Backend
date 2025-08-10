@@ -39,6 +39,8 @@ public class Review {
     @JoinColumn(name = "member_id", nullable = false)
     private User member;
 
+
+
     @ManyToOne
     @JoinColumn(name = "expert_id", nullable = false)
     private User expert;
