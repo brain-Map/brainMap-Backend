@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,4 +29,12 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Override
     Page<User> findAll(Pageable pageable);
+
+    long countByCreatedAt(LocalDateTime createdAt);
+
+    long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+
+    long countByUserRoleAndCreatedAtBetween(UserRoleType userRoleType, LocalDateTime previousMonthStart, LocalDateTime start);
+
+    long countByStatusAndCreatedAtBetween(UserStatus userStatus, LocalDateTime previousMonthStart, LocalDateTime start);
 }
