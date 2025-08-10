@@ -1,6 +1,8 @@
 package com.app.brainmap.controllers;
 
+import com.app.brainmap.domain.dto.KanbanBoardColumnDto;
 import com.app.brainmap.domain.dto.KanbanBoardDto;
+import com.app.brainmap.domain.dto.MessageResponse;
 import com.app.brainmap.domain.dto.ProjectDto;
 import com.app.brainmap.domain.entities.Project;
 import com.app.brainmap.mappers.KanbanBoardMapper;
@@ -84,6 +86,24 @@ public class ProjectController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PutMapping(path = "/kanban-board/{project_id}")
+    public ResponseEntity<MessageResponse> updateKanbanBoard(
+            @PathVariable("project_id") UUID projectId,
+            @RequestBody KanbanBoardColumnDto kanbanBoardColumnDto
+    ) {
+        boolean isUpdated = projectService.updateKanbanColumn(
+                projectId,
+                kanbanBoardMapper.toEntity(kanbanBoardColumnDto) // maps DTO → KanbanColumn
+        );
+
+        if (isUpdated) {
+            return ResponseEntity.ok(new MessageResponse("Kanban board updated successfully"));
+        } else {
+            return ResponseEntity.status(404).body(new MessageResponse("Project not found"));
+        }
+    }
+
 
 
 }
