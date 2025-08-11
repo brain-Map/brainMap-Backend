@@ -32,6 +32,11 @@ public class AdminController {
                 .body(status);
     }
 
+    @GetMapping("/dashboard/user_trend")
+    public List<UserTrendDto> getUserTrendsLast12Months() {
+        return adminService.getUserTrendsLast12Months();
+    }
+
     @GetMapping("/dashboard/usersStatus")
     public ResponseEntity<UsersStatusDto> getUsersStatus() {
         UsersStatusDto usersStatus = adminService.getUsersStatus();
@@ -56,4 +61,6 @@ public class AdminController {
     public List<UserProjectCountDto> getUsersWithProjectCount() {
         return userService.getUsersWithProjectCount();
     }
+
+
 }   

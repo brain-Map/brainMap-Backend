@@ -11,4 +11,5 @@ public interface AdminService {
      UsersStatusDto getUsersStatus();
      Page<AdminUserListDto> getAllUsers(int page, int size, String sortBy);
      List<UserProjectCountDto> getUsersWithProjectCount();
+     List<UserTrendDto> getUserTrendsLast12Months();
 }

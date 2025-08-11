@@ -9,8 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +32,16 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Override
     Page<User> findAll(Pageable pageable);
 
-    long countByCreatedAt(LocalDateTime createdAt);
+    @Query("""
+        SELECT EXTRACT(MONTH FROM u.createdAt) AS monthNumber,
+            u.userRole AS role,
+            COUNT(u) AS count
+        FROM User u
+        WHERE u.createdAt >= :startDate
+        GROUP BY EXTRACT(MONTH FROM u.createdAt), u.userRole
+        ORDER BY EXTRACT(MONTH FROM u.createdAt), u.userRole 
+""")
+    List<Object[]> getMonthlyUserCountByRole(@Param("startDate") LocalDateTime startDate);
 
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 

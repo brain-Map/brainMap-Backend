@@ -19,8 +19,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @AllArgsConstructor
@@ -45,6 +49,23 @@ public class AdminServiceImpl implements AdminService {
             .pendingDomainExperts(pendingDomainExperts)
             .openIsquiries(openInquiries)
             .build();
+    }
+
+    @Override
+    public List<UserTrendDto> getUserTrendsLast12Months() {
+        LocalDateTime startDate = LocalDateTime.now().minusMonths(12);
+        List<Object[]> result = userRepository.getMonthlyUserCountByRole(startDate);
+
+        return result
+                .stream()
+                .map(row -> {
+                    Integer monthNumber = ((Integer) row[0]).intValue();
+                    String monthName = Month.of(monthNumber).getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
+                    UserRoleType userRole = (UserRoleType) row[1];
+                    Long count = (Long) row[2];
+                    return new UserTrendDto(monthName, userRole, count);
+                })
+                .toList();
     }
 
     @Override
