@@ -5,6 +5,8 @@ import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.domain.dto.EventDto;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class EventMapper {
 
@@ -20,11 +22,27 @@ public class EventMapper {
                 .createdDate(event.getCreatedDate())
                 .dueDate(event.getDueDate())
                 .createdTime(event.getCreatedTime())
-                .userId(event.getUser() != null ? event.getUser().getId() : null)
+                .userId(extractUserId(event.getUser()))
                 .build();
     }
 
     public Event toEntity(EventDto eventDto) {
+        if (eventDto == null) {
+            return null;
+        }
+
+        Event.EventBuilder eventBuilder = Event.builder()
+                // Don't set eventId for new entities - let JPA handle it
+                // .eventId(eventDto.getEventId())
+                .title(eventDto.getTitle())
+                .description(eventDto.getDescription())
+                .dueDate(eventDto.getDueDate());
+        // Don't set createdDate and createdTime - let entity handle these with @CreationTimestamp
+
+        return eventBuilder.build();
+    }
+
+    public Event toEntityWithId(EventDto eventDto) {
         if (eventDto == null) {
             return null;
         }
@@ -37,7 +55,6 @@ public class EventMapper {
                 .dueDate(eventDto.getDueDate())
                 .createdTime(eventDto.getCreatedTime());
 
-        // Note: User entity needs to be set separately in the service layer
         return eventBuilder.build();
     }
 
@@ -46,9 +63,28 @@ public class EventMapper {
             return;
         }
 
-        event.setTitle(eventDto.getTitle());
-        event.setDescription(eventDto.getDescription());
-        event.setDueDate(eventDto.getDueDate());
+        // Only update non-null values to avoid overwriting existing data
+        if (eventDto.getTitle() != null) {
+            event.setTitle(eventDto.getTitle());
+        }
+        if (eventDto.getDescription() != null) {
+            event.setDescription(eventDto.getDescription());
+        }
+        if (eventDto.getDueDate() != null) {
+            event.setDueDate(eventDto.getDueDate());
+        }
         // Note: createdDate and createdTime should not be updated
+    }
+
+    // Helper method for safe user ID extraction
+    private UUID extractUserId(User user) {
+        return user != null ? user.getId() : null;
+    }
+
+    // Additional helper method for setting user relationship
+    public void setUserRelation(Event event, User user) {
+        if (event != null) {
+            event.setUser(user);
+        }
     }
 }
