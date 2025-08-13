@@ -14,4 +14,8 @@ public class UsersStatusDto {
     private Long members;
     private Long domainExperts;
     private Long activeUsers;
+    private Long currentMonthUserGrowthRate;
+    private Long currentMonthMemberGrowthRate;
+    private Long currentMonthExpertGrowthRate;
+    private Long currentMonthActiveUserGrowthRate;
 }
