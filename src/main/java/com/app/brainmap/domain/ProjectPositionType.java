@@ -4,8 +4,5 @@ public enum ProjectPositionType {
     OWNER,
     MEMBER,
     EXPERT,
-    VIEWER,
-    CONTRIBUTOR,
-    ADMIN,
     GUEST,
 }
