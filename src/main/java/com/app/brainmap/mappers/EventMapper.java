@@ -31,15 +31,11 @@ public class EventMapper {
             return null;
         }
 
-        Event.EventBuilder eventBuilder = Event.builder()
-                // Don't set eventId for new entities - let JPA handle it
-                // .eventId(eventDto.getEventId())
+        return Event.builder()
                 .title(eventDto.getTitle())
                 .description(eventDto.getDescription())
-                .dueDate(eventDto.getDueDate());
-        // Don't set createdDate and createdTime - let entity handle these with @CreationTimestamp
-
-        return eventBuilder.build();
+                .dueDate(eventDto.getDueDate())
+                .build();
     }
 
     public Event toEntityWithId(EventDto eventDto) {
@@ -47,23 +43,20 @@ public class EventMapper {
             return null;
         }
 
-        Event.EventBuilder eventBuilder = Event.builder()
+        return Event.builder()
                 .eventId(eventDto.getEventId())
                 .title(eventDto.getTitle())
                 .description(eventDto.getDescription())
                 .createdDate(eventDto.getCreatedDate())
                 .dueDate(eventDto.getDueDate())
-                .createdTime(eventDto.getCreatedTime());
-
-        return eventBuilder.build();
+                .createdTime(eventDto.getCreatedTime())
+                .build();
     }
 
     public void updateEntityFromDto(EventDto eventDto, Event event) {
         if (eventDto == null || event == null) {
             return;
         }
-
-        // Only update non-null values to avoid overwriting existing data
         if (eventDto.getTitle() != null) {
             event.setTitle(eventDto.getTitle());
         }
@@ -73,15 +66,12 @@ public class EventMapper {
         if (eventDto.getDueDate() != null) {
             event.setDueDate(eventDto.getDueDate());
         }
-        // Note: createdDate and createdTime should not be updated
     }
 
-    // Helper method for safe user ID extraction
     private UUID extractUserId(User user) {
         return user != null ? user.getId() : null;
     }
 
-    // Additional helper method for setting user relationship
     public void setUserRelation(Event event, User user) {
         if (event != null) {
             event.setUser(user);
