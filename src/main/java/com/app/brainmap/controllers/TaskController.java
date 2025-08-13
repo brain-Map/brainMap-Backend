@@ -10,6 +10,7 @@ import com.app.brainmap.services.TaskService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path="/api/tasks")
@@ -37,6 +38,18 @@ public class TaskController {
                 taskMapper.toEntity(taskDto)
         );
         return taskMapper.toDto(createTask);
+    }
+
+    @PutMapping("/{task_id}")
+    public TaskDto updateTask(
+            @PathVariable("task_id") UUID id,
+            @RequestBody TaskDto taskDto
+    ) {
+        Task updatedTask = taskService.updateTask(
+                id,
+                taskMapper.toEntity(taskDto)
+        );
+        return taskMapper.toDto(updatedTask);
     }
 
 }
