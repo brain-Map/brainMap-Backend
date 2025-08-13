@@ -1,11 +1,13 @@
 package com.app.brainmap.services.impl;
 
+import com.app.brainmap.domain.entities.KanbanBoard;
 import com.app.brainmap.domain.entities.Task;
 import com.app.brainmap.repositories.TaskRepository;
 import com.app.brainmap.services.TaskService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,7 +29,36 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task updateTask(UUID id, Task task) {
-        return null;
+    public boolean updateTask(UUID id, Task task) {
+
+        Optional<Task> taskOptional = taskRepository.findById(id);
+
+        if (taskOptional.isEmpty()) {
+            return false;
+        }
+        Task taskfind = taskOptional.get();
+
+        // If you just want the ID
+//        UUID kanbanId = kanbanBoard.getKanbanId();
+
+        taskfind.setTitle(task.getTitle());
+        taskfind.setDescription(task.getDescription());
+
+        taskRepository.save(taskfind);
+
+        return true;
+    }
+
+    @Override
+    public boolean deleteTask(UUID id) {
+        Optional<Task> taskOptional = taskRepository.findById(id);
+
+        if (taskOptional.isEmpty()) {
+            return false;
+        }
+
+        Task task = taskOptional.get();
+        taskRepository.delete(task);
+        return true;
     }
 }

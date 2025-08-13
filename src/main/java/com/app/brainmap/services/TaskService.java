@@ -10,5 +10,6 @@ public interface TaskService {
 
     List<Task> listTasks();
     Task createTask(Task task);
-    Task updateTask(UUID id, Task task);
+    boolean updateTask(UUID id, Task task);
+    boolean deleteTask(UUID id);
 }
