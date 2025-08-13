@@ -7,16 +7,16 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@Table(name = "user_project")
+@Table(name = "user_tasks")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder
-public class UserProject {
+public class UserTask {
 
     @EmbeddedId
-    private UserProjectCompositeKey id;
+    private UserTaskCompositeKey id;
 
     @ManyToOne
     @MapsId("userId")
@@ -25,12 +25,9 @@ public class UserProject {
     private User user;
 
     @ManyToOne
-    @MapsId("projectId")
+    @MapsId("taskId")
     @JoinColumn(name = "project_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE) // When a project is deleted, delete this row too
-    private Project project;
+    private Task task;
 
-    @Column(name = "position", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private ProjectPositionType position;
 }
