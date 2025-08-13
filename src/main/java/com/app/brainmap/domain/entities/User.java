@@ -92,4 +92,7 @@ public class User {
         }
     }
 
+    public Object getUserId() {
+        return null;
+    }
 }
