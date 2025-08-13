@@ -6,6 +6,7 @@ import com.app.brainmap.services.TaskService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -23,5 +24,10 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Task createTask(Task task) {
         return taskRepository.save(task);
+    }
+
+    @Override
+    public Task updateTask(UUID id, Task task) {
+        return null;
     }
 }
