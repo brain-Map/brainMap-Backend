@@ -14,7 +14,7 @@ import lombok.*;
 public class UserProject {
 
     @EmbeddedId
-    private UserProjectId id;
+    private UserProjectCompositeKey id;
 
     @ManyToOne
     @MapsId("userId")

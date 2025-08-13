@@ -16,7 +16,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserProjectId implements Serializable {
+public class UserProjectCompositeKey implements Serializable {
     @Column(name = "user_id")
     UUID userId;
 
@@ -26,8 +26,8 @@ public class UserProjectId implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UserProjectId)) return false;
-        UserProjectId that = (UserProjectId) o;
+        if (!(o instanceof UserProjectCompositeKey)) return false;
+        UserProjectCompositeKey that = (UserProjectCompositeKey) o;
         return Objects.equals(userId, that.userId) &&
                 Objects.equals(projectId, that.projectId);
     }
