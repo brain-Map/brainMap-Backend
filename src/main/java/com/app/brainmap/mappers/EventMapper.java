@@ -1,80 +1,35 @@
 package com.app.brainmap.mappers;
 
+import com.app.brainmap.domain.dto.EventDto;
 import com.app.brainmap.domain.entities.Event;
 import com.app.brainmap.domain.entities.User;
-import com.app.brainmap.domain.dto.EventDto;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
 
-import java.util.UUID;
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface EventMapper {
 
-@Component
-public class EventMapper {
+    @Mapping(source = "user.id", target = "userId")
+    EventDto toDto(Event event);
 
-    public EventDto toDto(Event event) {
-        if (event == null) {
+    @Mapping(target = "user", source = "userId", qualifiedByName = "userFromId")
+    @Mapping(target = "eventId", ignore = true)
+    @Mapping(target = "createdDate", ignore = true)
+    @Mapping(target = "createdTime", ignore = true)
+    Event toEntity(EventDto dto, @MappingTarget Event existingEvent);
+
+    @Mapping(target = "user", source = "userId", qualifiedByName = "userFromId")
+    @Mapping(target = "eventId", ignore = true)
+    @Mapping(target = "createdDate", ignore = true)
+    @Mapping(target = "createdTime", ignore = true)
+    Event toEntity(EventDto dto);
+
+    @Named("userFromId")
+    default User userFromId(java.util.UUID userId) {
+        if (userId == null) {
             return null;
         }
-
-        return EventDto.builder()
-                .eventId(event.getEventId())
-                .title(event.getTitle())
-                .description(event.getDescription())
-                .createdDate(event.getCreatedDate())
-                .dueDate(event.getDueDate())
-                .createdTime(event.getCreatedTime())
-                .userId(extractUserId(event.getUser()))
-                .build();
-    }
-
-    public Event toEntity(EventDto eventDto) {
-        if (eventDto == null) {
-            return null;
-        }
-
-        return Event.builder()
-                .title(eventDto.getTitle())
-                .description(eventDto.getDescription())
-                .dueDate(eventDto.getDueDate())
-                .build();
-    }
-
-    public Event toEntityWithId(EventDto eventDto) {
-        if (eventDto == null) {
-            return null;
-        }
-
-        return Event.builder()
-                .eventId(eventDto.getEventId())
-                .title(eventDto.getTitle())
-                .description(eventDto.getDescription())
-                .createdDate(eventDto.getCreatedDate())
-                .dueDate(eventDto.getDueDate())
-                .createdTime(eventDto.getCreatedTime())
-                .build();
-    }
-
-    public void updateEntityFromDto(EventDto eventDto, Event event) {
-        if (eventDto == null || event == null) {
-            return;
-        }
-        if (eventDto.getTitle() != null) {
-            event.setTitle(eventDto.getTitle());
-        }
-        if (eventDto.getDescription() != null) {
-            event.setDescription(eventDto.getDescription());
-        }
-        if (eventDto.getDueDate() != null) {
-            event.setDueDate(eventDto.getDueDate());
-        }
-    }
-
-    private UUID extractUserId(User user) {
-        return user != null ? user.getId() : null;
-    }
-
-    public void setUserRelation(Event event, User user) {
-        if (event != null) {
-            event.setUser(user);
-        }
+        User user = new User();
+        user.setId(userId);
+        return user;
     }
 }

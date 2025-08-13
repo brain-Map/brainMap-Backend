@@ -16,23 +16,23 @@ import java.util.UUID;
 @Repository
 public interface EventRepository extends JpaRepository<Event, UUID> {
 
-    List<Event> findByUserIdOrderByDueDateAsc(UUID userId);
+    List<Event> findByUser_IdOrderByDueDateAsc(UUID userId);
 
-    List<Event> findByUserIdAndDueDateOrderByCreatedTimeAsc(UUID userId, LocalDate dueDate);
+    List<Event> findByUser_IdAndDueDateOrderByCreatedTimeAsc(UUID userId, LocalDate dueDate);
 
     @Query("SELECT e FROM Event e WHERE e.user.id = :userId AND e.dueDate BETWEEN :startDate AND :endDate ORDER BY e.dueDate ASC, e.createdTime ASC")
     List<Event> findEventsByUserIdAndDateRange(@Param("userId") UUID userId,
                                                @Param("startDate") LocalDate startDate,
                                                @Param("endDate") LocalDate endDate);
 
-    Page<Event> findByUserIdOrderByDueDateDesc(UUID userId, Pageable pageable);
+    Page<Event> findByUser_IdOrderByDueDateDesc(UUID userId, Pageable pageable);
 
     @Query("SELECT e FROM Event e WHERE e.user.id = :userId AND (LOWER(e.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(e.description) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-    List<Event> searchEventsByUserIdAndKeyword(@Param("userId") UUID userId, @Param("keyword") String keyword);
+    Page<Event> searchEventsByUserIdAndKeyword(@Param("userId") UUID userId, @Param("keyword") String keyword, Pageable pageable);
 
-    Optional<Event> findByEventIdAndUserId(UUID eventId, UUID userId);
+    Optional<Event> findByEventIdAndUser_Id(UUID eventId, UUID userId);
 
-    long countByUserId(UUID userId);
+    long countByUser_Id(UUID userId);
 
     @Query("SELECT COUNT(e) FROM Event e WHERE e.user.id = :userId AND e.dueDate = :date")
     long countEventsByUserIdAndDate(@Param("userId") UUID userId, @Param("date") LocalDate date);

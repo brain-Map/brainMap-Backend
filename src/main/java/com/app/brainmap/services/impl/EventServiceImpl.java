@@ -1,8 +1,8 @@
 package com.app.brainmap.services.impl;
 
+import com.app.brainmap.domain.dto.EventDto;
 import com.app.brainmap.domain.entities.Event;
 import com.app.brainmap.domain.entities.User;
-import com.app.brainmap.domain.dto.EventDto;
 import com.app.brainmap.mappers.EventMapper;
 import com.app.brainmap.repositories.EventRepository;
 import com.app.brainmap.repositories.UserRepository;
@@ -32,19 +32,13 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventDto createEvent(EventDto eventDto, UUID userId) {
-        log.info("Creating event for user: {}", userId);
-
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
+                .orElseThrow(() -> new RuntimeException("User not found"));
         Event event = eventMapper.toEntity(eventDto);
         event.setUser(user);
         event.setCreatedDate(LocalDate.now());
         event.setCreatedTime(LocalTime.now());
-
         Event savedEvent = eventRepository.save(event);
-        log.info("Event created successfully with id: {}", savedEvent.getEventId());
-
         return eventMapper.toDto(savedEvent);
     }
 
@@ -52,10 +46,10 @@ public class EventServiceImpl implements EventService {
     public EventDto updateEvent(UUID eventId, EventDto eventDto, UUID userId) {
         log.info("Updating event {} for user: {}", eventId, userId);
 
-        Event existingEvent = eventRepository.findByEventIdAndUserId(eventId, userId)
+        Event existingEvent = eventRepository.findByEventIdAndUser_Id(eventId, userId)
                 .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId + " for user: " + userId));
 
-        eventMapper.updateEntityFromDto(eventDto, existingEvent);
+        eventMapper.toEntity(eventDto, existingEvent);
         Event updatedEvent = eventRepository.save(existingEvent);
 
         log.info("Event updated successfully: {}", eventId);
@@ -66,7 +60,7 @@ public class EventServiceImpl implements EventService {
     public void deleteEvent(UUID eventId, UUID userId) {
         log.info("Deleting event {} for user: {}", eventId, userId);
 
-        Event event = eventRepository.findByEventIdAndUserId(eventId, userId)
+        Event event = eventRepository.findByEventIdAndUser_Id(eventId, userId)
                 .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId + " for user: " + userId));
 
         eventRepository.delete(event);
@@ -78,7 +72,7 @@ public class EventServiceImpl implements EventService {
     public EventDto getEventById(UUID eventId, UUID userId) {
         log.info("Fetching event {} for user: {}", eventId, userId);
 
-        Event event = eventRepository.findByEventIdAndUserId(eventId, userId)
+        Event event = eventRepository.findByEventIdAndUser_Id(eventId, userId)
                 .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId + " for user: " + userId));
 
         return eventMapper.toDto(event);
@@ -89,7 +83,7 @@ public class EventServiceImpl implements EventService {
     public List<EventDto> getAllEventsByUser(UUID userId) {
         log.info("Fetching all events for user: {}", userId);
 
-        List<Event> events = eventRepository.findByUserIdOrderByDueDateAsc(userId);
+        List<Event> events = eventRepository.findByUser_IdOrderByDueDateAsc(userId);
         return events.stream()
                 .map(eventMapper::toDto)
                 .collect(Collectors.toList());
@@ -100,7 +94,7 @@ public class EventServiceImpl implements EventService {
     public List<EventDto> getEventsByUserAndDate(UUID userId, LocalDate date) {
         log.info("Fetching events for user {} on date: {}", userId, date);
 
-        List<Event> events = eventRepository.findByUserIdAndDueDateOrderByCreatedTimeAsc(userId, date);
+        List<Event> events = eventRepository.findByUser_IdAndDueDateOrderByCreatedTimeAsc(userId, date);
         return events.stream()
                 .map(eventMapper::toDto)
                 .collect(Collectors.toList());
@@ -122,26 +116,24 @@ public class EventServiceImpl implements EventService {
     public Page<EventDto> getEventsByUserPaginated(UUID userId, Pageable pageable) {
         log.info("Fetching paginated events for user: {} with page: {}", userId, pageable.getPageNumber());
 
-        Page<Event> events = eventRepository.findByUserIdOrderByDueDateDesc(userId, pageable);
+        Page<Event> events = eventRepository.findByUser_IdOrderByDueDateDesc(userId, pageable);
         return events.map(eventMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<EventDto> searchEvents(UUID userId, String keyword) {
+    public Page<EventDto> searchEvents(UUID userId, String keyword, Pageable pageable) {
         log.info("Searching events for user {} with keyword: {}", userId, keyword);
 
-        List<Event> events = eventRepository.searchEventsByUserIdAndKeyword(userId, keyword);
-        return events.stream()
-                .map(eventMapper::toDto)
-                .collect(Collectors.toList());
+        Page<Event> events = eventRepository.searchEventsByUserIdAndKeyword(userId, keyword, null);
+        return events.map(eventMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
     public long getTotalEventsCount(UUID userId) {
         log.info("Getting total events count for user: {}", userId);
-        return eventRepository.countByUserId(userId);
+        return eventRepository.countByUser_Id(userId);
     }
 
     @Override

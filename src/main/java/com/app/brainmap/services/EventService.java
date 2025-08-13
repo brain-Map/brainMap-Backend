@@ -26,7 +26,7 @@ public interface EventService {
 
     Page<EventDto> getEventsByUserPaginated(UUID userId, Pageable pageable);
 
-    List<EventDto> searchEvents(UUID userId, String keyword);
+    Page<EventDto> searchEvents(UUID userId, String keyword, Pageable pageable);
 
     long getTotalEventsCount(UUID userId);
 
