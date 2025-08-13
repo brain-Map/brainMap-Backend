@@ -139,5 +139,18 @@ public class ProjectServiceImpl implements ProjectService {
         return true;
     }
 
+    @Override
+    public boolean deleteKanbanBoardColumn(UUID columnId) {
+        Optional<KanbanColumn> kanbanColumnOptional = kanbanColumnRepository.findById(columnId);
+
+        if (kanbanColumnOptional.isEmpty()) {
+            return false;
+        }
+
+        KanbanColumn kanbanColumn = kanbanColumnOptional.get();
+        kanbanColumnRepository.delete(kanbanColumn);
+        return true;
+    }
+
 
 }

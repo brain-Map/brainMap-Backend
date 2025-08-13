@@ -104,6 +104,20 @@ public class ProjectController {
         }
     }
 
+    @DeleteMapping("/kanban-board/{project_id}")
+    public ResponseEntity<MessageResponse> deleteKanbanBoard(@PathVariable("project_id") UUID projectId,
+                                                             @RequestBody KanbanBoardColumnDto kanbanBoardColumnDto) {
+
+        UUID columnId = kanbanBoardColumnDto.columnId();
+
+        boolean isDeleted = projectService.deleteKanbanBoardColumn(columnId);
+        if (isDeleted) {
+            return ResponseEntity.ok(new MessageResponse("Kanban board column deleted successfully"));
+        } else {
+            return ResponseEntity.status(404).body(new MessageResponse("Kanban board column not found"));
+        }
+    }
+
 
 
 }
