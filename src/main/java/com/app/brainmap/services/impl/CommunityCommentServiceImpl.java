@@ -33,7 +33,7 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
     @Override
     @Transactional
     public CommunityCommentDto createComment(UUID postId, CreateCommunityCommentRequestDto dto) {
-        log.info("Creating comment for post: {}", postId);
+        log.info("Creating comment for post: {}, parentCommentId: {}", postId, dto.getParentCommentId());
         
         CommunityPost post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("Post not found with id: " + postId));
@@ -42,13 +42,31 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         log.info("Comment being created by user: {}", currentUser.getId());
 
         CommunityComment comment = mapper.fromRequest(dto);
-        comment.setPost(post);  // Set the actual CommunityPost entity
+        comment.setPost(post);
         comment.setAuthor(currentUser);
+        
+        // Handle parent comment for replies
+        if (dto.getParentCommentId() != null) {
+            CommunityComment parentComment = commentRepository.findById(dto.getParentCommentId())
+                    .orElseThrow(() -> new NoSuchElementException("Parent comment not found with id: " + dto.getParentCommentId()));
+            
+            // Ensure the parent comment belongs to the same post
+            if (!parentComment.getPost().getCommunityPostId().equals(postId)) {
+                throw new IllegalArgumentException("Parent comment does not belong to the specified post");
+            }
+            
+            comment.setParentComment(parentComment);
+            log.info("Creating reply to comment: {}", dto.getParentCommentId());
+        } else {
+            log.info("Creating top-level comment");
+        }
         
         CommunityComment savedComment = commentRepository.save(comment);
         log.info("Comment created successfully with id: {}", savedComment.getCommunityCommentId());
         
-        return mapper.toDto(savedComment);
+        CommunityCommentDto resultDto = mapper.toDto(savedComment);
+        resultDto.setReply(savedComment.isReply());
+        return resultDto;
     }
 
     @Override
@@ -58,12 +76,34 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         CommunityPost post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("Post not found with id: " + postId));
         
-        List<CommunityComment> comments = commentRepository.findByPost(post);
-        log.info("Found {} comments for post: {}", comments.size(), postId);
+        // Get only top-level comments first
+        List<CommunityComment> topLevelComments = commentRepository.findByPostAndParentCommentIsNull(post);
+        log.info("Found {} top-level comments for post: {}", topLevelComments.size(), postId);
         
-        return comments.stream()
-                .map(mapper::toDto)
+        // Convert to DTOs and populate replies recursively
+        List<CommunityCommentDto> commentDtos = topLevelComments.stream()
+                .map(this::convertToHierarchicalDto)
                 .toList();
+        
+        return commentDtos;
+    }
+    
+    private CommunityCommentDto convertToHierarchicalDto(CommunityComment comment) {
+        CommunityCommentDto dto = mapper.toDto(comment);
+        
+        // Set the isReply field manually
+        dto.setReply(comment.isReply());
+        
+        // Get and convert replies recursively
+        List<CommunityComment> replies = commentRepository.findByParentComment(comment);
+        if (!replies.isEmpty()) {
+            List<CommunityCommentDto> replyDtos = replies.stream()
+                    .map(this::convertToHierarchicalDto)
+                    .toList();
+            dto.setReplies(replyDtos);
+        }
+        
+        return dto;
     }
 
     private User getCurrentUser() {

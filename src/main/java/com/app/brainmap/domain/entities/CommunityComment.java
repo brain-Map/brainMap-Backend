@@ -28,9 +28,14 @@ public class CommunityComment {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    // Self-referencing relationship for replies
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private CommunityComment parentComment;
+
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<CommunityReply> replies = new ArrayList<>();
+    private List<CommunityComment> replies = new ArrayList<>();
 
     @Column(columnDefinition = "TEXT")
     private String content;
@@ -51,5 +56,14 @@ public class CommunityComment {
     @PreUpdate
     protected void onUpdate(){
         this.updatedAt = LocalDateTime.now();
+    }
+
+    // Helper methods
+    public boolean isReply() {
+        return parentComment != null;
+    }
+
+    public boolean isTopLevelComment() {
+        return parentComment == null;
     }
 }
