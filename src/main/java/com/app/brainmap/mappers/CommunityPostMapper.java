@@ -23,6 +23,7 @@ public interface CommunityPostMapper {
     @Mapping(target = "communityPostId", source = "communityPostId")
     @Mapping(target = "tags", source = "tags", qualifiedByName = "tagsToCommunityTagResponse")
     @Mapping(target = "author", source = "author", qualifiedByName = "userToAuthorDto")
+    @Mapping(target = "comments", ignore = true) // Will be set in service
     CommunityPostDto toDto(CommunityPost post);
 
     @Mapping(target = "type", source = "type", qualifiedByName = "stringToCommunityPostType")
