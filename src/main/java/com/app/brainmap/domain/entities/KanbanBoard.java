@@ -25,7 +25,7 @@ public class KanbanBoard {
 
 
     @OneToOne
-    @JoinColumn(name = "project_id", nullable = false, foreignKey = @ForeignKey(name = "fk_project_kanban", foreignKeyDefinition = "FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE"))
+    @JoinColumn(name = "project_id", nullable = false, foreignKey = @ForeignKey(name = "fk_project_kanban", foreignKeyDefinition = "FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE"))
     private Project project;
 
     @OneToMany(mappedBy = "kanbanBoard", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -21,7 +21,7 @@ public class CommunityComment {
     private UUID communityCommentId;
 
     @ManyToOne
-    @JoinColumn(name = "post", nullable = false)
+    @JoinColumn(name = "post_id", nullable = false)
     private CommunityPost post;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,6 +29,7 @@ public class CommunityComment {
     private User author;
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<CommunityReply> replies = new ArrayList<>();
 
     @Column(columnDefinition = "TEXT")

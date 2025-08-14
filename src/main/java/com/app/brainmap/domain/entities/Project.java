@@ -7,6 +7,8 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -55,6 +57,7 @@ public class Project {
     @OneToOne(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private KanbanBoard kanbanBoard;
 
-
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserProject> userProjects = new ArrayList<>();
 
 }

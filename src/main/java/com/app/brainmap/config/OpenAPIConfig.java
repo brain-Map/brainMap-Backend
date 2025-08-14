@@ -14,7 +14,7 @@ public class OpenAPIConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Busmate Routes and Schedules API")
+                        .title("brainMap Routes and Schedules API")
                         .version("1.0.0")
                         .description("API for managing routes, schedules, stops, permits, and related entities for NTC Planning Section. " +
                                 "Use the Authorize button to enter a JWT token obtained from Supabase login."))

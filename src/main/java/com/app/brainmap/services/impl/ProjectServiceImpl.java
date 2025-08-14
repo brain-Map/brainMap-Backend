@@ -54,8 +54,8 @@ public class ProjectServiceImpl implements ProjectService {
                 now,
                 project.getDueDate(),
                 project.getPriority(),
+                null,
                 null
-
         ));
 
 
@@ -136,6 +136,19 @@ public class ProjectServiceImpl implements ProjectService {
 
         kanbanColumnRepository.save(kanbanColumn);
 
+        return true;
+    }
+
+    @Override
+    public boolean deleteKanbanBoardColumn(UUID columnId) {
+        Optional<KanbanColumn> kanbanColumnOptional = kanbanColumnRepository.findById(columnId);
+
+        if (kanbanColumnOptional.isEmpty()) {
+            return false;
+        }
+
+        KanbanColumn kanbanColumn = kanbanColumnOptional.get();
+        kanbanColumnRepository.delete(kanbanColumn);
         return true;
     }
 
