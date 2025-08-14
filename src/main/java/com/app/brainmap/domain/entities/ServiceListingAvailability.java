@@ -17,7 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-public class ServiceAvailability {
+public class ServiceListingAvailability {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "service_availability_id", updatable = false, nullable = false)
@@ -34,5 +34,5 @@ public class ServiceAvailability {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_id", nullable = false)
-    private Service service;
+    private ServiceListing service;
 }

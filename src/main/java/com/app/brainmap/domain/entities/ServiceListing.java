@@ -3,9 +3,7 @@ package com.app.brainmap.domain.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,7 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class Service {
+public class ServiceListing {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -48,6 +46,6 @@ public class Service {
     private User mentor;
 
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ServiceAvailability> availabilities;
+    private List<ServiceListingAvailability> availabilities;
 
 }
