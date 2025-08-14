@@ -77,7 +77,7 @@ public class EventServiceImpl implements EventService {
 
         return eventMapper.toDto(event);
     }
-
+//Done--------------------------------------------------------------------------------------------
     @Override
     @Transactional(readOnly = true)
     public List<EventDto> getAllEventsByUser(UUID userId) {
