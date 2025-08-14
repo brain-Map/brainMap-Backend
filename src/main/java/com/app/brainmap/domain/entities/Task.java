@@ -33,6 +33,12 @@ public class Task {
     @Column(name = "created_time", nullable = false, updatable = false)
     private LocalTime createdTime;
 
+    @Column(name = "due_date")
+    private LocalDate dueDate;
+
+    @Column(name = "priority")
+    private String priority = "MEDIUM"; // Default priority
+
 
     @ManyToOne
     @JoinColumn(name = "kanban_id",

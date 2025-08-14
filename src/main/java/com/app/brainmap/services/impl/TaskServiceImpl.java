@@ -19,8 +19,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> listTasks() {
-        return taskRepository.findAll();
+    public List<Task> listTasks(UUID kanbanId) {
+        return taskRepository.findByKanbanBoard_KanbanId(kanbanId);
     }
 
     @Override
@@ -43,6 +43,7 @@ public class TaskServiceImpl implements TaskService {
 
         taskfind.setTitle(task.getTitle());
         taskfind.setDescription(task.getDescription());
+
 
         taskRepository.save(taskfind);
 

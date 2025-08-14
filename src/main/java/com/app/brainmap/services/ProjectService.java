@@ -19,6 +19,7 @@ public interface ProjectService {
     Optional<KanbanBoard> getKanbanBoardDetails(UUID projectId);
 
     boolean updateKanbanColumn(UUID projectId, KanbanColumn kanbanColumn);
+    boolean deleteKanbanBoardColumn(UUID columnId);
 
 
 }
