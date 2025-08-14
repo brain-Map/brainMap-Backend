@@ -51,6 +51,7 @@ package com.app.brainmap.controllers;
             EventDto event = eventService.getEventById(eventId);
             return ResponseEntity.ok(event);
         }
+        //Done----------
 
         @GetMapping
         public ResponseEntity<List<EventDto>> getAllEvents(@RequestHeader("User-Id") UUID userId) {
@@ -62,10 +63,9 @@ package com.app.brainmap.controllers;
         @GetMapping("/date/{date}")
         public ResponseEntity<List<EventDto>> getEventsByDate(@PathVariable
                                                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                                                              LocalDate date,
-                                                              @RequestHeader("User-Id") UUID userId) {
-            log.info("Request to get events for user {} on date: {}", userId, date);
-            List<EventDto> events = eventService.getEventsByUserAndDate(userId, date);
+                                                              LocalDate date) {
+            log.info("Request to get events on date: {}",  date);
+            List<EventDto> events = eventService.getEventsByDate(date);
             return ResponseEntity.ok(events);
         }
 
@@ -75,20 +75,18 @@ package com.app.brainmap.controllers;
                                                                    LocalDate startDate,
                                                                    @RequestParam
                                                                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                                                                   LocalDate endDate,
-                                                                   @RequestHeader("User-Id") UUID userId) {
-            log.info("Request to get events for user {} between {} and {}", userId, startDate, endDate);
-            List<EventDto> events = eventService.getEventsByDateRange(userId, startDate, endDate);
+                                                                   LocalDate endDate) {
+            log.info("Request to get events between {} and {}",  startDate, endDate);
+            List<EventDto> events = eventService.getEventsByDateRange(startDate, endDate);
             return ResponseEntity.ok(events);
         }
 
         @GetMapping("/paginated")
         public ResponseEntity<Page<EventDto>> getEventsPaginated(@RequestParam(defaultValue = "0") int page,
-                                                                 @RequestParam(defaultValue = "10") int size,
-                                                                 @RequestHeader("User-Id") UUID userId) {
-            log.info("Request to get paginated events for user: {} (page: {}, size: {})", userId, page, size);
+                                                                 @RequestParam(defaultValue = "10") int size) {
+            log.info("Request to get paginated events (page: {}, size: {})",  page, size);
             Pageable pageable = PageRequest.of(page, size);
-            Page<EventDto> events = eventService.getEventsByUserPaginated(userId, pageable);
+            Page<EventDto> events = eventService.getEventsByUserPaginated( pageable);
             return ResponseEntity.ok(events);
         }
 

@@ -91,21 +91,26 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<EventDto> getEventsByUserAndDate(UUID userId, LocalDate date) {
-        log.info("Fetching events for user {} on date: {}", userId, date);
+    public List<EventDto> getEventsByDate(LocalDate date) {
+        log.info("Fetching events on date: {}", date);
 
-        List<Event> events = eventRepository.findByUser_IdAndDueDateOrderByCreatedTimeAsc(userId, date);
+        List<Event> events = eventRepository.findByDueDateOrderByCreatedTimeAsc(date);
         return events.stream()
                 .map(eventMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<EventDto> getEventsByDateRange(UUID userId, LocalDate startDate, LocalDate endDate) {
-        log.info("Fetching events for user {} between {} and {}", userId, startDate, endDate);
+        return List.of();
+    }
 
-        List<Event> events = eventRepository.findEventsByUserIdAndDateRange(userId, startDate, endDate);
+    @Transactional(readOnly = true)
+    @Override
+    public List<EventDto> getEventsByDateRange(LocalDate startDate, LocalDate endDate) {
+        log.info("Fetching events between {} and {}", startDate, endDate);
+
+        List<Event> events = eventRepository.findEventsByDateRange(startDate, endDate);
         return events.stream()
                 .map(eventMapper::toDto)
                 .collect(Collectors.toList());
@@ -113,10 +118,10 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<EventDto> getEventsByUserPaginated(UUID userId, Pageable pageable) {
-        log.info("Fetching paginated events for user: {} with page: {}", userId, pageable.getPageNumber());
+    public Page<EventDto> getEventsByUserPaginated(Pageable pageable) {
+        log.info("Fetching paginated events with page: {}", pageable.getPageNumber());
 
-        Page<Event> events = eventRepository.findByUser_IdOrderByDueDateDesc(userId, pageable);
+        Page<Event> events = eventRepository.findByDueDateDesc(pageable);
         return events.map(eventMapper::toDto);
     }
 

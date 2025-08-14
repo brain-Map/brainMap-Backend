@@ -36,4 +36,10 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
 
     @Query("SELECT COUNT(e) FROM Event e WHERE e.user.id = :userId AND e.dueDate = :date")
     long countEventsByUserIdAndDate(@Param("userId") UUID userId, @Param("date") LocalDate date);
+
+    List<Event> findByDueDateOrderByCreatedTimeAsc(LocalDate date);
+
+    List<Event> findEventsByDateRange(LocalDate startDate, LocalDate endDate);
+
+    Page<Event> findByDueDateDesc(Pageable pageable);
 }

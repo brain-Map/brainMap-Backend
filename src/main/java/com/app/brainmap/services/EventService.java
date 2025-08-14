@@ -3,6 +3,7 @@ package com.app.brainmap.services;
 import com.app.brainmap.domain.dto.EventDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,11 +21,14 @@ public interface EventService {
 
     List<EventDto> getAllEventsByUser(UUID userId);
 
-    List<EventDto> getEventsByUserAndDate(UUID userId, LocalDate date);
+    List<EventDto> getEventsByDate(LocalDate date);
 
     List<EventDto> getEventsByDateRange(UUID userId, LocalDate startDate, LocalDate endDate);
 
-    Page<EventDto> getEventsByUserPaginated(UUID userId, Pageable pageable);
+    @Transactional(readOnly = true)
+    List<EventDto> getEventsByDateRange(LocalDate startDate, LocalDate endDate);
+
+    Page<EventDto> getEventsByUserPaginated(Pageable pageable);
 
     Page<EventDto> searchEvents(UUID userId, String keyword, Pageable pageable);
 
