@@ -31,7 +31,8 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
 
     @Override
-    public EventDto createEvent(EventDto eventDto, UUID userId) {
+    public EventDto createEvent(EventDto eventDto) {
+        UUID userId = eventDto.getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Event event = eventMapper.toEntity(eventDto);
@@ -43,10 +44,10 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventDto updateEvent(UUID eventId, EventDto eventDto, UUID userId) {
-        log.info("Updating event {} for user: {}", eventId, userId);
+    public EventDto updateEvent(UUID eventId, EventDto eventDto) {
+        UUID userId = eventDto.getUserId();
 
-        Event existingEvent = eventRepository.findByEventIdAndUser_Id(eventId, userId)
+        Event existingEvent = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId + " for user: " + userId));
 
         eventMapper.toEntity(eventDto, existingEvent);
@@ -57,11 +58,10 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void deleteEvent(UUID eventId, UUID userId) {
-        log.info("Deleting event {} for user: {}", eventId, userId);
+    public void deleteEvent(UUID eventId) {
 
-        Event event = eventRepository.findByEventIdAndUser_Id(eventId, userId)
-                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId + " for user: " + userId));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId ));
 
         eventRepository.delete(event);
         log.info("Event deleted successfully: {}", eventId);
@@ -69,11 +69,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional(readOnly = true)
-    public EventDto getEventById(UUID eventId, UUID userId) {
-        log.info("Fetching event {} for user: {}", eventId, userId);
+    public EventDto getEventById(UUID eventId) {
+        log.info("Fetching event {} }", eventId);
 
-        Event event = eventRepository.findByEventIdAndUser_Id(eventId, userId)
-                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId + " for user: " + userId));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId ));
 
         return eventMapper.toDto(event);
     }

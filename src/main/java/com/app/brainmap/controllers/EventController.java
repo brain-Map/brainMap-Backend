@@ -1,6 +1,7 @@
 package com.app.brainmap.controllers;
 
     import com.app.brainmap.domain.dto.EventDto;
+    import com.app.brainmap.domain.dto.MessageResponse;
     import com.app.brainmap.services.EventService;
     import lombok.RequiredArgsConstructor;
     import lombok.extern.slf4j.Slf4j;
@@ -27,34 +28,27 @@ package com.app.brainmap.controllers;
 
         @PostMapping
         public ResponseEntity<EventDto> createEvent(
-                @Valid @RequestBody EventDto eventDto,
-                @RequestHeader("User-Id") UUID userId) {
-            EventDto createdEvent = eventService.createEvent(eventDto, userId);
+                @Valid @RequestBody EventDto eventDto) {
+            EventDto createdEvent = eventService.createEvent(eventDto);
             return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
         }
 
         @PutMapping("/{eventId}")
         public ResponseEntity<EventDto> updateEvent(@PathVariable UUID eventId,
-                                                    @Valid @RequestBody EventDto eventDto,
-                                                    @RequestHeader("User-Id") UUID userId) {
-            log.info("Request to update event {} for user: {}", eventId, userId);
-            EventDto updatedEvent = eventService.updateEvent(eventId, eventDto, userId);
+                                                    @Valid @RequestBody EventDto eventDto) {
+            EventDto updatedEvent = eventService.updateEvent(eventId, eventDto);
             return ResponseEntity.ok(updatedEvent);
         }
 
         @DeleteMapping("/{eventId}")
-        public ResponseEntity<Void> deleteEvent(@PathVariable UUID eventId,
-                                                @RequestHeader("User-Id") UUID userId) {
-            log.info("Request to delete event {} for user: {}", eventId, userId);
-            eventService.deleteEvent(eventId, userId);
-            return ResponseEntity.noContent().build();
+        public ResponseEntity<MessageResponse> deleteEvent(@PathVariable UUID eventId) {
+            eventService.deleteEvent(eventId);
+            return ResponseEntity.ok(new MessageResponse("Event deleted successfully"));
         }
 
         @GetMapping("/{eventId}")
-        public ResponseEntity<EventDto> getEvent(@PathVariable UUID eventId,
-                                                 @RequestHeader("User-Id") UUID userId) {
-            log.info("Request to get event {} for user: {}", eventId, userId);
-            EventDto event = eventService.getEventById(eventId, userId);
+        public ResponseEntity<EventDto> getEvent(@PathVariable UUID eventId) {
+            EventDto event = eventService.getEventById(eventId);
             return ResponseEntity.ok(event);
         }
 
