@@ -3,6 +3,7 @@ package com.app.brainmap.controllers;
     import com.app.brainmap.domain.dto.EventDto;
     import com.app.brainmap.domain.dto.MessageResponse;
     import com.app.brainmap.services.EventService;
+    import com.app.brainmap.mappers.EventMapper;
     import lombok.RequiredArgsConstructor;
     import lombok.extern.slf4j.Slf4j;
     import org.springframework.data.domain.Page;
@@ -25,6 +26,7 @@ package com.app.brainmap.controllers;
     public class EventController {
 
         private final EventService eventService;
+        private final EventMapper eventMapper;
 
         @PostMapping
         public ResponseEntity<EventDto> createEvent(
@@ -51,13 +53,13 @@ package com.app.brainmap.controllers;
             EventDto event = eventService.getEventById(eventId);
             return ResponseEntity.ok(event);
         }
-        //Done----------
 
         @GetMapping
-        public ResponseEntity<List<EventDto>> getAllEvents(@RequestHeader("User-Id") UUID userId) {
-            log.info("Request to get all events for user: {}", userId);
-            List<EventDto> events = eventService.getAllEventsByUser(userId);
-            return ResponseEntity.ok(events);
+        public List<EventDto> listEvent() {
+            return eventService.listEvent()
+                    .stream()
+                    .map(eventMapper::toDto)
+                    .toList();
         }
 
         @GetMapping("/date/{date}")
@@ -69,7 +71,7 @@ package com.app.brainmap.controllers;
             return ResponseEntity.ok(events);
         }
 
-        @GetMapping("/date-range")
+        @GetMapping("/date-range")//CHECK
         public ResponseEntity<List<EventDto>> getEventsByDateRange(@RequestParam
                                                                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                                                    LocalDate startDate,
@@ -81,40 +83,19 @@ package com.app.brainmap.controllers;
             return ResponseEntity.ok(events);
         }
 
-        @GetMapping("/paginated")
-        public ResponseEntity<Page<EventDto>> getEventsPaginated(@RequestParam(defaultValue = "0") int page,
-                                                                 @RequestParam(defaultValue = "10") int size) {
-            log.info("Request to get paginated events (page: {}, size: {})",  page, size);
-            Pageable pageable = PageRequest.of(page, size);
-            Page<EventDto> events = eventService.getEventsByUserPaginated( pageable);
-            return ResponseEntity.ok(events);
-        }
-
-        @GetMapping("/search")
-        public ResponseEntity<Page<EventDto>> searchEvents(@RequestParam String keyword,
-                                                          @RequestParam(defaultValue = "0") int page,
-                                                          @RequestParam(defaultValue = "10") int size,
-                                                          @RequestHeader("User-Id") UUID userId) {
-            log.info("Request to search events for user {} with keyword: {}", userId, keyword);
-            Pageable pageable = PageRequest.of(page, size);
-            Page<EventDto> events = eventService.searchEvents(userId, keyword, pageable);
-            return ResponseEntity.ok(events);
-        }
-
         @GetMapping("/count")
-        public ResponseEntity<Long> getTotalEventsCount(@RequestHeader("User-Id") UUID userId) {
-            log.info("Request to get total events count for user: {}", userId);
-            long count = eventService.getTotalEventsCount(userId);
+        public ResponseEntity<Long> getTotalEventsCount(){
+            log.info("Request to get total events count");
+            long count = eventService.getTotalEventsCount();
             return ResponseEntity.ok(count);
         }
 
-        @GetMapping("/count/date/{date}")
+        @GetMapping("/count/date/{date}")//CHECK
         public ResponseEntity<Long> getEventsCountByDate(@PathVariable
                                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                                                         LocalDate date,
-                                                         @RequestHeader("User-Id") UUID userId) {
-            log.info("Request to get events count for user {} on date: {}", userId, date);
-            long count = eventService.getEventsCountByDate(userId, date);
+                                                         LocalDate date) {
+            log.info("Request to get events count on date: {}", date);
+            long count = eventService.getEventsCountByDate(date);
             return ResponseEntity.ok(count);
         }
     }

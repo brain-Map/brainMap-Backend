@@ -2,6 +2,7 @@ package com.app.brainmap.services.impl;
 
 import com.app.brainmap.domain.dto.EventDto;
 import com.app.brainmap.domain.entities.Event;
+import com.app.brainmap.domain.entities.Project;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.mappers.EventMapper;
 import com.app.brainmap.repositories.EventRepository;
@@ -77,16 +78,10 @@ public class EventServiceImpl implements EventService {
 
         return eventMapper.toDto(event);
     }
-//Done--------------------------------------------------------------------------------------------
-    @Override
-    @Transactional(readOnly = true)
-    public List<EventDto> getAllEventsByUser(UUID userId) {
-        log.info("Fetching all events for user: {}", userId);
 
-        List<Event> events = eventRepository.findByUser_IdOrderByDueDateAsc(userId);
-        return events.stream()
-                .map(eventMapper::toDto)
-                .collect(Collectors.toList());
+    @Override
+    public List<Event> listEvent() {
+        return eventRepository.findAll();
     }
 
     @Override
@@ -100,12 +95,7 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<EventDto> getEventsByDateRange(UUID userId, LocalDate startDate, LocalDate endDate) {
-        return List.of();
-    }
-
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true)//CHECK
     @Override
     public List<EventDto> getEventsByDateRange(LocalDate startDate, LocalDate endDate) {
         log.info("Fetching events between {} and {}", startDate, endDate);
@@ -118,33 +108,16 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<EventDto> getEventsByUserPaginated(Pageable pageable) {
-        log.info("Fetching paginated events with page: {}", pageable.getPageNumber());
-
-        Page<Event> events = eventRepository.findByDueDateDesc(pageable);
-        return events.map(eventMapper::toDto);
+    public long getTotalEventsCount() {
+        long count = eventRepository.count();
+        log.info("Total events count: {}", count);
+        return count;
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Page<EventDto> searchEvents(UUID userId, String keyword, Pageable pageable) {
-        log.info("Searching events for user {} with keyword: {}", userId, keyword);
-
-        Page<Event> events = eventRepository.searchEventsByUserIdAndKeyword(userId, keyword, null);
-        return events.map(eventMapper::toDto);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public long getTotalEventsCount(UUID userId) {
-        log.info("Getting total events count for user: {}", userId);
-        return eventRepository.countByUser_Id(userId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public long getEventsCountByDate(UUID userId, LocalDate date) {
-        log.info("Getting events count for user {} on date: {}", userId, date);
-        return eventRepository.countEventsByUserIdAndDate(userId, date);
+    @Transactional(readOnly = true)//CHECK
+    public long getEventsCountByDate(LocalDate date) {
+        log.info("Getting events count on date: {}",date);
+        return eventRepository.countByDueDate(date);
     }
 }
