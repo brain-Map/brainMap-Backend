@@ -44,6 +44,16 @@ public class CommunityTagController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping(path = "/popular")
+    public ResponseEntity<List<CommunityTagResponse>> getPopularTags() {
+        List<CommunityTag> popularTags = communityTagService.getPopularTags();
+        List<CommunityTagResponse> popularTagResponses = popularTags.stream()
+                .map(communityTagMapper::toTagResponse)
+                .toList();
+        
+        return ResponseEntity.ok(popularTagResponses);
+    }
+
     @PostMapping(path = "/test")
     public ResponseEntity<Set<UUID>> createTagsForPost(@RequestBody CreateCommunityTagRequest createCommunityTagRequest){
         Set<UUID> savedTags = communityTagService.createTagsForPost(createCommunityTagRequest.getNames());

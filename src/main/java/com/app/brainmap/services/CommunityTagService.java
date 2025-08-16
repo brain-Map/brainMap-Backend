@@ -14,4 +14,5 @@ public interface CommunityTagService {
     void deleteTag(UUID id);
     CommunityTag getTagById(UUID id);
     List<CommunityTag> getTagsByIds(Set<UUID> ids);
+    List<CommunityTag> getPopularTags();
 }
