@@ -20,4 +20,6 @@ public class CommunityCommentDto {
     private UUID parentCommentId; // null for top-level comments
     private List<CommunityCommentDto> replies; // nested replies for hierarchical display
     private boolean reply; // helper field to easily identify replies
+    private long likesCount;
+    private boolean liked; // Whether current user liked this comment
 }

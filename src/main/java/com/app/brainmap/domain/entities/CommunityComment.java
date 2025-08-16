@@ -37,6 +37,10 @@ public class CommunityComment {
     @Builder.Default
     private List<CommunityComment> replies = new ArrayList<>();
 
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<CommunityLike> likes = new ArrayList<>();
+
     @Column(columnDefinition = "TEXT")
     private String content;
 

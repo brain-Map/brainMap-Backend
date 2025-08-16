@@ -25,4 +25,6 @@ public class CommunityPostDto {
     private CommunityPostAuthorDto author;
     private CommunityPostType type;
     private List<CommunityCommentDto> comments;
+    private long likesCount;
+    private boolean liked; // Whether current user liked this post
 }

@@ -7,6 +7,7 @@ import com.app.brainmap.mappers.CommunityCommentMapper;
 import com.app.brainmap.repositories.CommunityCommentRepository;
 import com.app.brainmap.repositories.CommunityPostRepository;
 import com.app.brainmap.services.CommunityCommentService;
+import com.app.brainmap.services.LikeService;
 import com.app.brainmap.services.UserService;
 import com.app.brainmap.security.JwtUserDetails;
 import jakarta.transaction.Transactional;
@@ -29,6 +30,7 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
     private final CommunityPostRepository postRepository;
     private final CommunityCommentMapper mapper;
     private final UserService userService;
+    private final LikeService likeService;
 
     @Override
     @Transactional
@@ -66,6 +68,11 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         
         CommunityCommentDto resultDto = mapper.toDto(savedComment);
         resultDto.setReply(savedComment.isReply());
+        
+        // Set like information for the new comment
+        resultDto.setLikesCount(0); // New comments start with 0 likes
+        resultDto.setLiked(false);  // User hasn't liked their own comment yet
+        
         return resultDto;
     }
 
@@ -93,6 +100,11 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         
         // Set the isReply field manually
         dto.setReply(comment.isReply());
+        
+        // Set like information
+        User currentUser = getCurrentUser();
+        dto.setLikesCount(likeService.getCommentLikesCount(comment.getCommunityCommentId()));
+        dto.setLiked(likeService.isCommentLikedByUser(comment.getCommunityCommentId(), currentUser.getId()));
         
         // Get and convert replies recursively
         List<CommunityComment> replies = commentRepository.findByParentComment(comment);
