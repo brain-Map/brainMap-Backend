@@ -12,11 +12,14 @@ import java.util.UUID;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, UUID> {
-    List<Event> findByDueDateOrderByCreatedTimeAsc(LocalDate date);
 
-    @Query("SELECT e FROM Event e WHERE e.dueDate BETWEEN :startDate AND :endDate ORDER BY e.createdTime ASC")
+    // Method 1: Find events by single date - Spring Data JPA auto-generates query
+    List<Event> findByDueDateOrderByDueTimeAsc(LocalDate dueDate);
 
-    List<Event> findEventsByDateRange(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);//CHECK
+    // Method 2: Find events between date range with custom query
+    @Query("SELECT e FROM Event e WHERE e.dueDate BETWEEN :startDate AND :endDate ORDER BY e.dueDate ASC, e.dueTime ASC")
+    List<Event> findByDueDateBetweenOrderByDueDateAscDueTimeAsc(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-    long countByDueDate(LocalDate dueDate);//CHECK
+    // Method 3: Count events by single date - Spring Data JPA auto-generates query
+    long countByDueDate(LocalDate dueDate);
 }

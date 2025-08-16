@@ -33,6 +33,9 @@ package com.app.brainmap.domain.entities;
         @Column(name = "due_date")
         private LocalDate dueDate;
 
+        @Column(name = "due_time")
+        private LocalTime dueTime;
+
         @Column(name = "created_time", nullable = false, updatable = false)
         private LocalTime createdTime;
 

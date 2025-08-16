@@ -71,16 +71,11 @@ package com.app.brainmap.controllers;
             return ResponseEntity.ok(events);
         }
 
-        @GetMapping("/date-range")//CHECK
-        public ResponseEntity<List<EventDto>> getEventsByDateRange(@RequestParam
-                                                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                                                                   LocalDate startDate,
-                                                                   @RequestParam
-                                                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                                                                   LocalDate endDate) {
-            log.info("Request to get events between {} and {}",  startDate, endDate);
-            List<EventDto> events = eventService.getEventsByDateRange(startDate, endDate);
-            return ResponseEntity.ok(events);
+        @GetMapping("/range")
+        public List<EventDto> getEventsByDateRange(
+                @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            return eventService.getEventsByDateRange(startDate, endDate);
         }
 
         @GetMapping("/count")
@@ -90,7 +85,7 @@ package com.app.brainmap.controllers;
             return ResponseEntity.ok(count);
         }
 
-        @GetMapping("/count/date/{date}")//CHECK
+        @GetMapping("/count/date/{date}")
         public ResponseEntity<Long> getEventsCountByDate(@PathVariable
                                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                                          LocalDate date) {

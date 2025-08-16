@@ -40,6 +40,9 @@ public class EventServiceImpl implements EventService {
         event.setUser(user);
         event.setCreatedDate(LocalDate.now());
         event.setCreatedTime(LocalTime.now());
+        // Set dueDate and dueTime from DTO, since mapper ignores them
+        event.setDueDate(eventDto.getDueDate());
+        event.setDueTime(eventDto.getDueTime());
         Event savedEvent = eventRepository.save(event);
         return eventMapper.toDto(savedEvent);
     }
@@ -52,6 +55,10 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId + " for user: " + userId));
 
         eventMapper.toEntity(eventDto, existingEvent);
+        // Set dueDate and dueTime from DTO, since mapper ignores them
+        existingEvent.setDueDate(eventDto.getDueDate());
+        existingEvent.setDueTime(eventDto.getDueTime());
+
         Event updatedEvent = eventRepository.save(existingEvent);
 
         log.info("Event updated successfully: {}", eventId);
@@ -60,7 +67,6 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void deleteEvent(UUID eventId) {
-
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId ));
 
@@ -89,18 +95,18 @@ public class EventServiceImpl implements EventService {
     public List<EventDto> getEventsByDate(LocalDate date) {
         log.info("Fetching events on date: {}", date);
 
-        List<Event> events = eventRepository.findByDueDateOrderByCreatedTimeAsc(date);
+        List<Event> events = eventRepository.findByDueDateOrderByDueTimeAsc(date);
         return events.stream()
                 .map(eventMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)//CHECK
+    @Transactional(readOnly = true)
     @Override
     public List<EventDto> getEventsByDateRange(LocalDate startDate, LocalDate endDate) {
         log.info("Fetching events between {} and {}", startDate, endDate);
 
-        List<Event> events = eventRepository.findEventsByDateRange(startDate, endDate);
+        List<Event> events = eventRepository.findByDueDateBetweenOrderByDueDateAscDueTimeAsc(startDate, endDate);
         return events.stream()
                 .map(eventMapper::toDto)
                 .collect(Collectors.toList());
