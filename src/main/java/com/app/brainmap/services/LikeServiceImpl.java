@@ -15,8 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -144,5 +144,82 @@ public class LikeServiceImpl implements LikeService {
     @Transactional(readOnly = true)
     public long getCommentLikesCount(UUID commentId) {
         return likeRepository.countByCommentId(commentId);
+    }
+
+    // Batch operations for performance optimization
+    @Override
+    @Transactional(readOnly = true)
+    public Map<UUID, Boolean> getPostLikeStatusForUser(List<UUID> postIds, UUID userId) {
+        if (postIds.isEmpty()) {
+            return new HashMap<>();
+        }
+        
+        List<UUID> likedPostIds = likeRepository.findLikedPostIdsByAuthorAndPostIds(userId, postIds);
+        
+        return postIds.stream().collect(Collectors.toMap(
+            postId -> postId,
+            likedPostIds::contains
+        ));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<UUID, Boolean> getCommentLikeStatusForUser(List<UUID> commentIds, UUID userId) {
+        if (commentIds.isEmpty()) {
+            return new HashMap<>();
+        }
+        
+        List<UUID> likedCommentIds = likeRepository.findLikedCommentIdsByAuthorAndCommentIds(userId, commentIds);
+        
+        return commentIds.stream().collect(Collectors.toMap(
+            commentId -> commentId,
+            likedCommentIds::contains
+        ));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<UUID, Long> getPostLikeCounts(List<UUID> postIds) {
+        if (postIds.isEmpty()) {
+            return new HashMap<>();
+        }
+        
+        List<Object[]> results = likeRepository.countLikesByPostIds(postIds);
+        Map<UUID, Long> likeCounts = new HashMap<>();
+        
+        // Initialize all post IDs with 0 counts
+        postIds.forEach(postId -> likeCounts.put(postId, 0L));
+        
+        // Update with actual counts
+        results.forEach(result -> {
+            UUID postId = (UUID) result[0];
+            Long count = (Long) result[1];
+            likeCounts.put(postId, count);
+        });
+        
+        return likeCounts;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<UUID, Long> getCommentLikeCounts(List<UUID> commentIds) {
+        if (commentIds.isEmpty()) {
+            return new HashMap<>();
+        }
+        
+        List<Object[]> results = likeRepository.countLikesByCommentIds(commentIds);
+        Map<UUID, Long> likeCounts = new HashMap<>();
+        
+        // Initialize all comment IDs with 0 counts
+        commentIds.forEach(commentId -> likeCounts.put(commentId, 0L));
+        
+        // Update with actual counts
+        results.forEach(result -> {
+            UUID commentId = (UUID) result[0];
+            Long count = (Long) result[1];
+            likeCounts.put(commentId, count);
+        });
+        
+        return likeCounts;
     }
 }

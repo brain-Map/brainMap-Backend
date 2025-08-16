@@ -21,7 +21,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -40,10 +43,7 @@ public class CommunityPostController {
     @GetMapping
     public ResponseEntity<List<CommunityPostDto>> getAllPosts() {
         List<CommunityPost> posts = communityPostService.getAllPosts();
-        List<CommunityPostDto> postDtos = posts.stream()
-                .map(this::convertPostToDto)
-                .toList();
-
+        List<CommunityPostDto> postDtos = convertPostsToDto(posts);
         return ResponseEntity.ok(postDtos);
     }
 
@@ -66,10 +66,7 @@ public class CommunityPostController {
             @RequestParam(required = false) UUID tagId
     ) {
         List<CommunityPost> posts = communityPostService.getAllPostsByTag(tagId);
-        List<CommunityPostDto> postDtos = posts.stream()
-                .map(this::convertPostToDto)
-                .toList();
-
+        List<CommunityPostDto> postDtos = convertPostsToDto(posts);
         return ResponseEntity.ok(postDtos);
     }
 
@@ -149,6 +146,34 @@ public class CommunityPostController {
         }
         
         return dto;
+    }
+
+    // Optimized batch conversion method to avoid N+1 queries
+    private List<CommunityPostDto> convertPostsToDto(List<CommunityPost> posts) {
+        if (posts.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        UUID currentUserId = getCurrentUserId();
+        List<UUID> postIds = posts.stream()
+                .map(CommunityPost::getCommunityPostId)
+                .toList();
+
+        // Batch fetch like counts and statuses
+        Map<UUID, Long> likeCounts = likeService.getPostLikeCounts(postIds);
+        Map<UUID, Boolean> likeStatuses = currentUserId != null 
+                ? likeService.getPostLikeStatusForUser(postIds, currentUserId)
+                : new HashMap<>();
+
+        return posts.stream().map(post -> {
+            CommunityPostDto dto = communityPostMapper.toDto(post);
+            
+            UUID postId = post.getCommunityPostId();
+            dto.setLikesCount(likeCounts.getOrDefault(postId, 0L));
+            dto.setLiked(currentUserId != null && likeStatuses.getOrDefault(postId, false));
+            
+            return dto;
+        }).toList();
     }
 
     private UUID getCurrentUserId() {

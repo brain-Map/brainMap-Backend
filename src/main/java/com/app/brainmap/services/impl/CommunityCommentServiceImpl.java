@@ -18,6 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -87,30 +90,64 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         List<CommunityComment> topLevelComments = commentRepository.findByPostAndParentCommentIsNull(post);
         log.info("Found {} top-level comments for post: {}", topLevelComments.size(), postId);
         
-        // Convert to DTOs and populate replies recursively
-        List<CommunityCommentDto> commentDtos = topLevelComments.stream()
-                .map(this::convertToHierarchicalDto)
-                .toList();
+        // Convert to DTOs and populate replies recursively with batch optimization
+        List<CommunityCommentDto> commentDtos = convertCommentsToHierarchicalDtos(topLevelComments);
         
         return commentDtos;
     }
     
-    private CommunityCommentDto convertToHierarchicalDto(CommunityComment comment) {
+    private List<CommunityCommentDto> convertCommentsToHierarchicalDtos(List<CommunityComment> comments) {
+        if (comments.isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        User currentUser = getCurrentUser();
+        
+        // Collect all comment IDs for batch processing (including nested replies)
+        List<UUID> allCommentIds = collectAllCommentIds(comments);
+        
+        // Batch fetch like counts and statuses
+        Map<UUID, Long> likeCounts = likeService.getCommentLikeCounts(allCommentIds);
+        Map<UUID, Boolean> likeStatuses = likeService.getCommentLikeStatusForUser(allCommentIds, currentUser.getId());
+        
+        return comments.stream()
+                .map(comment -> convertToHierarchicalDtoWithBatch(comment, likeCounts, likeStatuses))
+                .toList();
+    }
+    
+    private List<UUID> collectAllCommentIds(List<CommunityComment> comments) {
+        List<UUID> allIds = new ArrayList<>();
+        for (CommunityComment comment : comments) {
+            allIds.add(comment.getCommunityCommentId());
+            // Recursively collect reply IDs
+            List<CommunityComment> replies = commentRepository.findByParentComment(comment);
+            if (!replies.isEmpty()) {
+                allIds.addAll(collectAllCommentIds(replies));
+            }
+        }
+        return allIds;
+    }
+    
+    private CommunityCommentDto convertToHierarchicalDtoWithBatch(
+            CommunityComment comment, 
+            Map<UUID, Long> likeCounts, 
+            Map<UUID, Boolean> likeStatuses) {
+        
         CommunityCommentDto dto = mapper.toDto(comment);
         
         // Set the isReply field manually
         dto.setReply(comment.isReply());
         
-        // Set like information
-        User currentUser = getCurrentUser();
-        dto.setLikesCount(likeService.getCommentLikesCount(comment.getCommunityCommentId()));
-        dto.setLiked(likeService.isCommentLikedByUser(comment.getCommunityCommentId(), currentUser.getId()));
+        // Set like information using batch data
+        UUID commentId = comment.getCommunityCommentId();
+        dto.setLikesCount(likeCounts.getOrDefault(commentId, 0L));
+        dto.setLiked(likeStatuses.getOrDefault(commentId, false));
         
-        // Get and convert replies recursively
+        // Get and convert replies recursively using the same batch data
         List<CommunityComment> replies = commentRepository.findByParentComment(comment);
         if (!replies.isEmpty()) {
             List<CommunityCommentDto> replyDtos = replies.stream()
-                    .map(this::convertToHierarchicalDto)
+                    .map(reply -> convertToHierarchicalDtoWithBatch(reply, likeCounts, likeStatuses))
                     .toList();
             dto.setReplies(replyDtos);
         }
