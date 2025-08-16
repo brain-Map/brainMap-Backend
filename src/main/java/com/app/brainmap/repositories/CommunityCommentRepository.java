@@ -24,4 +24,12 @@ public interface CommunityCommentRepository extends JpaRepository<CommunityComme
     // Find all comments and replies for a post with proper ordering
     @Query("SELECT c FROM CommunityComment c WHERE c.post = :post ORDER BY c.parentComment.communityCommentId ASC NULLS FIRST, c.createdAt ASC")
     List<CommunityComment> findByPostOrderedHierarchically(@Param("post") CommunityPost post);
+    
+    // Get top commenters for a specific post with comment counts
+    @Query("SELECT c.author.id as userId, c.author.firstName as firstName, c.author.lastName as lastName, " +
+           "c.author.username as username, c.author.userRole as userRole, COUNT(c) as commentCount " +
+           "FROM CommunityComment c WHERE c.post = :post " +
+           "GROUP BY c.author.id, c.author.firstName, c.author.lastName, c.author.username, c.author.userRole " +
+           "ORDER BY COUNT(c) DESC")
+    List<Object[]> findTopCommentersByPost(@Param("post") CommunityPost post);
 }

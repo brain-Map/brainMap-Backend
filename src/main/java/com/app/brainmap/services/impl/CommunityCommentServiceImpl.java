@@ -2,6 +2,8 @@ package com.app.brainmap.services.impl;
 
 import com.app.brainmap.domain.dto.CreateCommunityCommentRequestDto;
 import com.app.brainmap.domain.dto.CommunityCommentDto;
+import com.app.brainmap.domain.dto.TopCommenterDto;
+import com.app.brainmap.domain.UserRoleType;
 import com.app.brainmap.domain.entities.*;
 import com.app.brainmap.mappers.CommunityCommentMapper;
 import com.app.brainmap.repositories.CommunityCommentRepository;
@@ -94,6 +96,69 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         List<CommunityCommentDto> commentDtos = convertCommentsToHierarchicalDtos(topLevelComments);
         
         return commentDtos;
+    }
+    
+    @Override
+    public List<TopCommenterDto> getTopCommentersByPost(UUID postId) {
+        log.info("Fetching top commenters for post: {}", postId);
+        
+        CommunityPost post = postRepository.findById(postId)
+                .orElseThrow(() -> new NoSuchElementException("Post not found with id: " + postId));
+        
+        List<Object[]> results = commentRepository.findTopCommentersByPost(post);
+        
+        List<TopCommenterDto> topCommenters = new ArrayList<>();
+        for (Object[] result : results) {
+            UUID userId = (UUID) result[0];
+            String firstName = (String) result[1];
+            String lastName = (String) result[2];
+            String username = (String) result[3];
+            UserRoleType userRole = (UserRoleType) result[4];
+            Long commentCount = (Long) result[5];
+            
+            // Create display name (prefer firstName + lastName, fallback to username)
+            String displayName = "";
+            if (firstName != null && lastName != null) {
+                displayName = firstName + " " + lastName;
+            } else if (firstName != null) {
+                displayName = firstName;
+            } else if (username != null) {
+                displayName = username;
+            } else {
+                displayName = "Anonymous User";
+            }
+            
+            // Convert UserRoleType to display string
+            String roleDisplay = userRole != null ? formatRole(userRole) : null;
+            
+            TopCommenterDto commenter = TopCommenterDto.builder()
+                    .id(userId)
+                    .name(displayName)
+                    .avatar(null) // Avatar URL can be added later if needed
+                    .commentCount(commentCount)
+                    .role(roleDisplay)
+                    .build();
+            
+            topCommenters.add(commenter);
+        }
+        
+        log.info("Found {} top commenters for post: {}", topCommenters.size(), postId);
+        return topCommenters;
+    }
+    
+    private String formatRole(UserRoleType role) {
+        switch (role) {
+            case PROJECT_MEMBER:
+                return "Project Member";
+            case MENTOR:
+                return "Mentor";
+            case MODERATOR:
+                return "Moderator";
+            case ADMIN:
+                return "Admin";
+            default:
+                return role.name();
+        }
     }
     
     private List<CommunityCommentDto> convertCommentsToHierarchicalDtos(List<CommunityComment> comments) {
