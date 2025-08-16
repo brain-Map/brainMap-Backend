@@ -32,9 +32,9 @@ public class ProjectController {
         this.userProjectMapper = userProjectMapper;
     }
 
-    @GetMapping
-    public List<ProjectDto> listProject() {
-        return projectService.listProject()
+    @GetMapping(path = "/all/{user_id}")
+    public List<ProjectDto> listProject(@PathVariable("user_id") UUID userId) {
+        return projectService.listProject(userId)
                 .stream()
                 .map(projectMapper::toDto)
                 .toList();

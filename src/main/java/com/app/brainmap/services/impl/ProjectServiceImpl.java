@@ -33,8 +33,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Project> listProject() {
-        return projectRepositiory.findAll();
+    public List<Project> listProject(UUID userId) {
+        return projectRepositiory.findAllByOwnerId(userId);
     }
 
     @Override
