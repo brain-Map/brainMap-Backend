@@ -2,6 +2,7 @@ package com.app.brainmap.domain.entities;
 
 import com.app.brainmap.domain.ProjctStatus;
 import com.app.brainmap.domain.ProjectPriority;
+import com.app.brainmap.domain.ProjectPrivacy;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,6 +38,10 @@ public class Project {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private ProjctStatus status;
+
+    @Column(name = "privacy", updatable = true)
+    @Enumerated(EnumType.STRING)
+    private ProjectPrivacy privacy;
 
     private LocalDateTime createdAt;
 
