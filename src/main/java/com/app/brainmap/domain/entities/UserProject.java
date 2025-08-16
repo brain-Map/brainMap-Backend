@@ -2,6 +2,7 @@ package com.app.brainmap.domain.entities;
 
 import com.app.brainmap.domain.ProjectCollaboratorAccept;
 import com.app.brainmap.domain.ProjectPositionType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -22,6 +23,7 @@ public class UserProject {
     @ManyToOne
     @MapsId("userId")
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore  // stop recursion her
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 

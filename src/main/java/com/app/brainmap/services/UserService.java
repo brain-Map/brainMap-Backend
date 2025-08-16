@@ -15,4 +15,5 @@ public interface UserService {
     List<User> getAllUsers();
     User updateUser(UUID id, UpdateUser request);
     List<UserProjectCountDto> getUsersWithProjectCount();
+    List<User> searchUsers(String query, String type);
 }

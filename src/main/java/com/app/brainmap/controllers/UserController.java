@@ -82,4 +82,18 @@ public class UserController {
     public ResponseEntity<String> testEndpoint() {
         return ResponseEntity.ok("Users Test endpoint is working!");
     }
+
+
+    @GetMapping("/searchcollaborator")
+    public List<UserDto> searchProjectCollaborator(
+            @RequestParam String query,
+            @RequestParam String type // "member" or "supervisor"
+    ) {
+        return userService.searchUsers(query, type)
+                .stream()
+                .map(UserDto::fromEntity)
+                .toList();
+    }
+
+
 }

@@ -133,4 +133,13 @@ public class UserServiceImpl implements UserService {
         return List.of();
     }
 
+    @Override
+    public List<User> searchUsers(String query, String type) {
+        if ("supervisor".equalsIgnoreCase(type)) {
+            return userRepository.searchSupervisors(query);
+        } else {
+            return userRepository.searchMembers(query);
+        }
+    }
+
 }
