@@ -1,5 +1,6 @@
 package com.app.brainmap.domain.entities;
 
+import com.app.brainmap.domain.ProjectCollaboratorAccept;
 import com.app.brainmap.domain.ProjectPositionType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,16 +22,21 @@ public class UserProject {
     @ManyToOne
     @MapsId("userId")
     @JoinColumn(name = "user_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE) // When a user is deleted, delete this row too
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @ManyToOne
     @MapsId("projectId")
     @JoinColumn(name = "project_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE) // When a project is deleted, delete this row too
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
 
-    @Column(name = "position", nullable = false)
+
+    @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
-    private ProjectPositionType position;
+    private ProjectPositionType role;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private ProjectCollaboratorAccept status;
 }

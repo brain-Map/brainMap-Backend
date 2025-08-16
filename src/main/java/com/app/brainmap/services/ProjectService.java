@@ -3,6 +3,7 @@ package com.app.brainmap.services;
 import com.app.brainmap.domain.entities.KanbanBoard;
 import com.app.brainmap.domain.entities.KanbanColumn;
 import com.app.brainmap.domain.entities.Project;
+import com.app.brainmap.domain.entities.UserProject;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,7 @@ public interface ProjectService {
 
     boolean updateKanbanColumn(UUID projectId, KanbanColumn kanbanColumn);
     boolean deleteKanbanBoardColumn(UUID columnId);
+    List<UserProject> listUserProject(UUID projectId);
 
 
 }
