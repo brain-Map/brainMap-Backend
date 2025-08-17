@@ -15,12 +15,16 @@ public interface EventMapper {
     @Mapping(target = "eventId", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "createdTime", ignore = true)
+    @Mapping(target = "dueDate", ignore = true)
+    @Mapping(target = "dueTime", ignore = true)
     Event toEntity(EventDto dto, @MappingTarget Event existingEvent);
 
     @Mapping(target = "user", source = "userId", qualifiedByName = "userFromId")
     @Mapping(target = "eventId", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "createdTime", ignore = true)
+    @Mapping(target = "dueDate", ignore = true)
+    @Mapping(target = "dueTime", ignore = true)
     Event toEntity(EventDto dto);
 
     @Named("userFromId")

@@ -29,5 +29,5 @@ public interface EventService {
 
     long getTotalEventsCount();
 
-    long getEventsCountByDate(LocalDate date);//CHECK
+    long getEventsCountByDate(LocalDate date);
 }

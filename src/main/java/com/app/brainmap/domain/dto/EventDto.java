@@ -15,6 +15,7 @@ package com.app.brainmap.domain.dto;
         private String description;
         private LocalDate createdDate;
         private LocalDate dueDate;
+        private LocalTime dueTime;
         private LocalTime createdTime;
         private UUID userId;
     }
