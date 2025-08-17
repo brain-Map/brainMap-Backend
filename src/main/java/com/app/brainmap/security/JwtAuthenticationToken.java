@@ -15,14 +15,14 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
         super(null);
         this.principal = null;
         this.token = token;
-        setAuthenticated(false); // Initially not authenticated
+        setAuthenticated(false);
     }
 
     public JwtAuthenticationToken(Object principal, String token, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.principal = principal;
         this.token = token;
-        super.setAuthenticated(true);
+        setAuthenticated(true);
     }
 
     @Override
@@ -30,4 +30,8 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
         return token;
     }
 
+    @Override
+    public Object getPrincipal() {
+        return principal;
+    }
 }
