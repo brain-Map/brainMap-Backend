@@ -48,4 +48,11 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     long countByUserRoleAndCreatedAtBetween(UserRoleType userRoleType, LocalDateTime previousMonthStart, LocalDateTime start);
 
     long countByStatusAndCreatedAtBetween(UserStatus userStatus, LocalDateTime previousMonthStart, LocalDateTime start);
+
+    @Query("SELECT u FROM User u WHERE u.userRole = 'PROJECT_MEMBER' AND LOWER(u.email) LIKE LOWER(CONCAT(:query, '%'))")
+    List<User> searchMembers(@Param("query") String query);
+
+    @Query("SELECT u FROM User u WHERE u.userRole = 'MENTOR' AND LOWER(u.email) LIKE LOWER(CONCAT(:query, '%'))")
+    List<User> searchSupervisors(@Param("query") String query);
+
 }

@@ -15,7 +15,8 @@ public record ProjectDto(
         String title,
         LocalDate dueDate,
         LocalDateTime createdAt,
-        String priority
+        String priority,
+        boolean isPublic
 
 ) {
 }
