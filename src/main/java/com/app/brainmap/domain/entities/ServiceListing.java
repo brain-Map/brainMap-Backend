@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "services")
+@Table(name = "Service_listing")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -33,16 +33,16 @@ public class ServiceListing {
     @Column(name = "fee", nullable = false)
     private Double fee;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at")
     @Builder.Default
-    private LocalDateTime created_at =  LocalDateTime.now();
+    private LocalDateTime createdAt =  LocalDateTime.now();
 
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_at")
     @Builder.Default
-    private LocalDateTime updated_at = LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @ManyToOne
-    @JoinColumn(name = "mentor_id", nullable = false)
+    @JoinColumn(name = "mentor_id")
     private User mentor;
 
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

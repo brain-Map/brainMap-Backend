@@ -29,9 +29,13 @@ public class DomainExpertsController {
                 .collect(Collectors.toList());
     }
 
-    @PostMapping("/create-service-listing")
+    @GetMapping("/create-service-listing")
     public ResponseEntity<String> createdemoService() {
-        domainExpertsService.createdemoService();
-        return ResponseEntity.ok("Created emo service listing");
+        try {
+            domainExpertsService.createdemoService();
+            return ResponseEntity.ok("Created demo service listing");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error creating demo service listing: " + e.getMessage());
+        }
     }
 }
