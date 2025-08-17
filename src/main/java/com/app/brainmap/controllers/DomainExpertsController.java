@@ -1,14 +1,17 @@
 package com.app.brainmap.controllers;
 
+import com.app.brainmap.domain.dto.AdminUserListDto;
 import com.app.brainmap.domain.dto.DomainExpertsDto;
+import com.app.brainmap.domain.dto.ServiceListingRequestDto;
+import com.app.brainmap.domain.dto.ServiceListingResponseDto;
+import com.app.brainmap.domain.entities.ServiceListing;
 import com.app.brainmap.mappers.DomainExpertsMapper;
 import com.app.brainmap.services.DomainExpertsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,13 +32,26 @@ public class DomainExpertsController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/create-service-listing")
-    public ResponseEntity<String> createdemoService() {
+    @PostMapping("/create-service-listing")
+    public ResponseEntity<String> createServiceListing(@RequestBody ServiceListingRequestDto serviceListingRequestDto) {
         try {
-            domainExpertsService.createdemoService();
+            domainExpertsService.createServiceListing(serviceListingRequestDto);
             return ResponseEntity.ok("Created demo service listing");
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error creating demo service listing: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating service listing: " + e.getMessage());
         }
     }
+
+    @GetMapping("/service-listings")
+    public ResponseEntity<Page<ServiceListingResponseDto>> getAllServiceListings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "serviceId") String sortBy
+    ){
+        Page<ServiceListingResponseDto> serviceListings = domainExpertsService.getAllServiceListings(page, size, sortBy);
+        return ResponseEntity.ok()
+                .header("content-type", "application/json")
+                .body(serviceListings);
+    }
+
 }

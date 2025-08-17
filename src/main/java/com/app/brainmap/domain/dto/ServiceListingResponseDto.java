@@ -21,7 +21,7 @@ public class ServiceListingResponseDto {
     private String description;
     private Double fee;
     private LocalDateTime createdAt;
-    private LocalTime updatedAt;
+    private LocalDateTime updatedAt;
     private UUID mentorId;
     private List<ServiceListingAvailabilityResponseDto> availabilities;
     }

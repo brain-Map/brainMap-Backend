@@ -32,9 +32,6 @@ public class ServiceListingAvailability {
     @Column(name = "end_time", nullable = false)
     private LocalTime endTime;
 
-    @Column(name = "is_available")
-    private boolean isAvailable;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_id")
     private ServiceListing service;
