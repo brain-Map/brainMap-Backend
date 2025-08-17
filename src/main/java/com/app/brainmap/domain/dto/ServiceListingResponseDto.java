@@ -24,4 +24,4 @@ public class ServiceListingResponseDto {
     private LocalTime updatedAt;
     private UUID mentorId;
     private List<ServiceListingAvailabilityResponseDto> availabilities;
-}
+    }
