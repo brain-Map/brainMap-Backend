@@ -128,6 +128,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Void deleteUser(UUID id) {
+        User user = getUserById(id);
+        userRepository.delete(user);
+        log.info("User with id {} deleted successfully", id);
+        return null;
+    }
+
+    @Override
+    public List<User> searchUsers(String query) {
+        return userRepository.findByUsernameContainingIgnoreCase(query);
+    }
+
+    @Override
     public Long userCount() {
         try {
             return userRepository.count();

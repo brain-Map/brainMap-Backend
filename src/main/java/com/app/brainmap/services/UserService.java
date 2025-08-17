@@ -13,4 +13,6 @@ public interface UserService {
     List<User> getAllUsers();
     User updateUser(UUID id, UpdateUser request);
     Long userCount();
+    Void deleteUser(UUID id);
+    List<User> searchUsers(String query);
 }
