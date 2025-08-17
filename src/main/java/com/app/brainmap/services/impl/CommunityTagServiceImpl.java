@@ -99,4 +99,9 @@ public class CommunityTagServiceImpl implements CommunityTagService {
         }
         return foundTags;
     }
+
+    @Override
+    public List<CommunityTag> getPopularTags() {
+        return communityTagRepository.findPopularTagsOrderedByPostCount();
+    }
 }

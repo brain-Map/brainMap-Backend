@@ -2,6 +2,7 @@ package com.app.brainmap.controllers;
 
 import com.app.brainmap.domain.dto.CreateCommunityCommentRequestDto;
 import com.app.brainmap.domain.dto.CommunityCommentDto;
+import com.app.brainmap.domain.dto.TopCommenterDto;
 import com.app.brainmap.services.CommunityCommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,5 +30,10 @@ public class CommunityCommentController {
     @GetMapping("/{postId}/comments")
     public ResponseEntity<List<CommunityCommentDto>> getCommentsByPost(@PathVariable("postId") UUID postId) {
         return ResponseEntity.ok(commentService.getCommentsByPost(postId));
+    }
+    
+    @GetMapping("/{postId}/top-commenters")
+    public ResponseEntity<List<TopCommenterDto>> getTopCommentersByPost(@PathVariable("postId") UUID postId) {
+        return ResponseEntity.ok(commentService.getTopCommentersByPost(postId));
     }
 }

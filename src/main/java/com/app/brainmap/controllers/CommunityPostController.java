@@ -11,6 +11,7 @@ import com.app.brainmap.security.JwtUserDetails;
 import com.app.brainmap.services.CommunityCommentService;
 import com.app.brainmap.services.CommunityPostService;
 import com.app.brainmap.services.CommunityTagService;
+import com.app.brainmap.services.LikeService;
 import com.app.brainmap.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -34,12 +38,12 @@ public class CommunityPostController {
     private final CommunityTagService communityTagService;
     private final UserService userService;
     private final CommunityCommentService commentService;
+    private final LikeService likeService;
 
     @GetMapping
     public ResponseEntity<List<CommunityPostDto>> getAllPosts() {
         List<CommunityPost> posts = communityPostService.getAllPosts();
-        List<CommunityPostDto> postDtos = posts.stream().map(communityPostMapper::toDto).toList();
-
+        List<CommunityPostDto> postDtos = convertPostsToDto(posts);
         return ResponseEntity.ok(postDtos);
     }
 
@@ -48,7 +52,7 @@ public class CommunityPostController {
         log.info("Fetching post with ID: {}", postId);
         
         CommunityPost post = communityPostService.getPostById(postId);
-        CommunityPostDto postDto = communityPostMapper.toDto(post);
+        CommunityPostDto postDto = convertPostToDto(post);
         
         // Fetch comments for this post
         List<CommunityCommentDto> comments = commentService.getCommentsByPost(postId);
@@ -62,8 +66,7 @@ public class CommunityPostController {
             @RequestParam(required = false) UUID tagId
     ) {
         List<CommunityPost> posts = communityPostService.getAllPostsByTag(tagId);
-        List<CommunityPostDto> postDtos = posts.stream().map(communityPostMapper::toDto).toList();
-
+        List<CommunityPostDto> postDtos = convertPostsToDto(posts);
         return ResponseEntity.ok(postDtos);
     }
 
@@ -83,7 +86,7 @@ public class CommunityPostController {
         log.info("User details: {}", user);
         CreateCommunityPostRequest createCommunityPostRequest = communityPostMapper.toCreateCommunityPostRequest(requestDto, communityTagService);
         CommunityPost createdPost = communityPostService.createPost(user, createCommunityPostRequest);
-        CommunityPostDto createdPostDto = communityPostMapper.toDto(createdPost);
+        CommunityPostDto createdPostDto = convertPostToDto(createdPost);
 
         return new ResponseEntity<>(createdPostDto, HttpStatus.CREATED);
 
@@ -124,8 +127,68 @@ public class CommunityPostController {
 
         CreateCommunityPostRequest createCommunityPostRequest = communityPostMapper.toCreateCommunityPostRequest(requestDto, communityTagService);
         CommunityPost updatedPost = communityPostService.updatePostById(postId, userId, createCommunityPostRequest);
-        CommunityPostDto updatedPostDto = communityPostMapper.toDto(updatedPost);
+        CommunityPostDto updatedPostDto = convertPostToDto(updatedPost);
 
         return ResponseEntity.ok(updatedPostDto);
+    }
+
+    private CommunityPostDto convertPostToDto(CommunityPost post) {
+        CommunityPostDto dto = communityPostMapper.toDto(post);
+        
+        // Get current user for like status
+        UUID currentUserId = getCurrentUserId();
+        if (currentUserId != null) {
+            dto.setLikesCount(likeService.getPostLikesCount(post.getCommunityPostId()));
+            dto.setLiked(likeService.isPostLikedByUser(post.getCommunityPostId(), currentUserId));
+        } else {
+            dto.setLikesCount(likeService.getPostLikesCount(post.getCommunityPostId()));
+            dto.setLiked(false);
+        }
+        
+        return dto;
+    }
+
+    // Optimized batch conversion method to avoid N+1 queries
+    private List<CommunityPostDto> convertPostsToDto(List<CommunityPost> posts) {
+        if (posts.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        UUID currentUserId = getCurrentUserId();
+        List<UUID> postIds = posts.stream()
+                .map(CommunityPost::getCommunityPostId)
+                .toList();
+
+        // Batch fetch like counts and statuses
+        Map<UUID, Long> likeCounts = likeService.getPostLikeCounts(postIds);
+        Map<UUID, Boolean> likeStatuses = currentUserId != null 
+                ? likeService.getPostLikeStatusForUser(postIds, currentUserId)
+                : new HashMap<>();
+
+        return posts.stream().map(post -> {
+            CommunityPostDto dto = communityPostMapper.toDto(post);
+            
+            UUID postId = post.getCommunityPostId();
+            dto.setLikesCount(likeCounts.getOrDefault(postId, 0L));
+            dto.setLiked(currentUserId != null && likeStatuses.getOrDefault(postId, false));
+            
+            return dto;
+        }).toList();
+    }
+
+    private UUID getCurrentUserId() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            JwtUserDetails userDetails = (authentication != null && authentication.getPrincipal() != null)
+                    ? authentication.getPrincipal() instanceof JwtUserDetails
+                    ? (JwtUserDetails) authentication.getPrincipal()
+                    : null
+                    : null;
+            
+            return userDetails != null ? userDetails.getUserId() : null;
+        } catch (Exception e) {
+            log.warn("Could not get current user ID: {}", e.getMessage());
+            return null;
+        }
     }
 }

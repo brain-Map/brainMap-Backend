@@ -2,6 +2,7 @@ package com.app.brainmap.domain.dto;
 
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -13,4 +14,12 @@ public class CommunityCommentDto {
     private UUID authorId;
     private String authorName; // optional for displaying
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    
+    // For nested replies structure
+    private UUID parentCommentId; // null for top-level comments
+    private List<CommunityCommentDto> replies; // nested replies for hierarchical display
+    private boolean reply; // helper field to easily identify replies
+    private long likesCount;
+    private boolean liked; // Whether current user liked this comment
 }
