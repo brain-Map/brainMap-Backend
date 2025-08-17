@@ -1,10 +1,12 @@
 package com.app.brainmap.services.impl;
 
-import com.app.brainmap.domain.entities.KanbanBoard;
-import com.app.brainmap.domain.entities.KanbanColumn;
-import com.app.brainmap.domain.entities.Project;
+import com.app.brainmap.domain.ProjectCollaboratorAccept;
+import com.app.brainmap.domain.ProjectPositionType;
+import com.app.brainmap.domain.entities.*;
 import com.app.brainmap.repositories.KanbanBoardRepository;
+import com.app.brainmap.repositories.KanbanColumnRepository;
 import com.app.brainmap.repositories.ProjectRepositiory;
+import com.app.brainmap.repositories.UserProjectRepository;
 import com.app.brainmap.services.ProjectService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -20,15 +22,19 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepositiory projectRepositiory;
     private final KanbanBoardRepository kanbanBoardRepository;
+    private final KanbanColumnRepository kanbanColumnRepository;
+    private final UserProjectRepository userProjectRepository;
 
-    public ProjectServiceImpl(ProjectRepositiory projectRepositiory, KanbanBoardRepository kanbanBoardRepository) {
+    public ProjectServiceImpl(ProjectRepositiory projectRepositiory, KanbanBoardRepository kanbanBoardRepository, KanbanColumnRepository kanbanColumnRepository, UserProjectRepository userProjectRepository) {
         this.projectRepositiory = projectRepositiory;
         this.kanbanBoardRepository = kanbanBoardRepository;
+        this.kanbanColumnRepository = kanbanColumnRepository;
+        this.userProjectRepository = userProjectRepository;
     }
 
     @Override
-    public List<Project> listProject() {
-        return projectRepositiory.findAll();
+    public List<Project> listProject(UUID userId) {
+        return projectRepositiory.findAllByOwnerId(userId);
     }
 
     @Override
@@ -48,11 +54,12 @@ public class ProjectServiceImpl implements ProjectService {
                 project.getDescription(),
                 project.getUser(),
                 project.getStatus(),
+                project.getPrivacy(),
                 now,
                 project.getDueDate(),
                 project.getPriority(),
+                null,
                 null
-
         ));
 
 
@@ -71,6 +78,21 @@ public class ProjectServiceImpl implements ProjectService {
         kanbanBoard.setColumns(defaultColumns);
         // Save the kanban board (columns will be saved via cascade)
         kanbanBoardRepository.save(kanbanBoard);
+
+        UserProjectCompositeKey key = new UserProjectCompositeKey(
+                savedProject.getUser().getId(),
+                savedProject.getId()
+        );
+
+        UserProject userProject = UserProject.builder()
+                .id(key)
+                .user(savedProject.getUser())
+                .project(savedProject)
+                .role(ProjectPositionType.OWNER)
+                .status(ProjectCollaboratorAccept.ACCEPTED)
+                .build();
+
+        userProjectRepository.save(userProject);
 
         return savedProject;
 
@@ -113,5 +135,46 @@ public class ProjectServiceImpl implements ProjectService {
     public Optional<KanbanBoard> getKanbanBoardDetails(UUID projectId) {
         return kanbanBoardRepository.findByProjectId(projectId);
     }
+
+    @Override
+    public boolean updateKanbanColumn(UUID projectId, KanbanColumn kanbanColumn) {
+
+        Optional<KanbanBoard> kanbanBoardOpt = kanbanBoardRepository.findByProjectId(projectId);
+
+        if (kanbanBoardOpt.isEmpty()) {
+            return false;
+        }
+
+        KanbanBoard kanbanBoard = kanbanBoardOpt.get();
+
+        // If you just want the ID
+//        UUID kanbanId = kanbanBoard.getKanbanId();
+
+        // Link column to board
+        kanbanColumn.setKanbanBoard(kanbanBoard);
+
+        kanbanColumnRepository.save(kanbanColumn);
+
+        return true;
+    }
+
+    @Override
+    public boolean deleteKanbanBoardColumn(UUID columnId) {
+        Optional<KanbanColumn> kanbanColumnOptional = kanbanColumnRepository.findById(columnId);
+
+        if (kanbanColumnOptional.isEmpty()) {
+            return false;
+        }
+
+        KanbanColumn kanbanColumn = kanbanColumnOptional.get();
+        kanbanColumnRepository.delete(kanbanColumn);
+        return true;
+    }
+
+    @Override
+    public List<UserProject> listUserProject(UUID projectId) {
+        return userProjectRepository.findAllByProjectId(projectId);
+    }
+
 
 }

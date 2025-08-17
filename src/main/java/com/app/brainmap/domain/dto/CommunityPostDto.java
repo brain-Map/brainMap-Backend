@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,4 +24,7 @@ public class CommunityPostDto {
     private LocalDateTime updatedAt;
     private CommunityPostAuthorDto author;
     private CommunityPostType type;
+    private List<CommunityCommentDto> comments;
+    private long likesCount;
+    private boolean liked; // Whether current user liked this post
 }

@@ -21,15 +21,25 @@ public class CommunityComment {
     private UUID communityCommentId;
 
     @ManyToOne
-    @JoinColumn(name = "post", nullable = false)
+    @JoinColumn(name = "post_id", nullable = false)
     private CommunityPost post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
+    // Self-referencing relationship for replies
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private CommunityComment parentComment;
+
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<CommunityComment> replies = new ArrayList<>();
+
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CommunityReply> replies = new ArrayList<>();
+    @Builder.Default
+    private List<CommunityLike> likes = new ArrayList<>();
 
     @Column(columnDefinition = "TEXT")
     private String content;
@@ -50,5 +60,14 @@ public class CommunityComment {
     @PreUpdate
     protected void onUpdate(){
         this.updatedAt = LocalDateTime.now();
+    }
+
+    // Helper methods
+    public boolean isReply() {
+        return parentComment != null;
+    }
+
+    public boolean isTopLevelComment() {
+        return parentComment == null;
     }
 }

@@ -3,11 +3,11 @@ package com.app.brainmap.controllers;
 
 import com.app.brainmap.domain.CreateUser;
 import com.app.brainmap.domain.UpdateUser;
-import com.app.brainmap.domain.dto.CreateUserDto;
-import com.app.brainmap.domain.dto.UpdateUserDto;
-import com.app.brainmap.domain.dto.UserDto;
+import com.app.brainmap.domain.dto.*;
 import com.app.brainmap.domain.entities.User;
+import com.app.brainmap.domain.entities.UserProject;
 import com.app.brainmap.mappers.UserMapper;
+import com.app.brainmap.mappers.UserProjectMapper;
 import com.app.brainmap.security.JwtUserDetails;
 import com.app.brainmap.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,7 @@ public class UserController {
 
     private final UserService userService;
     private final UserMapper userMapper;
+    private final UserProjectMapper userProjectMapper;
 
     @GetMapping
     public ResponseEntity<List<UserDto>> getAllUsers() {
@@ -89,4 +91,28 @@ public class UserController {
     public ResponseEntity<String> testEndpoint() {
         return ResponseEntity.ok("Users Test endpoint is working!");
     }
+
+
+    @GetMapping("/searchcollaborator")
+    public List<UserDto> searchProjectCollaborator(
+            @RequestParam String query,
+            @RequestParam String type // "member" or "supervisor"
+    ) {
+        return userService.searchUsers(query, type)
+                .stream()
+                .map(UserDto::fromEntity)
+                .toList();
+    }
+
+    @PostMapping(path="/addcollaborator")
+    public ResponseEntity<String> addCollaborator(@RequestBody Map<String, Object> json) {
+        UserProjectSaveDto userProjectSaveDto = UserProjectSaveDto.fromMap(json); // static call
+//        UserProject userProject = userProjectMapper.toEntity(userProjectSaveDto);
+        userService.addCollaboration(userProjectSaveDto); // make sure this method exists
+
+        log.info("Adding collaborator: {}", userProjectSaveDto);
+        String responseMessage = "Collaborator added successfully";
+        return ResponseEntity.ok(responseMessage);
+    }
+
 }

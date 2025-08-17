@@ -1,10 +1,10 @@
 package com.app.brainmap.controllers;
 
-import com.app.brainmap.domain.dto.KanbanBoardDto;
-import com.app.brainmap.domain.dto.ProjectDto;
+import com.app.brainmap.domain.dto.*;
 import com.app.brainmap.domain.entities.Project;
 import com.app.brainmap.mappers.KanbanBoardMapper;
 import com.app.brainmap.mappers.ProjectMapper;
+import com.app.brainmap.mappers.UserProjectMapper;
 import com.app.brainmap.services.ProjectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,17 +22,19 @@ public class ProjectController {
     private final ProjectService projectService;
     private final ProjectMapper projectMapper;
     private final KanbanBoardMapper kanbanBoardMapper;
+    private final UserProjectMapper userProjectMapper;
 
 
-    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, KanbanBoardMapper kanbanBoardMapper) {
+    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, KanbanBoardMapper kanbanBoardMapper, UserProjectMapper userProjectMapper) {
         this.projectService = projectService;
         this.projectMapper = projectMapper;
         this.kanbanBoardMapper = kanbanBoardMapper;
+        this.userProjectMapper = userProjectMapper;
     }
 
-    @GetMapping
-    public List<ProjectDto> listProject() {
-        return projectService.listProject()
+    @GetMapping(path = "/all/{user_id}")
+    public List<ProjectDto> listProject(@PathVariable("user_id") UUID userId) {
+        return projectService.listProject(userId)
                 .stream()
                 .map(projectMapper::toDto)
                 .toList();
@@ -84,6 +86,48 @@ public class ProjectController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PutMapping(path = "/kanban-board/{project_id}")
+    public ResponseEntity<MessageResponse> updateKanbanBoard(
+            @PathVariable("project_id") UUID projectId,
+            @RequestBody KanbanBoardColumnDto kanbanBoardColumnDto
+    ) {
+        boolean isUpdated = projectService.updateKanbanColumn(
+                projectId,
+                kanbanBoardMapper.toEntity(kanbanBoardColumnDto) // maps DTO → KanbanColumn
+        );
+
+        if (isUpdated) {
+            return ResponseEntity.ok(new MessageResponse("Kanban board updated successfully"));
+        } else {
+            return ResponseEntity.status(404).body(new MessageResponse("Project not found"));
+        }
+    }
+
+    @DeleteMapping("/kanban-board/{project_id}")
+    public ResponseEntity<MessageResponse> deleteKanbanBoard(@PathVariable("project_id") UUID projectId,
+                                                             @RequestBody KanbanBoardColumnDto kanbanBoardColumnDto) {
+
+        UUID columnId = kanbanBoardColumnDto.columnId();
+
+        boolean isDeleted = projectService.deleteKanbanBoardColumn(columnId);
+        if (isDeleted) {
+            return ResponseEntity.ok(new MessageResponse("Kanban board column deleted successfully"));
+        } else {
+            return ResponseEntity.status(404).body(new MessageResponse("Kanban board column not found"));
+        }
+    }
+
+    @GetMapping(path = "/collaborators/{project_id}")
+    public List<UserProjectDto> listCollaborators(@PathVariable("project_id") UUID projectId) {
+        return projectService.listUserProject(projectId)
+                .stream()
+                .map(userProjectMapper::toDto)
+                .toList();
+    }
+
+
+
 
 
 }

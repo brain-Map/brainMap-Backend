@@ -2,11 +2,14 @@ package com.app.brainmap.domain.entities;
 
 import com.app.brainmap.domain.ProjctStatus;
 import com.app.brainmap.domain.ProjectPriority;
+import com.app.brainmap.domain.ProjectPrivacy;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -36,6 +39,10 @@ public class Project {
     @Enumerated(EnumType.STRING)
     private ProjctStatus status;
 
+    @Column(name = "privacy", updatable = true)
+    @Enumerated(EnumType.STRING)
+    private ProjectPrivacy privacy;
+
     private LocalDateTime createdAt;
 
     @Column(name= "due_date", nullable = true, updatable = true)
@@ -55,6 +62,7 @@ public class Project {
     @OneToOne(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private KanbanBoard kanbanBoard;
 
-
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserProject> userProjects = new ArrayList<>();
 
 }

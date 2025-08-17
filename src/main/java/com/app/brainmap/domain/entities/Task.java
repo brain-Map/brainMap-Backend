@@ -33,8 +33,11 @@ public class Task {
     @Column(name = "created_time", nullable = false, updatable = false)
     private LocalTime createdTime;
 
-    @Column(name = "status", nullable = false)
-    private String status;
+    @Column(name = "due_date")
+    private LocalDate dueDate;
+
+    @Column(name = "priority")
+    private String priority = "MEDIUM"; // Default priority
 
 
     @ManyToOne
@@ -42,6 +45,12 @@ public class Task {
             foreignKey = @ForeignKey(name = "fk_kanban_task",
                     foreignKeyDefinition = "FOREIGN KEY (kanban_id) REFERENCES kanaban_boards(kanban_id) ON DELETE CASCADE"))
     private KanbanBoard kanbanBoard;
+
+    @ManyToOne
+    @JoinColumn(name = "column_id",
+            foreignKey = @ForeignKey(name = "fk_column_task",
+                    foreignKeyDefinition = "FOREIGN KEY (column_id) REFERENCES kanban_columns(column_id) ON DELETE CASCADE"))
+    private KanbanColumn kanbanColumn;
 
 
 
