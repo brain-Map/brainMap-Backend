@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface ServiceListingResponseMapper {
 
+    @Mapping(source = "serviceId", target = "ServiceId")
     @Mapping(source = "mentor.id", target = "mentorId")
     ServiceListingResponseDto toServiceListingResponseDto(ServiceListing serviceListing);
 

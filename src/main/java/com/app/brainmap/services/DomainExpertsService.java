@@ -7,13 +7,12 @@ import com.app.brainmap.domain.entities.ServiceListing;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface DomainExpertsService {
 
     List<DomainExperts> listDomainExperts();
     ServiceListing createServiceListing(ServiceListingRequestDto serviceListingRequestDto);
     Page<ServiceListingResponseDto> getAllServiceListings(int page, int size, String sortBy);
-
-
-
+    ServiceListingResponseDto getServiceListingById(UUID serviceId);
 }

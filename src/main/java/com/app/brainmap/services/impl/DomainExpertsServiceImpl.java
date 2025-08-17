@@ -74,4 +74,11 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
         return serviceListings.map(serviceListingResponseMapper::toServiceListingResponseDto);
     }
 
+    @Override
+    public ServiceListingResponseDto getServiceListingById(UUID serviceId) {
+        ServiceListing serviceListing = serviceListingRepository.findById(serviceId)
+                .orElseThrow(() -> new RuntimeException("Service not found with UUID: " + serviceId));
+        return serviceListingResponseMapper.toServiceListingResponseDto(serviceListing);
+    }
+
 }

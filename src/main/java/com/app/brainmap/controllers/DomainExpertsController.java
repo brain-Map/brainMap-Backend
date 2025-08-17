@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -52,6 +53,18 @@ public class DomainExpertsController {
         return ResponseEntity.ok()
                 .header("content-type", "application/json")
                 .body(serviceListings);
+    }
+
+    @GetMapping("/service-listing")
+    public ResponseEntity<ServiceListingResponseDto> getServiceListingById(
+            @RequestParam UUID serviceId
+    ) {
+        try {
+            ServiceListingResponseDto dto = domainExpertsService.getServiceListingById(serviceId);
+            return  ResponseEntity.ok(dto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
 }
