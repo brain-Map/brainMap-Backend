@@ -1,10 +1,14 @@
 package com.app.brainmap.mappers;
 
 import com.app.brainmap.domain.dto.UserProjectDto;
+import com.app.brainmap.domain.dto.UserProjectSaveDto;
 import com.app.brainmap.domain.entities.UserProject;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
+
+import java.util.Map;
+import java.util.UUID;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserProjectMapper {
@@ -15,7 +19,13 @@ public interface UserProjectMapper {
     @Mapping(target = "name", expression = "java(userProject.getUser().getFirstName() + \" \" + userProject.getUser().getLastName())")
     @Mapping(target = "role", source = "role")
     UserProjectDto toDto(UserProject userProject);
-    // UserProject toEntity(UserProjectDto userProjectDto);
+
+    @Mapping(target = "user.id", source = "userId")
+    @Mapping(target = "project.id", source = "projectId")
+    UserProject toEntity(UserProjectSaveDto userProjectSaveDto);
+
+
+
 
     // Additional methods can be added as needed for specific use cases
 }

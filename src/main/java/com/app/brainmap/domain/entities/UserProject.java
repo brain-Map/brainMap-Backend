@@ -41,4 +41,15 @@ public class UserProject {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private ProjectCollaboratorAccept status;
+
+    // ✅ Convenience constructor
+    public UserProject(User user, Project project,
+                       ProjectPositionType role,
+                       ProjectCollaboratorAccept status) {
+        this.id = new UserProjectCompositeKey(user.getId(), project.getId());
+        this.user = user;
+        this.project = project;
+        this.role = role;
+        this.status = status;
+    }
 }
