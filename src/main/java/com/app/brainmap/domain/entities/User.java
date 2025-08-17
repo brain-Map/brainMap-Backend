@@ -53,8 +53,8 @@ public class User {
     private String gender;
     private String bio;
 
-
-
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ProjectMember projectMember;
 
     //    Make it easy to get user posts using user.getPosts();
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
