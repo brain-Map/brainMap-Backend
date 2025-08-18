@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
@@ -79,6 +80,41 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
         ServiceListing serviceListing = serviceListingRepository.findById(serviceId)
                 .orElseThrow(() -> new RuntimeException("Service not found with UUID: " + serviceId));
         return serviceListingResponseMapper.toServiceListingResponseDto(serviceListing);
+    }
+
+    @Override
+    public ServiceListingResponseDto updateServiceListing(UUID serviceId, ServiceListingRequestDto serviceListingRequestDto){
+        ServiceListing serviceListing = serviceListingRepository.findById(serviceId)
+                .orElseThrow(() -> new RuntimeException("Service listing not found"));
+
+        serviceListing.setTitle(serviceListingRequestDto.getTitle());
+        serviceListing.setSubject(serviceListingRequestDto.getSubject());
+        serviceListing.setDescription(serviceListingRequestDto.getDescription());
+        serviceListing.setFee(serviceListingRequestDto.getFee());
+        serviceListing.setUpdatedAt(LocalDateTime.now());
+
+        // update availabilities
+        serviceListing.getAvailabilities().clear();
+        List<ServiceListingAvailability> newAvailabilities = serviceListingRequestDto.getAvailabilities().stream()
+                .map(availability -> ServiceListingAvailability.builder()
+                        .dayOfWeek(availability.getDayOfWeek())
+                        .startTime(availability.getStartTime())
+                        .endTime(availability.getEndTime())
+                        .service(serviceListing)
+                        .build()
+                ).toList();
+        serviceListing.getAvailabilities().addAll(newAvailabilities);
+
+        ServiceListing updatedServicelisting =  serviceListingRepository.save(serviceListing);
+        return serviceListingResponseMapper.toServiceListingResponseDto(updatedServicelisting);
+    }
+
+    @Override
+    public  void deleteServiceListing(UUID serviceId) {
+        if(!serviceListingRepository.existsById(serviceId)){
+            throw new RuntimeException("Service not fount with UUID: " + serviceId);
+        }
+        serviceListingRepository.deleteById(serviceId);
     }
 
 }

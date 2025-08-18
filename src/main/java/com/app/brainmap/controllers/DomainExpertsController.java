@@ -67,4 +67,19 @@ public class DomainExpertsController {
         }
     }
 
+    @PutMapping("/service-listing")
+    public ResponseEntity<ServiceListingResponseDto> updateServiceListing(
+            @RequestParam UUID serviceId,
+            @RequestBody ServiceListingRequestDto serviceListingRequestDto
+    ){
+        try {
+            ServiceListingResponseDto updatedServiceListing = domainExpertsService.updateServiceListing(serviceId, serviceListingRequestDto);
+            return  ResponseEntity.ok(updatedServiceListing);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
+
 }

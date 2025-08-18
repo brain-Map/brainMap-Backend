@@ -15,4 +15,6 @@ public interface DomainExpertsService {
     ServiceListing createServiceListing(ServiceListingRequestDto serviceListingRequestDto);
     Page<ServiceListingResponseDto> getAllServiceListings(int page, int size, String sortBy);
     ServiceListingResponseDto getServiceListingById(UUID serviceId);
+    ServiceListingResponseDto updateServiceListing(UUID serviceId, ServiceListingRequestDto serviceListingRequestDto);
+    void deleteServiceListing(UUID serviceId);
 }
