@@ -33,6 +33,7 @@ public class DomainExpertsController {
                 .collect(Collectors.toList());
     }
 
+    // domain experts service listings
     @PostMapping("/create-service-listing")
     public ResponseEntity<String> createServiceListing(@RequestBody ServiceListingRequestDto serviceListingRequestDto) {
         try {
@@ -43,6 +44,7 @@ public class DomainExpertsController {
         }
     }
 
+    // Get all service listings
     @GetMapping("/service-listings")
     public ResponseEntity<Page<ServiceListingResponseDto>> getAllServiceListings(
             @RequestParam(defaultValue = "0") int page,
@@ -55,31 +57,50 @@ public class DomainExpertsController {
                 .body(serviceListings);
     }
 
+    // Get service listing by ID
     @GetMapping("/service-listing")
-    public ResponseEntity<ServiceListingResponseDto> getServiceListingById(
+    public ResponseEntity<?> getServiceListingById(
             @RequestParam UUID serviceId
     ) {
         try {
             ServiceListingResponseDto dto = domainExpertsService.getServiceListingById(serviceId);
             return  ResponseEntity.ok(dto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
+    // Update service listing
     @PutMapping("/service-listing")
-    public ResponseEntity<ServiceListingResponseDto> updateServiceListing(
+    public ResponseEntity<?> updateServiceListing(
             @RequestParam UUID serviceId,
             @RequestBody ServiceListingRequestDto serviceListingRequestDto
     ){
         try {
             ServiceListingResponseDto updatedServiceListing = domainExpertsService.updateServiceListing(serviceId, serviceListingRequestDto);
             return  ResponseEntity.ok(updatedServiceListing);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-
+    // Delete service listing
+    @DeleteMapping("/service-listing")
+    public ResponseEntity<?> deleteServiceListing(
+            @RequestParam UUID serviceId
+    ){
+        try {
+            domainExpertsService.deleteServiceListing(serviceId);
+            return ResponseEntity.noContent().build();
+        }catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 
 }
