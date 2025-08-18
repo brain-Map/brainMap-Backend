@@ -51,6 +51,7 @@ public class User {
 
     private String city;
     private String gender;
+    @Column(columnDefinition = "TEXT")
     private String bio;
 
 
@@ -63,9 +64,6 @@ public class User {
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommunityComment> comments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CommunityReply> replies = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSocialLink> socialLinks = new ArrayList<>();

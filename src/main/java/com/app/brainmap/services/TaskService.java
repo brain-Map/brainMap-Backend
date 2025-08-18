@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface TaskService {
 
-    List<Task> listTasks();
+    List<Task> listTasks(UUID kanbanId);
     Task createTask(Task task);
     boolean updateTask(UUID id, Task task);
     boolean deleteTask(UUID id);

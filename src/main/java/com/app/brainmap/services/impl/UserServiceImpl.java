@@ -4,14 +4,9 @@ import com.app.brainmap.domain.CreateUser;
 import com.app.brainmap.domain.UpdateUser;
 import com.app.brainmap.domain.UserRoleType;
 import com.app.brainmap.domain.dto.UserProjectCountDto;
-import com.app.brainmap.domain.entities.DomainExperts;
-import com.app.brainmap.domain.entities.ProjectMember;
-import com.app.brainmap.domain.entities.User;
-import com.app.brainmap.domain.entities.UserSocialLink;
-import com.app.brainmap.repositories.DomainExpertRepository;
-import com.app.brainmap.repositories.ProjectMemberRepository;
-import com.app.brainmap.repositories.UserRepository;
-import com.app.brainmap.repositories.UserSocialLinkRepository;
+import com.app.brainmap.domain.dto.UserProjectSaveDto;
+import com.app.brainmap.domain.entities.*;
+import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +24,9 @@ public class UserServiceImpl implements UserService {
     private final UserSocialLinkRepository userSocialLinkRepository;
     private final DomainExpertRepository domainExpertRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final UserProjectRepository userProjectRepository;
+    private final ProjectRepositiory projectRepository;
+
 
     @Override
     public User getUserById(UUID id) {
@@ -132,5 +130,30 @@ public class UserServiceImpl implements UserService {
     public List<UserProjectCountDto> getUsersWithProjectCount() {
         return List.of();
     }
+
+    @Override
+    public List<User> searchUsers(String query, String type) {
+        if ("supervisor".equalsIgnoreCase(type)) {
+            return userRepository.searchSupervisors(query);
+        } else {
+            return userRepository.searchMembers(query);
+        }
+    }
+
+    @Override
+    public void addCollaboration(UserProjectSaveDto dto) {
+        User user = userRepository.findById(dto.userId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Project project = projectRepository.findById(dto.projectId())
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        // ✅ Use convenience constructor
+        UserProject userProject = new UserProject(user, project, dto.role(), dto.status());
+
+        userProjectRepository.save(userProject);
+    }
+
+
+
 
 }

@@ -27,9 +27,9 @@ public class TaskController {
         this.taskMapper = taskMapper;
     }
 
-    @GetMapping
-    public List<TaskDto> listTasks() {
-        return taskService.listTasks()
+    @GetMapping("/{kanban_id}")
+    public List<TaskDto> listTasks(@PathVariable("kanban_id") UUID kanbanId) {
+        return taskService.listTasks(kanbanId)
                 .stream()
                 .map(taskMapper::toDto)
                 .toList();
