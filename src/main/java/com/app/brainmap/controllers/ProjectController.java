@@ -61,7 +61,6 @@ public class ProjectController {
             @RequestBody ProjectDto projectDto
     ){
         Project project = projectMapper.toEntity(projectDto);
-//        log.info("Updating project with id: {}, {}" , id , project.getId());
         Project updateProject = projectService.updateProject(
                 id, project
         );
@@ -125,6 +124,7 @@ public class ProjectController {
                 .map(userProjectMapper::toDto)
                 .toList();
     }
+
 
 
 

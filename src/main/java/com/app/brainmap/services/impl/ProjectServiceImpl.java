@@ -105,26 +105,35 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project updateProject(UUID id, Project project) {
-
-        if(project.getId() == null){
-            throw new IllegalArgumentException("Project must have and id");
-        }
-
-        if(!Objects.equals(project.getId(), id)){
-            throw new IllegalArgumentException("Attempting to change project ID, this is not permitted!");
-        }
-
-        Project existingProject =  projectRepositiory.findById(id).orElseThrow(()->
+        Project existingProject = projectRepositiory.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("project not found"));
 
-        existingProject.setTitle(project.getTitle());
-        existingProject.setDescription(project.getDescription());
-        existingProject.setCreatedAt(LocalDateTime.now());
-        existingProject.setPriority(project.getPriority());
-        existingProject.setStatus(project.getStatus());
-        existingProject.setDueDate(project.getDueDate());
+        if (project.getTitle() != null) {
+            existingProject.setTitle(project.getTitle());
+        }
+        if (project.getDescription() != null) {
+            existingProject.setDescription(project.getDescription());
+        }
+        if (project.getPriority() != null) {
+            existingProject.setPriority(project.getPriority());
+        }
+        if (project.getStatus() != null) {
+            existingProject.setStatus(project.getStatus());
+        }
+        if (project.getDueDate() != null) {
+            existingProject.setDueDate(project.getDueDate());
+        }
+        if(project.getPrivacy() != null){
+            existingProject.setPrivacy(project.getPrivacy());
+        }
+
+        // Usually `createdAt` should NOT be updated on update.
+        // Instead, you might want to update `updatedAt`.
+//        existingProject.setUpdatedAt(LocalDateTime.now());
+
         return projectRepositiory.save(existingProject);
     }
+
 
     @Override
     public void deleteProject(UUID projectId) {
