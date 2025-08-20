@@ -54,6 +54,8 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String bio;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ProjectMember projectMember;
     @Column(name ="avatar", columnDefinition = "TEXT")
     private String avatar;
 

@@ -24,11 +24,11 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String token = (String) authentication.getCredentials();
 
-        try{
+        try {
             Algorithm algorithm = Algorithm.HMAC256(jwtSecret);
             DecodedJWT decodedJWT = JWT.require(algorithm).build().verify(token);
 
-            String  subject = decodedJWT.getSubject();
+            String subject = decodedJWT.getSubject();
             UUID userId = UUID.fromString(subject);
             String email = decodedJWT.getClaim("email").asString();
 
@@ -37,7 +37,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
             return new JwtAuthenticationToken(userDetails, token,
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
         } catch (Exception e) {
-            throw  new BadCredentialsException("Invalid JWT token:", e);
+            throw new BadCredentialsException("Invalid JWT token: " + e.getMessage(), e);
         }
     }
 
