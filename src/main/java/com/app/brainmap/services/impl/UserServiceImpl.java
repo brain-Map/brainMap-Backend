@@ -127,6 +127,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Long userCount() {
+        return 0L;
+    }
+
+    @Override
     public Void deleteUser(UUID id) {
         User user = getUserById(id);
         userRepository.delete(user);
@@ -140,14 +145,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Long userCount() {
-        try {
-            return userRepository.count();
-        } catch (Exception e) {
-            throw new RuntimeException("error retrieving user count", e);
     public List<UserProjectCountDto> getUsersWithProjectCount() {
         return List.of();
     }
+
 
     @Override
     public List<User> searchUsers(String query, String type) {
