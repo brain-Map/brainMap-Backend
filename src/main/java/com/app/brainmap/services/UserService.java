@@ -19,4 +19,5 @@ public interface UserService {
     List<UserProjectCountDto> getUsersWithProjectCount();
     List<User> searchUsers(String query, String type);
     void addCollaboration(UserProjectSaveDto dto);
+    void updateAvatar(UUID userId, String imageUrl);
 }
