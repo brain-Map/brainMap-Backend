@@ -40,6 +40,15 @@ public class UserController {
         List<UserDto> userDtos = users.stream().map(userMapper::toDto).toList();
         return new ResponseEntity<>(userDtos, HttpStatus.OK);
     }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserAllDataDto> getUserById(@PathVariable UUID userId) {
+        User user = userService.getUserById(userId);
+        UserAllDataDto userAllDataDto = userMapper.toAllDataDto(user);
+        return ResponseEntity.ok(userAllDataDto);
+    }
+
+
     @PostMapping
     public ResponseEntity<UserDto> createUser(@RequestBody CreateUserDto createUserDto) {
 
@@ -106,6 +115,19 @@ public class UserController {
         log.info("Adding collaborator: {}", userProjectSaveDto);
         String responseMessage = "Collaborator added successfully";
         return ResponseEntity.ok(responseMessage);
+    }
+
+
+    @PutMapping(path="/avatar")
+    public ResponseEntity<MessageResponse> updateAvatar(@RequestBody UserImageDto userImageDto) {
+        UUID userId = userImageDto.userId();
+        String imageUrl = userImageDto.avatar(); // assuming this field exists
+        log.info("Updating avatar for user with id: {}", userId);
+
+        userService.updateAvatar(userId, imageUrl);
+
+        MessageResponse response = new MessageResponse("Avatar updated successfully");
+        return ResponseEntity.ok(response);
     }
 
 }

@@ -153,6 +153,14 @@ public class UserServiceImpl implements UserService {
         userProjectRepository.save(userProject);
     }
 
+    @Override
+    public void updateAvatar(UUID userId, String imageUrl) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setAvatar(imageUrl); // make sure User entity has setAvatarUrl
+        userRepository.save(user);
+    }
+
 
 
 

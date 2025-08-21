@@ -3,10 +3,7 @@ package com.app.brainmap.mappers;
 import com.app.brainmap.domain.CreateUser;
 import com.app.brainmap.domain.UpdateUser;
 import com.app.brainmap.domain.UserRoleType;
-import com.app.brainmap.domain.dto.AdminUserListDto;
-import com.app.brainmap.domain.dto.CreateUserDto;
-import com.app.brainmap.domain.dto.UpdateUserDto;
-import com.app.brainmap.domain.dto.UserDto;
+import com.app.brainmap.domain.dto.*;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.services.UserService;
 import org.mapstruct.*;
@@ -19,6 +16,26 @@ import java.time.format.DateTimeFormatter;
 public interface UserMapper {
 
     UserDto toDto(User user);
+
+    public default UserAllDataDto toAllDataDto(User user) {
+     if (user == null) return null;
+     return new UserAllDataDto(
+         user.getId(),
+         user.getFirstName(),
+         user.getLastName(),
+         user.getUsername(),
+         user.getEmail(),
+         user.getMobileNumber(),
+         user.getDateOfBirth(),
+         user.getUserRole().toString(),
+         user.getCreatedAt().toString(),
+         user.getStatus().toString(),
+         user.getCity(),
+         user.getGender(),
+         user.getBio(),
+         user.getAvatar()
+     );
+ }
 
     @Mapping(target = "userRole", source = "userRole", qualifiedByName = "stringToUserRoleType")
     @Mapping(target = "userId", expression = "java(java.util.UUID.fromString(dto.getUserId()))")
