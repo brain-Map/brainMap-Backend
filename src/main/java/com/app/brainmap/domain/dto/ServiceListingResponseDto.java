@@ -16,11 +16,16 @@ import java.util.UUID;
 public class ServiceListingResponseDto {
     private UUID ServiceId;
     private String title;
+    private String thumbnail;
     private String subject;
     private String description;
     private Double fee;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private UUID mentorId;
+    private String avatar;
+    private String mentorName;
+    private Double mentorRating;
+    private Integer reviews;
     private List<ServiceListingAvailabilityResponseDto> availabilities;
     }

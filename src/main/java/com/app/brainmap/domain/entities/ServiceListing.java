@@ -24,6 +24,9 @@ public class ServiceListing {
     @Column(name = "title",columnDefinition = "TEXT",  nullable = false)
     private String title;
 
+    @Column(name = "thumbnail", columnDefinition = "TEXT")
+    private String thumbnail;
+
     @Column(name = "subject", columnDefinition = "TEXT", nullable = false)
     private String subject;
 

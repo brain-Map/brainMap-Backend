@@ -7,11 +7,13 @@ import com.app.brainmap.domain.entities.DomainExperts;
 import com.app.brainmap.domain.entities.ServiceListingAvailability;
 import com.app.brainmap.domain.entities.ServiceListing;
 import com.app.brainmap.domain.entities.User;
+import com.app.brainmap.domain.entities.Review;
 import com.app.brainmap.mappers.ServiceListingResponseMapper;
 import com.app.brainmap.repositories.DomainExpertRepository;
 import com.app.brainmap.repositories.ServiceListingAvailabilityRepository;
 import com.app.brainmap.repositories.ServiceListingRepository;
 import com.app.brainmap.repositories.UserRepository;
+import com.app.brainmap.repositories.ReviewRepository;
 import com.app.brainmap.services.DomainExpertsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,6 +35,19 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
     private final UserRepository userRepository;
     private final ServiceListingAvailabilityRepository serviceListingAvailabilityRepository;
     private final ServiceListingResponseMapper serviceListingResponseMapper;
+    private final ReviewRepository reviewRepository;
+
+    private Double calculateMentorRating(UUID mentorId) {
+        List<Review> reviews = reviewRepository.findByMentorId(mentorId);
+        if(reviews.isEmpty()) return 0.0;
+        return reviews.stream().mapToInt(Review::getRate).average().orElse(0.0);
+    }
+
+    private Integer calculateMentorreviews(UUID mentorId) {
+        List<Review> reviews = reviewRepository.findByMentorId(mentorId);
+        if(reviews.isEmpty()) return 0;
+        return reviews.stream().mapToInt(Review::getRate).sum();
+    }
 
     @Override
     public List<DomainExperts> listDomainExperts() {
@@ -72,7 +87,15 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
     public Page<ServiceListingResponseDto> getAllServiceListings(int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
         Page<ServiceListing> serviceListings = serviceListingRepository.findAll(pageable);
-        return serviceListings.map(serviceListingResponseMapper::toServiceListingResponseDto);
+//        return serviceListings.map(serviceListingResponseMapper::toServiceListingResponseDto);
+        return serviceListings.map(serviceListing -> {
+            ServiceListingResponseDto dto = serviceListingResponseMapper.toServiceListingResponseDto(serviceListing);
+            Double rating = calculateMentorRating(serviceListing.getMentor().getId());
+            Integer reviews = calculateMentorreviews(serviceListing.getMentor().getId());
+            dto.setMentorRating(rating);
+            dto.setReviews(reviews);
+            return dto;
+        });
     }
 
     @Override

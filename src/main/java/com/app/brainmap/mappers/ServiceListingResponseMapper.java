@@ -10,6 +10,8 @@ public interface ServiceListingResponseMapper {
 
     @Mapping(source = "serviceId", target = "ServiceId")
     @Mapping(source = "mentor.id", target = "mentorId")
+    @Mapping(target = "mentorName", expression = "java(serviceListing.getMentor().getFirstName() + \" \" + serviceListing.getMentor().getLastName())")
+    @Mapping(target = "avatar", expression = "java(serviceListing.getMentor().getAvatar())")
     ServiceListingResponseDto toServiceListingResponseDto(ServiceListing serviceListing);
 
     ServiceListing toServiceListing(ServiceListingResponseDto serviceListingResponseDto);
