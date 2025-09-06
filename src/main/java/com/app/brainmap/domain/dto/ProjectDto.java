@@ -17,7 +17,8 @@ public record ProjectDto(
         LocalDateTime createdAt,
         String priority,
         boolean isPublic,
-        String status
+        String status,
+        String avatar
 
 ) {
 }
