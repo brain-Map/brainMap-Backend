@@ -6,6 +6,7 @@ import com.app.brainmap.domain.UserRoleType;
 import com.app.brainmap.domain.dto.UserProjectCountDto;
 import com.app.brainmap.domain.dto.UserProjectSaveDto;
 import com.app.brainmap.domain.entities.*;
+import com.app.brainmap.domain.entities.DomainExpert.DomainExperts;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.UserService;
 import jakarta.transaction.Transactional;
