@@ -1,14 +1,14 @@
-package com.app.brainmap.domain.entities;
+package com.app.brainmap.domain.entities.DomainExpert;
 
 import com.app.brainmap.domain.DomainExpertStatus;
+import com.app.brainmap.domain.entities.User;
+import com.app.brainmap.domain.entities.Wallet;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Entity
