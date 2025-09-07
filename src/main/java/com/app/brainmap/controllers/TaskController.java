@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -44,6 +45,7 @@ public class TaskController {
     }
 
 
+
     @PutMapping("/{task_id}")
     public ResponseEntity<MessageResponse> updateTask(
             @PathVariable("task_id") UUID taskId,
@@ -60,6 +62,24 @@ public class TaskController {
             return ResponseEntity.status(404).body(new MessageResponse("task not found"));
         }
     }
+
+    @PutMapping("column/{task_id}")
+    public ResponseEntity<MessageResponse> updateTaskColumn(
+            @PathVariable("task_id") UUID taskId,
+            @RequestBody Map<String, UUID> body
+    ) {
+        UUID columnId = body.get("columnId"); // get value from JSON
+
+        boolean isUpdated = taskService.updateTaskColumn(taskId, columnId);
+
+        if (isUpdated) {
+            return ResponseEntity.ok(new MessageResponse("task updated successfully"));
+        } else {
+            return ResponseEntity.status(404).body(new MessageResponse("task not found"));
+        }
+    }
+
+
 
 
     @DeleteMapping

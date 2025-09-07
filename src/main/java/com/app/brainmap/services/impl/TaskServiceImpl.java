@@ -1,6 +1,7 @@
 package com.app.brainmap.services.impl;
 
 import com.app.brainmap.domain.entities.KanbanBoard;
+import com.app.brainmap.domain.entities.KanbanColumn;
 import com.app.brainmap.domain.entities.Task;
 import com.app.brainmap.repositories.TaskRepository;
 import com.app.brainmap.services.TaskService;
@@ -49,6 +50,24 @@ public class TaskServiceImpl implements TaskService {
 
         return true;
     }
+
+    @Override
+    public boolean updateTaskColumn(UUID id, UUID columnId) {
+        Optional<Task> taskOptional = taskRepository.findById(id);
+        if (taskOptional.isEmpty()) {
+            return false;
+        }
+
+        Task taskfind = taskOptional.get();
+
+        KanbanColumn columnRef = new KanbanColumn();
+        columnRef.setColumnId(columnId); // just set the ID
+        taskfind.setKanbanColumn(columnRef);
+
+        taskRepository.save(taskfind);
+        return true;
+    }
+
 
     @Override
     public boolean deleteTask(UUID id) {

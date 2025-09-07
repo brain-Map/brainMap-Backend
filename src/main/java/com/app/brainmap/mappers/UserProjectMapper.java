@@ -19,6 +19,7 @@ public interface UserProjectMapper {
     @Mapping(target = "name", expression = "java(userProject.getUser().getFirstName() + \" \" + userProject.getUser().getLastName())")
     @Mapping(target = "role", source = "role")
     @Mapping(target="email", source = "user.email")
+    @Mapping(target = "avatar", source = "user.avatar")
     UserProjectDto toDto(UserProject userProject);
 
     @Mapping(target = "user.id", source = "userId")

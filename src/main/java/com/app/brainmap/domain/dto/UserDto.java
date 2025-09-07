@@ -9,10 +9,11 @@ public record UserDto(
         String firstName,
         String lastName,
         String username,
-        String email
+        String email,
+        String avatar
 ) {
     public static UserDto fromEntity(User user) {
         return new UserDto(user.getId(), user.getFirstName(), user.getLastName(),
-                user.getUsername(), user.getEmail());
+                user.getUsername(), user.getEmail(), user.getAvatar());
     }
 }
