@@ -44,7 +44,7 @@ public class AdminServiceImpl implements AdminService {
     public AdminDashboardStatusDto getAdminDashboardStatus() {
         long userCount = userRepository.count();
         long activeProjects = projectRepositiory.countByStatus(ProjctStatus.ACTIVE);
-        long pendingDomainExperts = domainExpertRepository.countByStatus(null);
+        long pendingDomainExperts = domainExpertRepository.countByStatus("PENDING");
         long openInquiries = inquiryRepository.countByStatus(InquiryStatus.PENDING);
 
         return AdminDashboardStatusDto.builder()

@@ -40,6 +40,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
+        String contentType = request.getContentType();
+        if (contentType != null && contentType.toLowerCase().startsWith("multipart/")) {
+            // Avoid triggering multipart parsing (and potential FileCountLimitExceeded) just to look for a parameter
+            return null;
+        }
         return request.getParameter("access_token");
     }
 
