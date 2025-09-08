@@ -25,13 +25,3 @@ public class NotificationSettingsDTO {
     private Boolean inAppFileSharing;
 }
 
-@Data
-public class PrivacySettingsDTO {
-    private ProfileVisibility profileVisibility;
-    private Boolean showEmail;
-    private Boolean showPhone;
-    private Boolean showProjects;
-    private Boolean showProgress;
-    private Boolean allowContactFromExperts;
-    private Boolean showOnlineStatus;
-}

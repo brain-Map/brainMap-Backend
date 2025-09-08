@@ -71,14 +71,3 @@ public class Report {
     }
 }
 
-enum ReportType {
-    TECHNICAL_ISSUE, USER_COMPLAINT, HARASSMENT, PAYMENT_ISSUE, SERVICE_QUALITY, OTHER
-}
-
-enum ReportStatus {
-    OPEN, IN_PROGRESS, RESOLVED, CLOSED
-}
-
-enum ReportPriority {
-    LOW, MEDIUM, HIGH, CRITICAL
-}

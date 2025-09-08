@@ -30,6 +30,3 @@ public class PrivacySettings {
     private Boolean showOnlineStatus = true;
 }
 
-enum ProfileVisibility {
-    PUBLIC, EXPERTS, PRIVATE
-}
