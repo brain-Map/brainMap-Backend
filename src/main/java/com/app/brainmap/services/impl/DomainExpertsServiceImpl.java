@@ -1,5 +1,6 @@
 package com.app.brainmap.services.impl;
 
+import com.app.brainmap.domain.DomainExpertStatus;
 import com.app.brainmap.domain.dto.DomainExpert.CompleteDomainExpertProfileDto;
 import com.app.brainmap.domain.dto.DomainExpert.DomainExpertProfileDto;
 import com.app.brainmap.domain.dto.ServiceListingRequestDto;
@@ -177,6 +178,7 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
         expert.setPortfolio(profileDto.getPortfolio());
         expert.setAddress(profileDto.getAddress());
         expert.setLocation(profileDto.getLocation());
+        expert.setStatus(DomainExpertStatus.PENDING);
 
         // Expertise Areas
         expert.getExpertiseAreas().clear();
@@ -247,5 +249,12 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
         domainExpertRepository.saveAndFlush(expert);
         log.debug("Completed profile for expert id={}", expert.getId());
         return expert.getId();
+    }
+
+    @Override
+    public Boolean isProfileComplete(UUID userId) {
+        return domainExpertRepository.findById(userId)
+                .map(expert -> expert.getStatus() == DomainExpertStatus.VERIFIED || expert.getStatus() == DomainExpertStatus.PENDING)
+                .orElse(false);
     }
 }
