@@ -103,23 +103,37 @@ public class DomainExpertsController {
         }
     }
 
-    @GetMapping(path = "/{id}/profile")
-    public ResponseEntity<DomainExpertProfileDto> getDomainExpertProfile(@PathVariable UUID id) {
-        System.out.println("Hit the function with id: " + id);
+//    @GetMapping(path = "/{id}/profile")
+//    public ResponseEntity<DomainExpertProfileDto> getDomainExpertProfile(@PathVariable UUID id) {
+//        System.out.println("Hit the function with id: " + id);
+//        try{
+//            DomainExpertProfileDto expert = domainExpertsService.getDomainExpertProfile(id);
+//            System.out.println("Expert: " + expert);
+//            return ResponseEntity.ok(expert);
+//        } catch (RuntimeException e) {
+//            System.out.println("Error: " + e.getMessage());
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+//        } catch (Exception e) {
+//            System.out.println("Error: " + e.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//
+//        }
+//
+//    }
+    @GetMapping(path = "/{id}/profile-status")
+    public ResponseEntity<Boolean> getProfileStatus(@PathVariable UUID id) {
         try{
-            DomainExpertProfileDto expert = domainExpertsService.getDomainExpertProfile(id);
-            System.out.println("Expert: " + expert);
-            return ResponseEntity.ok(expert);
+            Boolean isComplete = domainExpertsService.isProfileComplete(id);
+            System.out.println("Isconplete: " + isComplete);
+            return ResponseEntity.ok(isComplete);
         } catch (RuntimeException e) {
-            System.out.println("Error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 
         }
-
     }
+
     @PostMapping(path = "/{id}/profile-complete", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UUID> completeDomainExpertProfile(
             @PathVariable UUID id,

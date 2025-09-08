@@ -49,7 +49,7 @@ public class UserController {
     }
 
 
-    @PostMapping
+    @PostMapping(path = "/register")
     public ResponseEntity<UserDto> createUser(@RequestBody CreateUserDto createUserDto) {
 
         log.info("Creating new user: {}", createUserDto);

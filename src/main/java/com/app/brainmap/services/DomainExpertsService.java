@@ -21,4 +21,5 @@ public interface DomainExpertsService {
     void deleteServiceListing(UUID serviceId);
     DomainExpertProfileDto getDomainExpertProfile(UUID userId);
     UUID completeDomainExpertProfile(UUID id, CompleteDomainExpertProfileDto profileDto);
+    Boolean isProfileComplete(UUID userId);
 }

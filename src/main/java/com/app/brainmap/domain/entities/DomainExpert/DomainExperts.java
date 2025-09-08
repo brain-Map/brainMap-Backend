@@ -30,9 +30,9 @@ public class DomainExperts {
     @JoinColumn(name = "id") // uses same column as primary key
     private User user;
 
-    @Column(name = "status", nullable = true, columnDefinition = "VARCHAR(20) DEFAULT 'PENDING'")
+    @Column(name = "status", nullable = true)
     @Enumerated(EnumType.STRING)
-    private DomainExpertStatus status = DomainExpertStatus.PENDING;
+    private DomainExpertStatus status = DomainExpertStatus.UNVERIFIED;
 
     @Column(name = "domain", nullable = true)
     private String domain;
