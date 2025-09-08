@@ -1,8 +1,10 @@
 package com.app.brainmap.services;
 
+import com.app.brainmap.domain.dto.DomainExpert.CompleteDomainExpertProfileDto;
+import com.app.brainmap.domain.dto.DomainExpert.DomainExpertProfileDto;
 import com.app.brainmap.domain.dto.ServiceListingRequestDto;
 import com.app.brainmap.domain.dto.ServiceListingResponseDto;
-import com.app.brainmap.domain.entities.DomainExperts;
+import com.app.brainmap.domain.entities.DomainExpert.DomainExperts;
 import com.app.brainmap.domain.entities.ServiceListing;
 import org.springframework.data.domain.Page;
 
@@ -17,4 +19,7 @@ public interface DomainExpertsService {
     ServiceListingResponseDto getServiceListingById(UUID serviceId);
     ServiceListingResponseDto updateServiceListing(UUID serviceId, ServiceListingRequestDto serviceListingRequestDto);
     void deleteServiceListing(UUID serviceId);
+    DomainExpertProfileDto getDomainExpertProfile(UUID userId);
+    UUID completeDomainExpertProfile(UUID id, CompleteDomainExpertProfileDto profileDto);
+    Boolean isProfileComplete(UUID userId);
 }
