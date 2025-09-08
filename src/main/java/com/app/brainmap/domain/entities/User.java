@@ -101,7 +101,7 @@ public class User {
         }
     }
 
-    @PostPersist
+    @PostUpdate
     protected void onUpdate(){
         this.updatedAt = LocalDateTime.now();
     }
