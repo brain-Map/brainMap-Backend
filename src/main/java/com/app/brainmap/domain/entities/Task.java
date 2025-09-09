@@ -37,7 +37,7 @@ public class Task {
     private LocalDate dueDate;
 
     @Column(name = "priority")
-    private String priority = "MEDIUM"; // Default priority
+    private String priority = "MEDIUM";
 
 
     @ManyToOne

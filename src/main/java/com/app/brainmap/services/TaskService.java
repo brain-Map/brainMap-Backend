@@ -11,5 +11,6 @@ public interface TaskService {
     List<Task> listTasks(UUID kanbanId);
     Task createTask(Task task);
     boolean updateTask(UUID id, Task task);
+    boolean updateTaskColumn(UUID id, UUID columnId);
     boolean deleteTask(UUID id);
 }

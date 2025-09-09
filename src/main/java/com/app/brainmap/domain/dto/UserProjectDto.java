@@ -9,7 +9,8 @@ public record UserProjectDto(
         String name,
         String role,
         String status,
-        String email
+        String email,
+        String avatar
 ) {
 
 }

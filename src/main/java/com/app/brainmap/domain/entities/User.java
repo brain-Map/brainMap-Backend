@@ -45,6 +45,9 @@ public class User {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at", nullable = false, updatable = false)
+    private LocalDateTime updatedAt;
+
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private UserStatus status;
@@ -53,6 +56,9 @@ public class User {
     private String gender;
     @Column(columnDefinition = "TEXT")
     private String bio;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ProjectMember projectMember;
 
     @Column(name ="avatar", columnDefinition = "TEXT")
     private String avatar;
@@ -86,11 +92,18 @@ public class User {
 
     @PrePersist
     protected void onCreate(){
-        this.createdAt = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
 
         if (this.status == null) {
             this.status = UserStatus.INACTIVE;
         }
+    }
+
+    @PostUpdate
+    protected void onUpdate(){
+        this.updatedAt = LocalDateTime.now();
     }
 
     public Object getUserId() {

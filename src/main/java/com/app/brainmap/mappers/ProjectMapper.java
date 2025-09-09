@@ -13,6 +13,7 @@ public interface ProjectMapper {
     @Mapping(source = "user.username", target = "userName")
     @Mapping(source = "user.id", target = "ownerId")
     @Mapping(target = "isPublic", expression = "java(mapPrivacyToBoolean(project.getPrivacy()))")
+    @Mapping(target = "avatar", source = "user.avatar")
     ProjectDto toDto(Project project);
 
     @Mapping(source = "ownerId", target = "user.id")

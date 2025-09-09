@@ -49,7 +49,7 @@ public class UserController {
     }
 
 
-    @PostMapping
+    @PostMapping(path = "/register")
     public ResponseEntity<UserDto> createUser(@RequestBody CreateUserDto createUserDto) {
 
         log.info("Creating new user: {}", createUserDto);
@@ -80,12 +80,19 @@ public class UserController {
         return new ResponseEntity<>(createdUserDto, HttpStatus.CREATED);
 
     }
+
     @GetMapping("/search")
-    public ResponseEntity<UserDto> searchUser(@RequestParam UUID id) {
-        User user = userService.getUserById(id);
-        UserDto userDto = userMapper.toDto(user);
-        log.info("User found: {}", userDto);
-        return ResponseEntity.ok(userDto);
+    public List<User> searchUsers(@RequestParam String query){
+        List<User> users = userService.searchUsers(query);
+        System.out.println("Users: " + users.stream().map(userMapper::toDto).collect(Collectors.toList()));
+        return userService.searchUsers(query);
+    }
+
+    @DeleteMapping(path = "/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+        userService.deleteUser(userId);
+        log.info("User with id {} deleted successfully", userId);
+        return ResponseEntity.noContent().build();
     }
 
 

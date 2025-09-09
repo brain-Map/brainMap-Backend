@@ -6,6 +6,7 @@ import com.app.brainmap.domain.UserRoleType;
 import com.app.brainmap.domain.dto.UserProjectCountDto;
 import com.app.brainmap.domain.dto.UserProjectSaveDto;
 import com.app.brainmap.domain.entities.*;
+import com.app.brainmap.domain.entities.DomainExpert.DomainExperts;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.UserService;
 import jakarta.transaction.Transactional;
@@ -127,9 +128,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Long userCount() {
+        return 0L;
+    }
+
+    @Override
+    public Void deleteUser(UUID id) {
+        User user = getUserById(id);
+        userRepository.delete(user);
+        log.info("User with id {} deleted successfully", id);
+        return null;
+    }
+
+    @Override
+    public List<User> searchUsers(String query) {
+        return userRepository.findByUsernameContainingIgnoreCase(query);
+    }
+
+    @Override
     public List<UserProjectCountDto> getUsersWithProjectCount() {
         return List.of();
     }
+
 
     @Override
     public List<User> searchUsers(String query, String type) {

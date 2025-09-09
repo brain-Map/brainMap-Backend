@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.lang.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -18,43 +19,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         String token = extractToken(request);
 
         if (token != null) {
-            try{
+            try {
                 Authentication authentication = authenticationManager.authenticate(new JwtAuthenticationToken(token));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Invalid JWT token");
-
-                return;
+                SecurityContextHolder.clearContext();
+                // Proceed without authentication; let endpoint-level security handle it
             }
         }
-        /*TODO: Uncomment the else block below once Authentication is implemented.*/
-//        else {
-//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//            response.getWriter().write("Authorization header is missing or invalid");
-//            return;
-//        }
 
         filterChain.doFilter(request, response);
     }
 
     private String extractToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if(bearerToken != null && bearerToken.startsWith("Bearer ")) {
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
-
-        return null;
+        String contentType = request.getContentType();
+        if (contentType != null && contentType.toLowerCase().startsWith("multipart/")) {
+            // Avoid triggering multipart parsing (and potential FileCountLimitExceeded) just to look for a parameter
+            return null;
+        }
+        return request.getParameter("access_token");
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
         return "/api/v1/auth/test".equals(path) ||
-               "/api/v1/users/test".equals(path);
+                "/api/v1/users/test".equals(path) ||
+                path.startsWith("/ws");
     }
 }

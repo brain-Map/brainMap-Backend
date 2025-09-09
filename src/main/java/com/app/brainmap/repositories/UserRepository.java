@@ -22,6 +22,9 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
     long countByUserRole(UserRoleType userRole);
     long countByStatus(UserStatus status);
+    Optional<User> findByEmail(String email);
+    Optional<User> findByUsername(String username);
+    List<User> findByUsernameContainingIgnoreCase(String username);
 
 
     @Query("SELECT new com.app.brainmap.domain.dto.UserProjectCountDto(u.id, COUNT(up.project)) " +
