@@ -14,6 +14,7 @@ public record UserAllDataDto(
         Date dateOfBirth,
         String userRole,
         String createdAt,
+        String updatedAt,
         String status,
         String city,
         String gender,

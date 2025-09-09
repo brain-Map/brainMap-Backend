@@ -29,6 +29,7 @@ public interface UserMapper {
          user.getDateOfBirth(),
          user.getUserRole().toString(),
          user.getCreatedAt().toString(),
+         user.getUpdatedAt().toString(),
          user.getStatus().toString(),
          user.getCity(),
          user.getGender(),
