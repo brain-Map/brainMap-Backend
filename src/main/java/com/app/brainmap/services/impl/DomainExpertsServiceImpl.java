@@ -79,6 +79,7 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
         // Create ServiceListing
         ServiceListing service = ServiceListing.builder()
                 .title(serviceListingRequestDto.getTitle())
+                .thumbnail(serviceListingRequestDto.getThumbnail())
                 .subject(serviceListingRequestDto.getSubject())
                 .description(serviceListingRequestDto.getDescription())
                 .fee(serviceListingRequestDto.getFee())

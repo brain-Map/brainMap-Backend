@@ -14,6 +14,7 @@ import java.util.UUID;
 @Builder
 public class ServiceListingRequestDto {
     private String title;
+    private String thumbnail;
     private String subject;
     private String description;
     private Double fee;
