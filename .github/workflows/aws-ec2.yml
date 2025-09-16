@@ -5,7 +5,7 @@ on:
     branches: [ "dinuka-deploy" ]
 
 env:
-  EC2_KEY: ${{ secrets.DINUKA_EC2_KEY }}
+  # EC2_KEY: ${{ secrets.DINUKA_EC2_KEY }}
   IMAGE_NAME: brain-map-backend
   IMAGE_TAG: latest
   EC2_USER: ec2-user
@@ -44,7 +44,7 @@ jobs:
         with:
           host: ${{ env.DINUKA_EC2_HOST }}
           username: ${{ env.DINUKA_EC2_USER }}
-          key: ${{ env.DINUKA_EC2_KEY }}
+          key: ${{ secrets.DINUKA_EC2_KEY }}
           source: "image.tar"
           target: "~/"
 
@@ -53,7 +53,7 @@ jobs:
         with:
           host: ${{ env.DINUKA_EC2_HOST }}
           username: ${{ env.DINUKA_EC2_USER }}
-          key: ${{ env.DINUKA_EC2_KEY }}
+          key: ${{ secrets.DINUKA_EC2_KEY }}
           script: |
             IMAGE_NAME=${{ env.IMAGE_NAME }}
             IMAGE_TAG=${{ env.IMAGE_TAG }}
