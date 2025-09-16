@@ -6,10 +6,10 @@ on:
 
 env:
   EC2_KEY: ${{ secrets.DINUKA_EC2_KEY }}
-  EC2_USER: ec2-user
-  EC2_HOST: ${{ secrets.DINUKA_EC2_HOST }}
   IMAGE_NAME: brain-map-backend
   IMAGE_TAG: latest
+  EC2_USER: ec2-user
+  EC2_HOST: ip-172-31-24-4
 
 permissions:
   contents: read
