@@ -76,4 +76,10 @@ jobs:
 
             # Pull latest image and run
             docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+            # Ensure any existing container (running or stopped) with same name is removed
+            if [ "$(docker ps -aq -f name=^brainMap$)" ]; then
+              echo "Removing existing brainMap container"
+              docker rm -f brainMap || true
+            fi
+
             docker run -d --name brainMap -p 8080:8080 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
