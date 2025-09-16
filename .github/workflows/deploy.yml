@@ -12,7 +12,7 @@ env:
   AWS_ACCOUNT_ID: 874119032533
   EC2_KEY: ${{ secrets.DINUKA_EC2_KEY }}
   EC2_USER: ec2-user
-  EC2_HOST: ip-172-31-24-4
+  EC2_HOST: ec2-54-251-80-5.ap-southeast-1.compute.amazonaws.com
   IMAGE_TAG: latest
 
 permissions:
