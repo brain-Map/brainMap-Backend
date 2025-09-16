@@ -2,7 +2,7 @@ name: Deploy Spring Boot Container to AWS EC2
 
 on:
   push:
-    branches: [ "dinuka-deploy" ]
+    branches: [ "nonenone" ]
 
 env:
   # EC2_KEY: ${{ secrets.DINUKA_EC2_KEY }}
