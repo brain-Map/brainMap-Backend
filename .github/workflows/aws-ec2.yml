@@ -42,18 +42,18 @@ jobs:
       - name: Copy Docker image to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.DINUKA_EC2_HOST }}
-          username: ${{ secrets.DINUKA_EC2_USER }}
-          key: ${{ secrets.DINUKA_EC2_KEY }}
+          host: ${{ env.DINUKA_EC2_HOST }}
+          username: ${{ env.DINUKA_EC2_USER }}
+          key: ${{ env.DINUKA_EC2_KEY }}
           source: "image.tar"
           target: "~/"
 
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.DINUKA_EC2_HOST }}
-          username: ${{ secrets.DINUKA_EC2_USER }}
-          key: ${{ secrets.DINUKA_EC2_KEY }}
+          host: ${{ env.DINUKA_EC2_HOST }}
+          username: ${{ env.DINUKA_EC2_USER }}
+          key: ${{ env.DINUKA_EC2_KEY }}
           script: |
             IMAGE_NAME=${{ env.IMAGE_NAME }}
             IMAGE_TAG=${{ env.IMAGE_TAG }}
