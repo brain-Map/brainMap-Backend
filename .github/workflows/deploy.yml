@@ -2,7 +2,7 @@ name: Deploy Spring Boot Container to AWS EC2
 
 on:
   push:
-    branches: [ "none" ]
+    branches: [ "dinuka-deploy" ]
 
 env:
   AWS_REGION: ap-southeast-1                   # set this to your preferred AWS region, e.g. us-west-1
@@ -82,4 +82,4 @@ jobs:
               docker rm -f brainMap || true
             fi
 
-            docker run -d --name brainMap -p 8080:8080 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+            docker run -d --name brainMap-back-end -p 8080:8080 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
