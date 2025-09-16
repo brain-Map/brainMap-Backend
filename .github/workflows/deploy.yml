@@ -1,8 +1,22 @@
 name: Deploy Spring Boot Container to AWS EC2
 
 on:
-  schedule:
-    - cron '0 0 * * 0'  # Runs every Sunday at 00:00 UTC
+  push:
+    branches: [ "dinuka-deploy" ]
+
+env:
+  AWS_REGION: ap-southeast-1                   # set this to your preferred AWS region, e.g. us-west-1
+  ECR_REPOSITORY: 874119032533.dkr.ecr.ap-southeast-1.amazonaws.com/brain-map-back-end-ecr           # set this to your Amazon ECR repository name
+  AWS_ACCESS_KEY_ID: ${{ secrets.DINUKA_AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.DINUKA_AWS_SECRET_ACCESS_KEY }}
+  AWS_ACCOUNT_ID: 874119032533
+  EC2_KEY: ${{ secrets.DINUKA_EC2_KEY }}
+  EC2_USER: ec2-user
+  EC2_HOST: ip-172-31-24-4
+  IMAGE_TAG: latest
+
+permissions:
+  contents: read
 
 jobs:
   deploy:
