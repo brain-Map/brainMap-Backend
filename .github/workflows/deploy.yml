@@ -72,4 +72,9 @@ jobs:
             # Stop and remove existing container
             docker ps -q --filter "name=brainMap" | grep -q . && docker stop brainMap && docker rm -f brainMap || true
 
-            docker run -d -p 8080:8080 ${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+            docker run -d -p 8080:8080  \
+            -e DB_URL="jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres" \
+            -e DB_USER="postgres.uvekrjsbsjxvaveqtbnu" \
+            -e DB_PASSWORD="brainMap123!" \
+            -e JWT_SECRET="Hpxhzd2ipHmKblQozmCMeMbIwWK4Ggoxcczqa4jJgRbzt/7hTWiee35FtU5YyzxHi/D9tde4ul8CPcBUiIps3Q==" \
+            ${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
