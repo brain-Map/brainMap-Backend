@@ -2,7 +2,7 @@ name: Deploy Spring Boot Container to AWS EC2
 
 on:
   push:
-    branches: [ "dinuka-deploy" ]
+    branches: [ "none" ]
 
 env:
   AWS_REGION: ap-southeast-1                   # set this to your preferred AWS region, e.g. us-west-1
@@ -70,10 +70,16 @@ jobs:
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
               | docker login --username AWS --password-stdin $ECR_REGISTRY
 
-            # Stop and remove existing container named brainMap if running
-            docker ps -q --filter "name=brainMap" | grep -q . && docker stop brainMap && docker rm -f brainMap || true      
-            
+            # Stop old container if exists
+            docker ps -q --filter "name=brainMap" \
+              | grep -q . && docker stop brainMap && docker rm -f brainMap || true
+
             # Pull latest image and run
             docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+            # Ensure any existing container (running or stopped) with same name is removed
+            if [ "$(docker ps -aq -f name=^brainMap$)" ]; then
+              echo "Removing existing brainMap container"
+              docker rm -f brainMap || true
+            fi
 
             docker run -d --name brainMap -p 8080:8080 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG

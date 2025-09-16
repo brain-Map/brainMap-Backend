@@ -1,0 +1,68 @@
+name: Deploy Spring Boot Container to AWS EC2
+
+on:
+  push:
+    branches: [ "dinuka-deploy" ]
+
+env:
+  EC2_KEY: ${{ secrets.DINUKA_EC2_KEY }}
+  EC2_USER: ec2-user
+  EC2_HOST: ${{ secrets.DINUKA_EC2_HOST }}
+  IMAGE_NAME: brain-map-backend
+  IMAGE_TAG: latest
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build JAR
+        run: ./mvnw clean package -DskipTests
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} .
+
+      - name: Save Docker image as tar
+        run: |
+          docker save ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} -o image.tar
+
+      - name: Copy Docker image to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DINUKA_EC2_HOST }}
+          username: ${{ secrets.DINUKA_EC2_USER }}
+          key: ${{ secrets.DINUKA_EC2_KEY }}
+          source: "image.tar"
+          target: "~/"
+
+      - name: Deploy on EC2
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.DINUKA_EC2_HOST }}
+          username: ${{ secrets.DINUKA_EC2_USER }}
+          key: ${{ secrets.DINUKA_EC2_KEY }}
+          script: |
+            IMAGE_NAME=${{ env.IMAGE_NAME }}
+            IMAGE_TAG=${{ env.IMAGE_TAG }}
+
+            # Stop and remove existing container
+            docker ps -q --filter "name=brainMap" | grep -q . && docker stop brainMap && docker rm -f brainMap || true
+
+            # Load new image
+            docker load -i ~/image.tar
+
+            # Run new container
+            docker run -d --name brainMap -p 8080:8080 $IMAGE_NAME:$IMAGE_TAG
