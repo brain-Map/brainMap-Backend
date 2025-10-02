@@ -48,4 +48,13 @@ public class ServiceListing {
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ServiceListingAvailability> availabilities;
 
+    @Column(name = "thumbnail_url")
+    private String thumbnailUrl;
+
+    @Column(name = "duration")
+    private Integer duration; // in minutes
+
+    @Column(name = "service_type")
+    private String serviceType;
+
 }

@@ -23,4 +23,7 @@ public class ServiceListingResponseDto {
     private LocalDateTime updatedAt;
     private UUID mentorId;
     private List<ServiceListingAvailabilityResponseDto> availabilities;
+    private String thumbnailUrl;
+    private Integer duration;
+    private String serviceType;
     }
