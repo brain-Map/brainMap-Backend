@@ -139,10 +139,10 @@ public class UserController {
     }
 
     @GetMapping(path = "/chat/search")
-    public ResponseEntity<MessageSearchResultDto> searchUserForChat(@RequestParam String query) {
+    public ResponseEntity<List<MessageSearchResultDto>> searchUserForChat(@RequestParam String query) {
         log.info("Query: {}", query);
-        MessageSearchResultDto result = userService.searchUserForChat(query);
-        return ResponseEntity.ok(result);
+        List<MessageSearchResultDto> results = userService.searchUserForChat(query);
+        return ResponseEntity.ok(results);
     }
 
 }
