@@ -61,7 +61,16 @@ public class SecurityConfig {
                         })
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/ws/**", "/error", "/v3/api-docs/**", "/swagger-ui/**", "/api/v1/domain-experts/service-listings/**", "/uploads/services/**").permitAll()
+                        .requestMatchers(
+                                "/api/v1/auth/**",
+                                "/ws/**",
+                                "/error",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/api/v1/domain-experts/service-listings/**",
+                                "/uploads/services/**",
+                                "/uploads/experts/**"
+                                ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                         .anyRequest().authenticated()
                 )
