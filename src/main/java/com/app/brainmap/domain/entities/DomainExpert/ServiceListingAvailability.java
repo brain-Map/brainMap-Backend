@@ -1,6 +1,5 @@
-package com.app.brainmap.domain.entities;
+package com.app.brainmap.domain.entities.DomainExpert;
 
-import com.app.brainmap.domain.entities.DomainExpert.ServiceListing;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

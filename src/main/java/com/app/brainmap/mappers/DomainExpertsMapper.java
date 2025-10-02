@@ -2,7 +2,7 @@ package com.app.brainmap.mappers;
 
 import com.app.brainmap.domain.dto.DomainExpertsDto;
 import com.app.brainmap.domain.entities.DomainExpert.DomainExperts;
-import com.app.brainmap.domain.entities.ServiceListingAvailability;
+import com.app.brainmap.domain.entities.DomainExpert.ServiceListingAvailability;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
