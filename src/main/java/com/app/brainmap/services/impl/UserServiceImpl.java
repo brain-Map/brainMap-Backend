@@ -3,6 +3,7 @@ package com.app.brainmap.services.impl;
 import com.app.brainmap.domain.CreateUser;
 import com.app.brainmap.domain.UpdateUser;
 import com.app.brainmap.domain.UserRoleType;
+import com.app.brainmap.domain.dto.Chat.MessageSearchResultDto;
 import com.app.brainmap.domain.dto.UserProjectCountDto;
 import com.app.brainmap.domain.dto.UserProjectSaveDto;
 import com.app.brainmap.domain.entities.*;
@@ -181,7 +182,22 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-
+    @Override
+    public MessageSearchResultDto searchUserForChat(String query) {
+        Optional<User> optionalUser = userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrUsernameContainingIgnoreCase(query, query, query);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            return MessageSearchResultDto.builder()
+                    .userId(user.getId())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .username(user.getUsername())
+                    .avatarUrl(user.getAvatar())
+                    .build();
+        } else {
+            throw new NoSuchElementException("No user found matching the query: " + query);
+        }
+    }
 
 
 }

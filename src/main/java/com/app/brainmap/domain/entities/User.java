@@ -2,6 +2,8 @@ package com.app.brainmap.domain.entities;
 
 import com.app.brainmap.domain.UserRoleType;
 import com.app.brainmap.domain.UserStatus;
+import com.app.brainmap.domain.entities.Community.CommunityComment;
+import com.app.brainmap.domain.entities.Community.CommunityPost;
 import com.app.brainmap.domain.entities.DomainExpert.DomainExperts;
 import jakarta.persistence.*;
 import lombok.*;
