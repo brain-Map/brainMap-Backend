@@ -183,20 +183,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public MessageSearchResultDto searchUserForChat(String query) {
-        Optional<User> optionalUser = userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrUsernameContainingIgnoreCase(query, query, query);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            return MessageSearchResultDto.builder()
-                    .userId(user.getId())
-                    .firstName(user.getFirstName())
-                    .lastName(user.getLastName())
-                    .username(user.getUsername())
-                    .avatarUrl(user.getAvatar())
-                    .build();
-        } else {
-            throw new NoSuchElementException("No user found matching the query: " + query);
+    public List<MessageSearchResultDto> searchUserForChat(String query) {
+        List<User> users = userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrUsernameContainingIgnoreCase(query, query, query);
+        if (users.isEmpty()) {
+            throw new NoSuchElementException("No users found matching the query: " + query);
         }
+        return users.stream()
+                .map(user -> MessageSearchResultDto.builder()
+                        .userId(user.getId())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .username(user.getUsername())
+                        .avatarUrl(user.getAvatar())
+                        .build())
+                .toList();
     }
 
 

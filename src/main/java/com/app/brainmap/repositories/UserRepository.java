@@ -25,7 +25,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmail(String email);
     Optional<User> findByUsername(String username);
     List<User> findByUsernameContainingIgnoreCase(String username);
-    Optional<User> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrUsernameContainingIgnoreCase(String firstName, String lastName, String username);
+    List<User> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrUsernameContainingIgnoreCase(String firstName, String lastName, String username);
 
 
     @Query("SELECT new com.app.brainmap.domain.dto.UserProjectCountDto(u.id, COUNT(up.project)) " +

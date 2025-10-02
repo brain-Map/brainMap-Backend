@@ -24,5 +24,5 @@ public interface UserService {
     List<User> searchUsers(String query, String type);
     void addCollaboration(UserProjectSaveDto dto);
     void updateAvatar(UUID userId, String imageUrl);
-    MessageSearchResultDto searchUserForChat(String query);
+    List<MessageSearchResultDto> searchUserForChat(String query);
 }
