@@ -4,8 +4,9 @@ package com.app.brainmap.controllers;
 import com.app.brainmap.domain.CreateUser;
 import com.app.brainmap.domain.UpdateUser;
 import com.app.brainmap.domain.dto.*;
+import com.app.brainmap.domain.dto.MessageResponse;
+import com.app.brainmap.domain.dto.Chat.MessageSearchResultDto;
 import com.app.brainmap.domain.entities.User;
-import com.app.brainmap.domain.entities.UserProject;
 import com.app.brainmap.mappers.UserMapper;
 import com.app.brainmap.mappers.UserProjectMapper;
 import com.app.brainmap.security.JwtUserDetails;
@@ -135,6 +136,13 @@ public class UserController {
 
         MessageResponse response = new MessageResponse("Avatar updated successfully");
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(path = "/chat/search")
+    public ResponseEntity<MessageSearchResultDto> searchUserForChat(@RequestParam String query) {
+        log.info("Query: {}", query);
+        MessageSearchResultDto result = userService.searchUserForChat(query);
+        return ResponseEntity.ok(result);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.app.brainmap.controllers;
 
 import com.app.brainmap.domain.dto.*;
+import com.app.brainmap.domain.dto.MessageResponse;
 import com.app.brainmap.domain.entities.Project;
 import com.app.brainmap.mappers.KanbanBoardMapper;
 import com.app.brainmap.mappers.ProjectMapper;
