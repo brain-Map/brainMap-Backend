@@ -2,6 +2,7 @@ package com.app.brainmap.domain.entities;
 
 import com.app.brainmap.domain.UserRoleType;
 import com.app.brainmap.domain.UserStatus;
+import com.app.brainmap.domain.entities.DomainExpert.DomainExperts;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -77,6 +78,8 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSocialLink> socialLinks = new ArrayList<>();
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private DomainExperts domainExpert;
 
     @Override
     public boolean equals(Object o) {

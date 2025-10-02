@@ -3,15 +3,11 @@ package com.app.brainmap.services.impl;
 import com.app.brainmap.domain.DomainExpertStatus;
 import com.app.brainmap.domain.dto.DomainExpert.CompleteDomainExpertProfileDto;
 import com.app.brainmap.domain.dto.DomainExpert.DomainExpertProfileDto;
-import com.app.brainmap.domain.dto.ServiceListingRequestDto;
-import com.app.brainmap.domain.dto.ServiceListingResponseDto;
+import com.app.brainmap.domain.dto.DomainExpert.ServiceListingRequestDto;
+import com.app.brainmap.domain.dto.DomainExpert.ServiceListingResponseDto;
+import com.app.brainmap.domain.entities.DomainExpert.*;
 import com.app.brainmap.domain.entities.User;
-import com.app.brainmap.domain.entities.ServiceListing;
 import com.app.brainmap.domain.entities.ServiceListingAvailability;
-import com.app.brainmap.domain.entities.DomainExpert.DomainExperts;
-import com.app.brainmap.domain.entities.DomainExpert.ExpertiseArea;
-import com.app.brainmap.domain.entities.DomainExpert.DomainExpertEducation;
-import com.app.brainmap.domain.entities.DomainExpert.DomainExpertVerificationDocument;
 import com.app.brainmap.mappers.ServiceListingResponseMapper;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.DomainExpertsService;
@@ -52,18 +48,28 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
 
     // create service listing
     @Override
-    public ServiceListing createServiceListing(ServiceListingRequestDto serviceListingRequestDto){
+    public ServiceListing createServiceListing(ServiceListingRequestDto serviceListingRequestDto, UUID mentorId) {
         // Fetch mentor
-        User mentor = userRepository.findById(serviceListingRequestDto.getMentorId())
-                .orElseThrow(() -> new RuntimeException("Mentor not found with UUID: " + serviceListingRequestDto.getMentorId()));
+        User mentor = userRepository.findById(mentorId)
+                .orElseThrow(() -> new RuntimeException("Mentor not found with UUID: " + mentorId));
         // Create ServiceListing
-        ServiceListing service = ServiceListing.builder()
+        ServiceListing.ServiceListingBuilder builder = ServiceListing.builder()
                 .title(serviceListingRequestDto.getTitle())
                 .subject(serviceListingRequestDto.getSubject())
                 .description(serviceListingRequestDto.getDescription())
-                .fee(serviceListingRequestDto.getFee())
+                .pricingType(serviceListingRequestDto.getPricingType())
+                .maxPrice(serviceListingRequestDto.getMaxPrice())
+                .minPrice(serviceListingRequestDto.getMinPrice())
+                .mentorshipType(serviceListingRequestDto.getMentorshipType())
                 .mentor(mentor)
-                .build();
+                .serviceType(serviceListingRequestDto.getServiceType());
+
+        // Handle thumbnail upload
+        if (serviceListingRequestDto.getThumbnail() != null && !serviceListingRequestDto.getThumbnail().isEmpty()) {
+            String thumbnailUrl = fileStorageService.store(serviceListingRequestDto.getThumbnail(), "services/" + mentorId  + "/thumbnails");
+            builder.thumbnailUrl(thumbnailUrl);
+        }
+        ServiceListing service = builder.build();
         // create availability
         List<ServiceListingAvailability> availabilities = serviceListingRequestDto.getAvailabilities().stream()
                 .map(availability -> ServiceListingAvailability.builder()
@@ -73,8 +79,19 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
                         .service(service)
                         .build())
                 .toList();
-
         service.setAvailabilities(availabilities);
+
+        // create offers (whatYouGet)
+        if (serviceListingRequestDto.getWhatYouGet() != null && !serviceListingRequestDto.getWhatYouGet().isEmpty()) {
+            List<ServiceListingOffer> offers = serviceListingRequestDto.getWhatYouGet().stream()
+                    .map(dto -> ServiceListingOffer.builder()
+                            .title(dto.getTitle())
+                            .description(dto.getDescription())
+                            .serviceListing(service)
+                            .build())
+                    .toList();
+            service.setOffers(offers);
+        }
         return serviceListingRepository.save(service);
     }
 
@@ -101,7 +118,7 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
         serviceListing.setTitle(serviceListingRequestDto.getTitle());
         serviceListing.setSubject(serviceListingRequestDto.getSubject());
         serviceListing.setDescription(serviceListingRequestDto.getDescription());
-        serviceListing.setFee(serviceListingRequestDto.getFee());
+        serviceListing.setPricingType(serviceListingRequestDto.getPricingType());
         serviceListing.setUpdatedAt(LocalDateTime.now());
 
         // update availabilities
@@ -115,6 +132,19 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
                         .build()
                 ).toList();
         serviceListing.getAvailabilities().addAll(newAvailabilities);
+
+        // update offers (whatYouGet)
+        serviceListing.getOffers().clear();
+        if (serviceListingRequestDto.getWhatYouGet() != null && !serviceListingRequestDto.getWhatYouGet().isEmpty()) {
+            List<ServiceListingOffer> offers = serviceListingRequestDto.getWhatYouGet().stream()
+                    .map(dto -> ServiceListingOffer.builder()
+                            .title(dto.getTitle())
+                            .description(dto.getDescription())
+                            .serviceListing(serviceListing)
+                            .build())
+                    .toList();
+            serviceListing.getOffers().addAll(offers);
+        }
 
         ServiceListing updatedServicelisting =  serviceListingRepository.save(serviceListing);
         return serviceListingResponseMapper.toServiceListingResponseDto(updatedServicelisting);

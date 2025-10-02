@@ -1,4 +1,4 @@
-package com.app.brainmap.domain.dto;
+package com.app.brainmap.domain.dto.DomainExpert;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
