@@ -1,7 +1,6 @@
 package com.app.brainmap.repositories;
 
-import com.app.brainmap.domain.entities.ServiceListing;
-import com.app.brainmap.domain.entities.User;
+import com.app.brainmap.domain.entities.DomainExpert.ServiceListing;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

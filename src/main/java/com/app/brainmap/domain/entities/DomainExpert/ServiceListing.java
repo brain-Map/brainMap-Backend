@@ -1,5 +1,7 @@
-package com.app.brainmap.domain.entities;
+package com.app.brainmap.domain.entities.DomainExpert;
 
+import com.app.brainmap.domain.entities.ServiceListingAvailability;
+import com.app.brainmap.domain.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,8 +32,23 @@ public class ServiceListing {
     @Column(name = "description", nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "fee", nullable = false)
-    private Double fee;
+    @Column(name = "pricing_type", nullable = false)
+    private String pricingType;
+
+    @Column(name = "min_price")
+    private Double minPrice;
+
+    @Column(name = "max_price")
+    private Double maxPrice;
+
+    @Column(name = "service_type")
+    private String serviceType;
+
+    @Column(name = "mentorship_type", nullable = false)
+    private String mentorshipType;
+
+    @OneToMany(mappedBy = "serviceListing", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ServiceListingOffer> offers;
 
     @Column(name = "created_at")
     @Builder.Default
@@ -50,11 +67,5 @@ public class ServiceListing {
 
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;
-
-    @Column(name = "duration")
-    private Integer duration; // in minutes
-
-    @Column(name = "service_type")
-    private String serviceType;
 
 }
