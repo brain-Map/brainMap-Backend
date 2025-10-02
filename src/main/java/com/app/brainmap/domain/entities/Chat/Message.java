@@ -1,6 +1,7 @@
 // Updated file: src/main/java/com/app/brainmap/domain/entities/Message.java
-package com.app.brainmap.domain.entities;
+package com.app.brainmap.domain.entities.Chat;
 
+import com.app.brainmap.domain.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
 

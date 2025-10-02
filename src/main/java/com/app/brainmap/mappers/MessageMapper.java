@@ -1,15 +1,13 @@
 package com.app.brainmap.mappers;
 
-import com.app.brainmap.domain.dto.MessageDto;
+import com.app.brainmap.domain.dto.Chat.MessageDto;
 import com.app.brainmap.domain.dto.PrivateMessageDto;
 import com.app.brainmap.domain.dto.UserChatDto;
-import com.app.brainmap.domain.entities.Message;
+import com.app.brainmap.domain.entities.Chat.Message;
 import com.app.brainmap.domain.entities.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-
-import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MessageMapper {

@@ -1,4 +1,4 @@
-package com.app.brainmap.domain.dto;
+package com.app.brainmap.domain.dto.Chat;
 
 import lombok.*;
 
