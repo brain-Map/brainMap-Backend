@@ -3,7 +3,7 @@ package com.app.brainmap.mappers;
 import com.app.brainmap.domain.dto.CommunityCommentDto;
 import com.app.brainmap.domain.dto.CreateCommunityCommentRequestDto;
 import com.app.brainmap.domain.dto.UpdateCommunityCommentRequestDto;
-import com.app.brainmap.domain.entities.CommunityComment;
+import com.app.brainmap.domain.entities.Community.CommunityComment;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

@@ -1,8 +1,8 @@
 package com.app.brainmap.mappers;
 
 import com.app.brainmap.domain.dto.CommunityTagResponse;
-import com.app.brainmap.domain.entities.CommunityPost;
-import com.app.brainmap.domain.entities.CommunityTag;
+import com.app.brainmap.domain.entities.Community.CommunityPost;
+import com.app.brainmap.domain.entities.Community.CommunityTag;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

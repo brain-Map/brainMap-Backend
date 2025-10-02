@@ -1,8 +1,8 @@
 package com.app.brainmap.services.impl;
 
 import com.app.brainmap.domain.CreateCommunityPostRequest;
-import com.app.brainmap.domain.entities.CommunityPost;
-import com.app.brainmap.domain.entities.CommunityTag;
+import com.app.brainmap.domain.entities.Community.CommunityPost;
+import com.app.brainmap.domain.entities.Community.CommunityTag;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.repositories.CommunityPostRepository;
 import com.app.brainmap.services.CommunityPostService;
