@@ -1,8 +1,8 @@
 package com.app.brainmap.services;
 
-import com.app.brainmap.domain.dto.MessageDto;
-import com.app.brainmap.domain.dto.MessageSummaryDto;
-import com.app.brainmap.domain.entities.Message;
+import com.app.brainmap.domain.dto.Chat.MessageDto;
+import com.app.brainmap.domain.dto.Chat.MessageSummaryDto;
+import com.app.brainmap.domain.entities.Chat.Message;
 import com.app.brainmap.domain.entities.User;
 
 import java.util.List;

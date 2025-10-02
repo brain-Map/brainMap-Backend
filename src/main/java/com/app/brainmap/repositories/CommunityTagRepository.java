@@ -1,6 +1,6 @@
 package com.app.brainmap.repositories;
 
-import com.app.brainmap.domain.entities.CommunityTag;
+import com.app.brainmap.domain.entities.Community.CommunityTag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

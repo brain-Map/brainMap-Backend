@@ -1,6 +1,6 @@
 package com.app.brainmap.repositories;
 
-import com.app.brainmap.domain.entities.CommunityLike;
+import com.app.brainmap.domain.entities.Community.CommunityLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

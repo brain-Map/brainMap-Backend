@@ -1,6 +1,6 @@
 package com.app.brainmap.services.impl;
 
-import com.app.brainmap.domain.entities.CommunityTag;
+import com.app.brainmap.domain.entities.Community.CommunityTag;
 import com.app.brainmap.repositories.CommunityTagRepository;
 import com.app.brainmap.services.CommunityTagService;
 import jakarta.persistence.EntityNotFoundException;

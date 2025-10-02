@@ -7,7 +7,7 @@ import com.app.brainmap.domain.dto.DomainExpert.ServiceListingRequestDto;
 import com.app.brainmap.domain.dto.DomainExpert.ServiceListingResponseDto;
 import com.app.brainmap.domain.entities.DomainExpert.*;
 import com.app.brainmap.domain.entities.User;
-import com.app.brainmap.domain.entities.ServiceListingAvailability;
+import com.app.brainmap.domain.entities.DomainExpert.ServiceListingAvailability;
 import com.app.brainmap.mappers.ServiceListingResponseMapper;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.DomainExpertsService;

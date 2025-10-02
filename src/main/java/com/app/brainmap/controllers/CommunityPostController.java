@@ -4,7 +4,7 @@ import com.app.brainmap.domain.CreateCommunityPostRequest;
 import com.app.brainmap.domain.dto.CommunityCommentDto;
 import com.app.brainmap.domain.dto.CommunityPostDto;
 import com.app.brainmap.domain.dto.CreateCommunityPostRequestDto;
-import com.app.brainmap.domain.entities.CommunityPost;
+import com.app.brainmap.domain.entities.Community.CommunityPost;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.mappers.CommunityPostMapper;
 import com.app.brainmap.security.JwtUserDetails;

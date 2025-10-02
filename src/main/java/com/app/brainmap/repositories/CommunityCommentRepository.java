@@ -1,7 +1,7 @@
 package com.app.brainmap.repositories;
 
-import com.app.brainmap.domain.entities.CommunityComment;
-import com.app.brainmap.domain.entities.CommunityPost;
+import com.app.brainmap.domain.entities.Community.CommunityComment;
+import com.app.brainmap.domain.entities.Community.CommunityPost;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -1,9 +1,7 @@
-package com.app.brainmap.domain.dto;
+package com.app.brainmap.domain.dto.Chat;
 
-import com.app.brainmap.domain.MessageType;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data

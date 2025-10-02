@@ -1,5 +1,6 @@
 package com.app.brainmap.domain;
 
+import com.app.brainmap.domain.entities.Community.CommunityPostType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

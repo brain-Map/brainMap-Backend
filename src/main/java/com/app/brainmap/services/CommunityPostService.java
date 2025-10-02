@@ -1,7 +1,7 @@
 package com.app.brainmap.services;
 
 import com.app.brainmap.domain.CreateCommunityPostRequest;
-import com.app.brainmap.domain.entities.CommunityPost;
+import com.app.brainmap.domain.entities.Community.CommunityPost;
 import com.app.brainmap.domain.entities.User;
 
 import java.util.List;

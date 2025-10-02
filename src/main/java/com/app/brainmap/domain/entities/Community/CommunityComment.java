@@ -1,5 +1,6 @@
-package com.app.brainmap.domain.entities;
+package com.app.brainmap.domain.entities.Community;
 
+import com.app.brainmap.domain.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
 

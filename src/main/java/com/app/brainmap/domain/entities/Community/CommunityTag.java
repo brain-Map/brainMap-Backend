@@ -1,4 +1,4 @@
-package com.app.brainmap.domain.entities;
+package com.app.brainmap.domain.entities.Community;
 
 import jakarta.persistence.*;
 import lombok.*;
