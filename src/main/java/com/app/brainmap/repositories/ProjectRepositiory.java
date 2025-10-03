@@ -5,8 +5,10 @@ import com.app.brainmap.domain.ProjctStatus;
 import com.app.brainmap.domain.UserStatus;
 import com.app.brainmap.domain.entities.Project;
 import com.app.brainmap.domain.entities.User;
+import com.app.brainmap.domain.entities.UserProject;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,4 +22,5 @@ public interface ProjectRepositiory extends JpaRepository<Project, UUID> {
 
     @Query("SELECT p FROM Project p WHERE p.user.id = :ownerId")
     List<Project> findAllByOwnerId(UUID ownerId);
+
 }

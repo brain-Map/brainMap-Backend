@@ -12,6 +12,7 @@ import java.util.UUID;
 public interface ProjectService {
 
     List<Project> listProject(UUID userId);
+    List<UserProject> getAcceptedProjects(UUID userId);
 
     Project createProject(Project project);
     Optional<Project> getProject(UUID id);
