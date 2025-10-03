@@ -2,14 +2,19 @@ package com.app.brainmap.controllers;
 
 import com.app.brainmap.domain.dto.*;
 import com.app.brainmap.domain.dto.DomainExpert.CompleteDomainExpertProfileDto;
-import com.app.brainmap.domain.dto.DomainExpert.DomainExpertProfileDto;
+import com.app.brainmap.domain.dto.DomainExpert.ServiceListingRequestDto;
+import com.app.brainmap.domain.dto.DomainExpert.ServiceListingResponseDto;
 import com.app.brainmap.mappers.DomainExpertsMapper;
+import com.app.brainmap.security.JwtUserDetails;
 import com.app.brainmap.services.DomainExpertsService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +25,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(path="/api/v1/domain-experts")
 @RequiredArgsConstructor
+@Slf4j
 public class DomainExpertsController {
 
     private final DomainExpertsService domainExpertsService;
@@ -34,10 +40,28 @@ public class DomainExpertsController {
     }
 
     // domain experts service listings
-    @PostMapping("/create-service-listing")
-    public ResponseEntity<String> createServiceListing(@RequestBody ServiceListingRequestDto serviceListingRequestDto) {
+    @PostMapping(path = "{userId}/create-service-listing", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> createServiceListing(
+            @PathVariable UUID userId,
+            @RequestPart("service") ServiceListingRequestDto serviceListingRequestDto,
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
+    ) {
+        log.info("Creating service listing for {}", serviceListingRequestDto);
         try {
-            domainExpertsService.createServiceListing(serviceListingRequestDto);
+
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            JwtUserDetails userDetails = (authentication != null && authentication.getPrincipal() != null)
+                    ? authentication.getPrincipal() instanceof JwtUserDetails
+                    ? (JwtUserDetails) authentication.getPrincipal()
+                    : null
+                    : null;
+
+            if (userDetails == null || !userDetails.getUserId().equals(userId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User is not authorized to create service listing for this userId");
+            }
+
+            if (thumbnail != null) serviceListingRequestDto.setThumbnail(thumbnail);
+            domainExpertsService.createServiceListing(serviceListingRequestDto, userId);
             return ResponseEntity.ok("Created demo service listing");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating service listing: " + e.getMessage());
@@ -58,9 +82,9 @@ public class DomainExpertsController {
     }
 
     // Get service listing by ID
-    @GetMapping("/service-listing")
+    @GetMapping("/service-listings/{serviceId}")
     public ResponseEntity<?> getServiceListingById(
-            @RequestParam UUID serviceId
+            @PathVariable UUID serviceId
     ) {
         try {
             ServiceListingResponseDto dto = domainExpertsService.getServiceListingById(serviceId);
@@ -89,9 +113,9 @@ public class DomainExpertsController {
     }
 
     // Delete service listing
-    @DeleteMapping("/service-listing")
+    @DeleteMapping("/service-listing/{serviceId}")
     public ResponseEntity<?> deleteServiceListing(
-            @RequestParam UUID serviceId
+            @PathVariable UUID serviceId
     ){
         try {
             domainExpertsService.deleteServiceListing(serviceId);

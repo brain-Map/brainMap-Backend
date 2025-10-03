@@ -1,9 +1,8 @@
 package com.app.brainmap.controllers;
 
 import com.app.brainmap.domain.dto.*;
-import com.app.brainmap.domain.dto.Project.AllProjectUserDto;
+import com.app.brainmap.domain.dto.MessageResponse;
 import com.app.brainmap.domain.entities.Project;
-import com.app.brainmap.mappers.CollaborateProjectMapper;
 import com.app.brainmap.mappers.KanbanBoardMapper;
 import com.app.brainmap.mappers.ProjectMapper;
 import com.app.brainmap.mappers.UserProjectMapper;
@@ -25,15 +24,13 @@ public class ProjectController {
     private final ProjectMapper projectMapper;
     private final KanbanBoardMapper kanbanBoardMapper;
     private final UserProjectMapper userProjectMapper;
-    private final CollaborateProjectMapper collaborateProjectMapper;
 
 
-    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, KanbanBoardMapper kanbanBoardMapper, UserProjectMapper userProjectMapper, CollaborateProjectMapper collaborateProjectMapper) {
+    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, KanbanBoardMapper kanbanBoardMapper, UserProjectMapper userProjectMapper) {
         this.projectService = projectService;
         this.projectMapper = projectMapper;
         this.kanbanBoardMapper = kanbanBoardMapper;
         this.userProjectMapper = userProjectMapper;
-        this.collaborateProjectMapper = collaborateProjectMapper;
     }
 
     @GetMapping(path = "/all/{user_id}")
@@ -41,14 +38,6 @@ public class ProjectController {
         return projectService.listProject(userId)
                 .stream()
                 .map(projectMapper::toDto)
-                .toList();
-    }
-
-    @GetMapping("/collaborator")
-    public List<AllProjectUserDto> getAcceptedProjects(@RequestParam UUID userId) {
-        return projectService.getAcceptedProjects(userId)
-                .stream()
-                .map(collaborateProjectMapper::toDto)
                 .toList();
     }
 

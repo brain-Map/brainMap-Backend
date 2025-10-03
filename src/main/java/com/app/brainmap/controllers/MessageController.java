@@ -1,11 +1,10 @@
 // Updated file: src/main/java/com/app/brainmap/controllers/MessageController.java
 package com.app.brainmap.controllers;
 
-import com.app.brainmap.domain.dto.MessageDto;
-import com.app.brainmap.domain.dto.MessageSummaryDto;
+import com.app.brainmap.domain.dto.Chat.MessageDto;
+import com.app.brainmap.domain.dto.Chat.MessageSummaryDto;
 import com.app.brainmap.domain.dto.PrivateMessageDto;
-import com.app.brainmap.domain.dto.UserChatDto;
-import com.app.brainmap.domain.entities.Message;
+import com.app.brainmap.domain.entities.Chat.Message;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.mappers.MessageMapper;
 import com.app.brainmap.security.JwtUserDetails;

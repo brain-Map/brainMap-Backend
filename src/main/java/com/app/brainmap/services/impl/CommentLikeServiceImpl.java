@@ -1,8 +1,8 @@
 package com.app.brainmap.services.impl;
 
 import com.app.brainmap.domain.dto.CommentLikeResponseDto;
-import com.app.brainmap.domain.entities.CommentLike;
-import com.app.brainmap.domain.entities.CommunityComment;
+import com.app.brainmap.domain.entities.Community.CommentLike;
+import com.app.brainmap.domain.entities.Community.CommunityComment;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.repositories.CommentLikeRepository;
 import com.app.brainmap.repositories.CommunityCommentRepository;

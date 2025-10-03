@@ -5,6 +5,8 @@ import com.app.brainmap.domain.dto.CommunityCommentDto;
 import com.app.brainmap.domain.dto.TopCommenterDto;
 import com.app.brainmap.domain.UserRoleType;
 import com.app.brainmap.domain.entities.*;
+import com.app.brainmap.domain.entities.Community.CommunityComment;
+import com.app.brainmap.domain.entities.Community.CommunityPost;
 import com.app.brainmap.mappers.CommunityCommentMapper;
 import com.app.brainmap.repositories.CommunityCommentRepository;
 import com.app.brainmap.repositories.CommunityPostRepository;
@@ -21,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.UUID;

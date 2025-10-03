@@ -1,6 +1,6 @@
 package com.app.brainmap.services;
 
-import com.app.brainmap.domain.entities.CommunityTag;
+import com.app.brainmap.domain.entities.Community.CommunityTag;
 
 import java.util.List;
 import java.util.Set;
