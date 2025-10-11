@@ -2,6 +2,7 @@ package com.app.brainmap.domain.dto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.UUID;
 
 public record TaskDto(
@@ -13,6 +14,8 @@ public record TaskDto(
         LocalDate createdDate,
         LocalTime createdTime,
         LocalDate dueDate,
-        String priority
+        String priority,
+        List<String> assignees
 ) {
+
 }

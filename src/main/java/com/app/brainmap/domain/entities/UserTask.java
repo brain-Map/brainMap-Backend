@@ -26,8 +26,8 @@ public class UserTask {
 
     @ManyToOne
     @MapsId("taskId")
-    @JoinColumn(name = "project_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE) // When a project is deleted, delete this row too
+    @JoinColumn(name = "task_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE) // When a task is deleted, delete this row too
     private Task task;
 
 }

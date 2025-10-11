@@ -1,9 +1,8 @@
 package com.app.brainmap.services.impl;
 
-import com.app.brainmap.domain.entities.KanbanBoard;
-import com.app.brainmap.domain.entities.KanbanColumn;
-import com.app.brainmap.domain.entities.Task;
+import com.app.brainmap.domain.entities.*;
 import com.app.brainmap.repositories.TaskRepository;
+import com.app.brainmap.repositories.UserTaskRepository;
 import com.app.brainmap.services.TaskService;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +14,10 @@ import java.util.UUID;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
-    public TaskServiceImpl(TaskRepository taskRepository) {
+    private final UserTaskRepository userTaskRepository;
+    public TaskServiceImpl(TaskRepository taskRepository, UserTaskRepository userTaskRepository) {
         this.taskRepository = taskRepository;
+        this.userTaskRepository = userTaskRepository;
     }
 
     @Override
@@ -81,4 +82,23 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.delete(task);
         return true;
     }
+
+    @Override
+    public void assignUserToTask(String userId, UUID taskId) {
+        UUID userUuid = UUID.fromString(userId); // Convert String to UUID
+        UserTaskCompositeKey key = new UserTaskCompositeKey(userUuid, taskId);
+        User user = new User();
+        user.setId(userUuid);
+        Task task = new Task();
+        task.setTaskId(taskId);
+
+        UserTask userTask = new UserTask();
+        userTask.setId(key);
+        userTask.setUser(user);
+        userTask.setTask(task);
+
+        userTaskRepository.save(userTask);
+    }
+
+
 }
