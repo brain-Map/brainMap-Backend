@@ -27,6 +27,7 @@ public class ServiceListingResponseDto {
     private String serviceType;
     private String mentorFirstName;
     private String mentorLastName;
+    private String mentorshipType;
     private String mentorBio;
     private String mentorAvatar;
     private Double minPrice;

@@ -3,11 +3,11 @@ package com.app.brainmap.services.impl;
 import com.app.brainmap.domain.DomainExpertStatus;
 import com.app.brainmap.domain.dto.DomainExpert.CompleteDomainExpertProfileDto;
 import com.app.brainmap.domain.dto.DomainExpert.DomainExpertProfileDto;
-import com.app.brainmap.domain.dto.DomainExpert.ServiceListingRequestDto;
-import com.app.brainmap.domain.dto.DomainExpert.ServiceListingResponseDto;
+import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingRequestDto;
+import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
 import com.app.brainmap.domain.entities.DomainExpert.*;
 import com.app.brainmap.domain.entities.User;
-import com.app.brainmap.domain.entities.DomainExpert.ServiceListingAvailability;
+import com.app.brainmap.mappers.BookingMapper;
 import com.app.brainmap.mappers.ServiceListingResponseMapper;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.DomainExpertsService;
@@ -32,130 +32,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DomainExpertsServiceImpl implements DomainExpertsService {
     private final DomainExpertRepository domainExpertRepository;
-    private final ServiceListingRepository serviceListingRepository;
     private final UserRepository userRepository;
-    private final ServiceListingAvailabilityRepository serviceListingAvailabilityRepository; // kept if needed elsewhere
-    private final ServiceListingResponseMapper serviceListingResponseMapper;
     private final ExpertiseAreaRepository expertiseAreaRepository;
     private final DomainExpertEducationRepository domainExpertEducationRepository;
     private final DomainExpertVerificationDocumentRepository domainExpertVerificationDocumentRepository;
     private final FileStorageService fileStorageService;
+    private final ServiceBookingRepository serviceBookingRepository;
+    private final ServiceListingRepository serviceListingRepository;
+    private final BookingMapper bookingMapper;
 
     @Override
     public List<DomainExperts> listDomainExperts() {
         return domainExpertRepository.findAll();
-    }
-
-    // create service listing
-    @Override
-    public ServiceListing createServiceListing(ServiceListingRequestDto serviceListingRequestDto, UUID mentorId) {
-        // Fetch mentor
-        User mentor = userRepository.findById(mentorId)
-                .orElseThrow(() -> new RuntimeException("Mentor not found with UUID: " + mentorId));
-        // Create ServiceListing
-        ServiceListing.ServiceListingBuilder builder = ServiceListing.builder()
-                .title(serviceListingRequestDto.getTitle())
-                .subject(serviceListingRequestDto.getSubject())
-                .description(serviceListingRequestDto.getDescription())
-                .pricingType(serviceListingRequestDto.getPricingType())
-                .maxPrice(serviceListingRequestDto.getMaxPrice())
-                .minPrice(serviceListingRequestDto.getMinPrice())
-                .mentorshipType(serviceListingRequestDto.getMentorshipType())
-                .mentor(mentor)
-                .serviceType(serviceListingRequestDto.getServiceType());
-
-        // Handle thumbnail upload
-        if (serviceListingRequestDto.getThumbnail() != null && !serviceListingRequestDto.getThumbnail().isEmpty()) {
-            String thumbnailUrl = fileStorageService.store(serviceListingRequestDto.getThumbnail(), "services/" + mentorId  + "/thumbnails");
-            builder.thumbnailUrl(thumbnailUrl);
-        }
-        ServiceListing service = builder.build();
-        // create availability
-        List<ServiceListingAvailability> availabilities = serviceListingRequestDto.getAvailabilities().stream()
-                .map(availability -> ServiceListingAvailability.builder()
-                        .dayOfWeek(availability.getDayOfWeek())
-                        .startTime(availability.getStartTime())
-                        .endTime(availability.getEndTime())
-                        .service(service)
-                        .build())
-                .toList();
-        service.setAvailabilities(availabilities);
-
-        // create offers (whatYouGet)
-        if (serviceListingRequestDto.getWhatYouGet() != null && !serviceListingRequestDto.getWhatYouGet().isEmpty()) {
-            List<ServiceListingOffer> offers = serviceListingRequestDto.getWhatYouGet().stream()
-                    .map(dto -> ServiceListingOffer.builder()
-                            .title(dto.getTitle())
-                            .description(dto.getDescription())
-                            .serviceListing(service)
-                            .build())
-                    .toList();
-            service.setOffers(offers);
-        }
-        return serviceListingRepository.save(service);
-    }
-
-    // retrieve service listing (all)
-    @Override
-    public Page<ServiceListingResponseDto> getAllServiceListings(int page, int size, String sortBy) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        Page<ServiceListing> serviceListings = serviceListingRepository.findAll(pageable);
-        return serviceListings.map(serviceListingResponseMapper::toServiceListingResponseDto);
-    }
-
-    @Override
-    public ServiceListingResponseDto getServiceListingById(UUID serviceId) {
-        ServiceListing serviceListing = serviceListingRepository.findById(serviceId)
-                .orElseThrow(() -> new RuntimeException("Service not found with UUID: " + serviceId));
-        return serviceListingResponseMapper.toServiceListingResponseDto(serviceListing);
-    }
-
-    @Override
-    public ServiceListingResponseDto updateServiceListing(UUID serviceId, ServiceListingRequestDto serviceListingRequestDto){
-        ServiceListing serviceListing = serviceListingRepository.findById(serviceId)
-                .orElseThrow(() -> new RuntimeException("Service listing not found"));
-
-        serviceListing.setTitle(serviceListingRequestDto.getTitle());
-        serviceListing.setSubject(serviceListingRequestDto.getSubject());
-        serviceListing.setDescription(serviceListingRequestDto.getDescription());
-        serviceListing.setPricingType(serviceListingRequestDto.getPricingType());
-        serviceListing.setUpdatedAt(LocalDateTime.now());
-
-        // update availabilities
-        serviceListing.getAvailabilities().clear();
-        List<ServiceListingAvailability> newAvailabilities = serviceListingRequestDto.getAvailabilities().stream()
-                .map(availability -> ServiceListingAvailability.builder()
-                        .dayOfWeek(availability.getDayOfWeek())
-                        .startTime(availability.getStartTime())
-                        .endTime(availability.getEndTime())
-                        .service(serviceListing)
-                        .build()
-                ).toList();
-        serviceListing.getAvailabilities().addAll(newAvailabilities);
-
-        // update offers (whatYouGet)
-        serviceListing.getOffers().clear();
-        if (serviceListingRequestDto.getWhatYouGet() != null && !serviceListingRequestDto.getWhatYouGet().isEmpty()) {
-            List<ServiceListingOffer> offers = serviceListingRequestDto.getWhatYouGet().stream()
-                    .map(dto -> ServiceListingOffer.builder()
-                            .title(dto.getTitle())
-                            .description(dto.getDescription())
-                            .serviceListing(serviceListing)
-                            .build())
-                    .toList();
-            serviceListing.getOffers().addAll(offers);
-        }
-
-        ServiceListing updatedServicelisting =  serviceListingRepository.save(serviceListing);
-        return serviceListingResponseMapper.toServiceListingResponseDto(updatedServicelisting);
-    }
-
-    @Override
-    public  void deleteServiceListing(UUID serviceId) {
-        if(!serviceListingRepository.existsById(serviceId)){
-            throw new RuntimeException("Service not fount with UUID: " + serviceId);
-        }
-        serviceListingRepository.deleteById(serviceId);
     }
 
     @Override
@@ -287,4 +175,97 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
                 .map(expert -> expert.getStatus() == DomainExpertStatus.VERIFIED || expert.getStatus() == DomainExpertStatus.PENDING)
                 .orElse(false);
     }
+
+    @Override
+    public ServiceBookingResponseDto createServiceBooking(ServiceBookingRequestDto requestDto, UUID userId) {
+        ServiceListing service = serviceListingRepository.findById(requestDto.getServiceId())
+                .orElseThrow(() -> new RuntimeException("Service not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        DomainExperts expert = domainExpertRepository.findById(requestDto.getDomainExpertId())
+                .orElseThrow(() -> new RuntimeException("Domain expert not found"));
+
+        ServiceBooking booking = ServiceBooking.builder()
+                .service(service)
+                .user(user)
+                .domainExpert(expert)
+                .duration(requestDto.getDuration())
+                .projectDetails(requestDto.getProjectDetails())
+                .requestedDate(requestDto.getRequestedDate())
+                .requestedStartTime(requestDto.getRequestedStartTime())
+                .requestedEndTime(requestDto.getRequestedEndTime())
+                .totalPrice(requestDto.getTotalPrice())
+                .status(ServiceBookingStatus.PENDING)
+                .createdAt(java.time.LocalDateTime.now())
+                .updatedAt(java.time.LocalDateTime.now())
+                .build();
+        booking = serviceBookingRepository.save(booking);
+        return bookingMapper.toBookingResponseDto(booking);
+    }
+
+    @Override
+    @Transactional
+    public ServiceBookingResponseDto reviewServiceBooking(UUID bookingId, boolean accept, ServiceBookingRequestDto adjustmentDto, String rejectionReason, UUID expertId) {
+        ServiceBooking booking = serviceBookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        // Only the expert who owns the service can review
+        if (!booking.getService().getMentor().getId().equals(expertId)) {
+            throw new RuntimeException("Not authorized to review this booking");
+        }
+        if (accept) {
+            booking.setStatus(ServiceBookingStatus.ACCEPTED);
+            if (adjustmentDto != null) {
+                booking.setAcceptedDate(adjustmentDto.getRequestedDate() != null ? adjustmentDto.getRequestedDate() : booking.getRequestedDate());
+                booking.setAcceptedTime(adjustmentDto.getRequestedStartTime() != null ? adjustmentDto.getRequestedStartTime() : booking.getRequestedStartTime());
+                booking.setAcceptedTime(adjustmentDto.getRequestedEndTime() != null ? adjustmentDto.getRequestedEndTime() : booking.getRequestedEndTime());
+                booking.setAcceptedPrice(adjustmentDto.getTotalPrice() != null ? adjustmentDto.getTotalPrice() : booking.getTotalPrice());
+            } else {
+                booking.setAcceptedDate(booking.getRequestedDate());
+                booking.setAcceptedTime(booking.getAcceptedTime());
+                booking.setAcceptedPrice(booking.getTotalPrice());
+            }
+            booking.setRejectionReason(null);
+        } else {
+            booking.setStatus(ServiceBookingStatus.REJECTED);
+            booking.setRejectionReason(rejectionReason);
+        }
+        booking.setUpdatedAt(java.time.LocalDateTime.now());
+        booking = serviceBookingRepository.save(booking);
+        return bookingMapper.toBookingResponseDto(booking);
+    }
+
+    @Override
+    public List<ServiceBookingResponseDto> getBookingsForService(UUID serviceId) {
+        List<ServiceBooking> bookings = serviceBookingRepository.findByService_ServiceId(serviceId);
+        return bookings.stream().map(bookingMapper::toBookingResponseDto).toList();
+    }
+
+    @Override
+    public List<ServiceBookingResponseDto> getBookingsForUser(UUID userId) {
+        List<ServiceBooking> bookings = serviceBookingRepository.findByUserId(userId);
+        return bookings.stream().map(bookingMapper::toBookingResponseDto).toList();
+    }
+
+    @Override
+    public List<ServiceBookingResponseDto> getBookingsForDomainExpert(UUID expertId) {
+        List<ServiceBooking> bookings = serviceBookingRepository.findByDomainExpert_Id(expertId);
+        return bookings.stream().map(bookingMapper::toBookingResponseDto).toList();
+    }
+
+    @Override
+    public List<ServiceBookingResponseDto> getBookingsForDomainExpertFiltered(UUID expertId, String status, String date) {
+        List<ServiceBooking> bookings = serviceBookingRepository.findByDomainExpert_Id(expertId);
+        if (status != null && !status.isEmpty()) {
+            bookings = bookings.stream()
+                .filter(b -> b.getStatus() != null && b.getStatus().name().equalsIgnoreCase(status))
+                .toList();
+        }
+        if (date != null && !date.isEmpty()) {
+            bookings = bookings.stream()
+                .filter(b -> b.getRequestedDate() != null && b.getRequestedDate().toString().equals(date))
+                .toList();
+        }
+        return bookings.stream().map(bookingMapper::toBookingResponseDto).toList();
+    }
+
 }
