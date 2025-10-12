@@ -37,15 +37,29 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Page<User> findAll(Pageable pageable);
 
     @Query("""
-        SELECT EXTRACT(MONTH FROM u.createdAt) AS monthNumber,
+        SELECT EXTRACT(YEAR FROM u.createdAt) AS year,
+            EXTRACT(MONTH FROM u.createdAt) AS monthNumber,
             u.userRole AS role,
             COUNT(u) AS count
         FROM User u
         WHERE u.createdAt >= :startDate
-        GROUP BY EXTRACT(MONTH FROM u.createdAt), u.userRole
-        ORDER BY EXTRACT(MONTH FROM u.createdAt), u.userRole 
+        GROUP BY EXTRACT(YEAR FROM u.createdAt), EXTRACT(MONTH FROM u.createdAt), u.userRole
+        ORDER BY EXTRACT(YEAR FROM u.createdAt), EXTRACT(MONTH FROM u.createdAt), u.userRole
 """)
     List<Object[]> getMonthlyUserCountByRole(@Param("startDate") LocalDateTime startDate);
+
+    @Query("""
+SELECT 
+EXTRACT(YEAR FROM u.createdAt) AS year,
+EXTRACT(MONTH FROM u.createdAt) AS monthNumber,
+COUNT(*) FILTER (WHERE u.userRole = 'MODERATOR') AS modaratorCount,
+COUNT(*) FILTER (WHERE u.userRole = 'MENTOR') AS mentorCount,
+COUNT(*) FILTER (WHERE u.userRole = 'PROJECT_MEMBER') AS projectMemberCount
+FROM User u
+GROUP BY EXTRACT(YEAR FROM u.createdAt), EXTRACT(MONTH FROM u.createdAt)
+ORDER BY EXTRACT(YEAR FROM u.createdAt), EXTRACT(MONTH FROM u.createdAt)
+""")
+    List<Object[]> getUserGrowthByMonth(@Param("startDate") LocalDateTime startDate);
 
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
@@ -59,4 +73,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("SELECT u FROM User u WHERE u.userRole = 'MENTOR' AND LOWER(u.email) LIKE LOWER(CONCAT(:query, '%'))")
     List<User> searchSupervisors(@Param("query") String query);
 
+    Page<User> findByUserRole(UserRoleType userRole, Pageable pageable);
+
+    Page<User> findAllByUserRole(UserRoleType userRole, Pageable pageable);
 }

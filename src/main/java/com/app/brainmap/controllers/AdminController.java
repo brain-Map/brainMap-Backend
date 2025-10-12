@@ -1,5 +1,6 @@
 package com.app.brainmap.controllers;
 
+import com.app.brainmap.domain.UserRoleType;
 import com.app.brainmap.domain.dto.AdminDashboardStatusDto;
 import com.app.brainmap.domain.dto.AdminUserListDto;
 import com.app.brainmap.domain.dto.UserTrendDto;
@@ -27,6 +28,21 @@ public class AdminController {
     private final AdminService adminService;
     private final UserService userService;
 
+    @GetMapping("dashboard/helthcheck")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("Admin service is up and running");
+    }
+
+    @GetMapping("/dashboard/dbcheck")
+    public ResponseEntity<String> dbCheck() {
+        try {
+            long userCount = adminService.getAdminDashboardStatus().getUserCount();
+            return ResponseEntity.ok("Database connection is healthy");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Database connection failed: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/dashboard/overview")
     public ResponseEntity<AdminDashboardStatusDto> getDashboardStatus() {
         log.info("Fetching admin dashboard status");
@@ -53,12 +69,13 @@ public class AdminController {
     public ResponseEntity<Page<AdminUserListDto>> getUserList(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "id") String sortBy
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(required = false) UserRoleType role
     ){
-        Page<AdminUserListDto> users = adminService.getAllUsers(page, size, sortBy);
+        Page<AdminUserListDto> users = adminService.getAllUsers(page, size, role, sortBy);
         return ResponseEntity.ok()
                 .header("content-type", "application/json")
-                .body(adminService.getAllUsers(page, size, sortBy));
+                .body(adminService.getAllUsers(page, size, role, sortBy));
     }
 
     @GetMapping("/project-count")
