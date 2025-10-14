@@ -13,4 +13,5 @@ public interface TaskService {
     boolean updateTask(UUID id, Task task);
     boolean updateTaskColumn(UUID id, UUID columnId);
     boolean deleteTask(UUID id);
+    void assignUserToTask(String userId, UUID taskId);
 }
