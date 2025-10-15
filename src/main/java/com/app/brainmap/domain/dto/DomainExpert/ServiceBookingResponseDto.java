@@ -1,6 +1,7 @@
 package com.app.brainmap.domain.dto.DomainExpert;
 
 import com.app.brainmap.domain.entities.DomainExpert.ServiceBookingStatus;
+import com.app.brainmap.domain.entities.DomainExpert.SessionType;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,7 +14,6 @@ public class ServiceBookingResponseDto {
     private UUID id;
     private UUID serviceId;
     private String serviceTitle;
-    private String serviceType;
     private UUID userId;
     private String username;
     private String userFirstName;
@@ -27,6 +27,7 @@ public class ServiceBookingResponseDto {
     private LocalTime requestedEndTime;
     private BigDecimal totalPrice;
     private ServiceBookingStatus status;
+    private SessionType sessionType;
     private LocalDate acceptedDate;
     private LocalTime acceptedTime;
     private BigDecimal acceptedPrice;

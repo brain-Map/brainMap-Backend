@@ -39,6 +39,8 @@ public class ServiceBooking {
     private LocalTime requestedStartTime;
     private LocalTime requestedEndTime;
     private BigDecimal totalPrice;
+    @Enumerated(EnumType.STRING)
+    private SessionType sessionType;
 
     @Enumerated(EnumType.STRING)
     private ServiceBookingStatus status;

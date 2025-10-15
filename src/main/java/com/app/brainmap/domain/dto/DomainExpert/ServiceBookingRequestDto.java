@@ -16,5 +16,6 @@ public class ServiceBookingRequestDto {
     private LocalTime requestedEndTime;
     private BigDecimal totalPrice;
     private UUID domainExpertId;
+    private String sessionType;
 }
 
