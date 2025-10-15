@@ -14,8 +14,8 @@ public interface ServiceListingResponseMapper {
     @Mapping(source = "mentor.bio", target = "mentorBio")
     @Mapping(source = "mentor.avatar", target = "mentorAvatar")
     @Mapping(target = "expertiseAreas", expression = "java(getExpertiseAreas(serviceListing))")
-    @Mapping(source = "minPrice", target = "minPrice")
-    @Mapping(source = "maxPrice", target = "maxPrice")
+    @Mapping(source = "hourlyRatePerPerson", target = "hourlyRatePerPerson")
+    @Mapping(source = "hourlyRatePerGroup", target = "hourlyRatePerGroup")
     @Mapping(target = "whatYouGet", expression = "java(mapOffers(serviceListing))")
     ServiceListingResponseDto toServiceListingResponseDto(ServiceListing serviceListing);
 

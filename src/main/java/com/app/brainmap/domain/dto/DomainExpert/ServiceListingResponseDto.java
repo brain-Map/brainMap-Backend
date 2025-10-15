@@ -24,14 +24,13 @@ public class ServiceListingResponseDto {
     private List<ServiceListingAvailabilityResponseDto> availabilities;
     private String thumbnailUrl;
     private Integer duration;
-    private String serviceType;
     private String mentorFirstName;
     private String mentorLastName;
     private String mentorshipType;
     private String mentorBio;
     private String mentorAvatar;
-    private Double minPrice;
-    private Double maxPrice;
+    private Double hourlyRatePerPerson;
+    private Double hourlyRatePerGroup;
     private List<String> expertiseAreas;
     private List<WhatYouGetDto> whatYouGet;
     }

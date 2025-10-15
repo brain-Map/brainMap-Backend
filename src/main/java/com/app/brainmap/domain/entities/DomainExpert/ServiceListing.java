@@ -31,20 +31,11 @@ public class ServiceListing {
     @Column(name = "description", nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "pricing_type", nullable = false)
-    private String pricingType;
+    @Column(name = "hourly_rate_per_person")
+    private Double hourlyRatePerPerson;
 
-    @Column(name = "min_price")
-    private Double minPrice;
-
-    @Column(name = "max_price")
-    private Double maxPrice;
-
-    @Column(name = "service_type")
-    private String serviceType;
-
-    @Column(name = "mentorship_type", nullable = false)
-    private String mentorshipType;
+    @Column(name = "hourly_rate_per_group")
+    private Double hourlyRatePerGroup;
 
     @OneToMany(mappedBy = "serviceListing", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ServiceListingOffer> offers;

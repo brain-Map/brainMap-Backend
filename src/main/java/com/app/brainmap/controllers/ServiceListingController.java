@@ -67,17 +67,19 @@ public class ServiceListingController {
         }
     }
 
-    @PutMapping
+    @PutMapping(path="/{serviceId}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateServiceListing(
-            @RequestParam UUID serviceId,
-            @RequestBody ServiceListingRequestDto serviceListingRequestDto
+            @PathVariable UUID serviceId,
+            @RequestPart("service") ServiceListingRequestDto serviceListingRequestDto,
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
     ){
         try {
+            if (thumbnail != null) serviceListingRequestDto.setThumbnail(thumbnail);
             ServiceListingResponseDto updatedServiceListing = serviceListingService.updateServiceListing(serviceId, serviceListingRequestDto);
             return ResponseEntity.ok(updatedServiceListing);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
@@ -85,6 +87,17 @@ public class ServiceListingController {
     @DeleteMapping("/{serviceId}")
     public ResponseEntity<?> deleteServiceListing(@PathVariable UUID serviceId){
         try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            JwtUserDetails userDetails = (authentication != null && authentication.getPrincipal() instanceof JwtUserDetails)
+                    ? (JwtUserDetails) authentication.getPrincipal() : null;
+            if (userDetails == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User not authenticated");
+            }
+            // Get the mentorId of the service listing
+            UUID mentorId = serviceListingService.getMentorIdByServiceId(serviceId);
+            if (!userDetails.getUserId().equals(mentorId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to delete this service listing");
+            }
             serviceListingService.deleteServiceListing(serviceId);
             return ResponseEntity.noContent().build();
         }catch (RuntimeException e) {
@@ -123,6 +136,9 @@ public class ServiceListingController {
             @PathVariable UUID bookingId,
             @RequestBody(required = false) ServiceBookingRequestDto adjustmentDto
     ) {
+        log.info("_____________________________________________________________________________________________________________________--");
+        log.info("Adjustment DTO: " + adjustmentDto);
+        log.info("Booking ID: " + bookingId);
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             JwtUserDetails userDetails = (authentication != null && authentication.getPrincipal() instanceof JwtUserDetails)
@@ -134,8 +150,10 @@ public class ServiceListingController {
                     bookingId, true, adjustmentDto, null, userDetails.getUserId());
             return ResponseEntity.ok(booking);
         } catch (RuntimeException e) {
+            log.info("Error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
+            log.info("Error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
@@ -175,5 +193,12 @@ public class ServiceListingController {
     public ResponseEntity<List<ServiceBookingResponseDto>> getBookingsForUser(@PathVariable UUID userId) {
         List<ServiceBookingResponseDto> bookings = domainExpertsService.getBookingsForUser(userId);
         return ResponseEntity.ok(bookings);
+    }
+
+    // Get service listings by mentor (domain expert) ID
+    @GetMapping("/mentor/{mentorId}")
+    public ResponseEntity<List<ServiceListingResponseDto>> getServiceListingsByMentorId(@PathVariable UUID mentorId) {
+        List<ServiceListingResponseDto> listings = serviceListingService.getServiceListingsByMentorId(mentorId);
+        return ResponseEntity.ok(listings);
     }
 }
