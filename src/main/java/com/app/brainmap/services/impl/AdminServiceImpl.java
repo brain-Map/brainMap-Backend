@@ -14,12 +14,12 @@ import com.app.brainmap.repositories.ProjectRepositiory;
 import com.app.brainmap.repositories.UserRepository;
 import com.app.brainmap.services.AdminService;
 import lombok.AllArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -114,14 +114,13 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Page<AdminUserListDto> getAllUsers(int page, int size, UserRoleType role, String sortBy) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        Page<User> users;
-        if (role == null) {
-            users = userRepository.findAll(pageable);
-        }else{
-            users = userRepository.findAllByUserRole(role, pageable);
-        }
+    public Page<AdminUserListDto> getAllUsers(int page, int size, UserRoleType role, UserStatus status, String search, String sortBy) {
+        String effectiveSort = StringUtils.hasText(sortBy) ? sortBy : "id";
+        Pageable pageable = PageRequest.of(page, size, Sort.by(effectiveSort));
+
+        String normalizedSearch = StringUtils.hasText(search) ? search.trim().toLowerCase() : null;
+
+        Page<User> users = userRepository.findByFilters(role, status, normalizedSearch, pageable);
         return users.map(userMapper::toAdminUserListDto);
     }
 

@@ -4,7 +4,6 @@ import com.app.brainmap.domain.UserRoleType;
 import com.app.brainmap.domain.UserStatus;
 import com.app.brainmap.domain.dto.UserProjectCountDto;
 import com.app.brainmap.domain.entities.User;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,7 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -76,4 +74,21 @@ ORDER BY EXTRACT(YEAR FROM u.createdAt), EXTRACT(MONTH FROM u.createdAt)
     Page<User> findByUserRole(UserRoleType userRole, Pageable pageable);
 
     Page<User> findAllByUserRole(UserRoleType userRole, Pageable pageable);
+
+    @Query("""
+        SELECT u FROM User u
+            WHERE (:userRole IS NULL OR u.userRole = :userRole)
+              AND (:userStatus IS NULL OR u.status = :userStatus)
+              AND (:search IS NULL OR (
+                  u.username ILIKE CONCAT('%',:search,'%') 
+                        OR u.firstName ILIKE CONCAT('%',:search,'%')
+                        OR u.lastName ILIKE CONCAT('%',:search,'%')
+                        OR u.email ILIKE CONCAT('%',:search,'%')
+              ))
+    """)
+    Page<User> findByFilters(
+            @Param("userRole") UserRoleType userRole,
+            @Param("userStatus") UserStatus userStatus,
+            @Param("search") String search,
+            Pageable pageable);
 }

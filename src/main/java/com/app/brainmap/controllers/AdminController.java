@@ -1,6 +1,7 @@
 package com.app.brainmap.controllers;
 
 import com.app.brainmap.domain.UserRoleType;
+import com.app.brainmap.domain.UserStatus;
 import com.app.brainmap.domain.dto.AdminDashboardStatusDto;
 import com.app.brainmap.domain.dto.AdminUserListDto;
 import com.app.brainmap.domain.dto.UserTrendDto;
@@ -70,12 +71,14 @@ public class AdminController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(required = false) UserRoleType role
+            @RequestParam(required = false) UserRoleType userRole,
+            @RequestParam(required = false) UserStatus userStatus,
+            @RequestParam(required = false) String search
     ){
-        Page<AdminUserListDto> users = adminService.getAllUsers(page, size, role, sortBy);
+        Page<AdminUserListDto> users = adminService.getAllUsers(page, size, userRole, userStatus, search, sortBy);
         return ResponseEntity.ok()
                 .header("content-type", "application/json")
-                .body(adminService.getAllUsers(page, size, role, sortBy));
+                .body(users);
     }
 
     @GetMapping("/project-count")
