@@ -2,7 +2,7 @@ package com.app.brainmap.controllers;
 
 import com.app.brainmap.domain.dto.CommunityTagResponse;
 import com.app.brainmap.domain.dto.CreateCommunityTagRequest;
-import com.app.brainmap.domain.entities.CommunityTag;
+import com.app.brainmap.domain.entities.Community.CommunityTag;
 import com.app.brainmap.mappers.CommunityTagMapper;
 import com.app.brainmap.services.CommunityTagService;
 import lombok.RequiredArgsConstructor;

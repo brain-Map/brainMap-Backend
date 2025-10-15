@@ -2,6 +2,7 @@ package com.app.brainmap.services;
 
 import com.app.brainmap.domain.CreateUser;
 import com.app.brainmap.domain.UpdateUser;
+import com.app.brainmap.domain.dto.Chat.MessageSearchResultDto;
 import com.app.brainmap.domain.dto.UserProjectCountDto;
 import com.app.brainmap.domain.dto.UserProjectSaveDto;
 import com.app.brainmap.domain.dto.UserTrendDto;
@@ -23,4 +24,5 @@ public interface UserService {
     List<User> searchUsers(String query, String type);
     void addCollaboration(UserProjectSaveDto dto);
     void updateAvatar(UUID userId, String imageUrl);
+    List<MessageSearchResultDto> searchUserForChat(String query);
 }

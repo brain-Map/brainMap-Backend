@@ -1,14 +1,12 @@
 package com.app.brainmap.services.impl;
 
-import com.app.brainmap.domain.dto.MessageDto;
-import com.app.brainmap.domain.dto.MessageSummaryDto;
-import com.app.brainmap.domain.entities.Message;
+import com.app.brainmap.domain.dto.Chat.MessageDto;
+import com.app.brainmap.domain.dto.Chat.MessageSummaryDto;
+import com.app.brainmap.domain.entities.Chat.Message;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.repositories.MessageRepository;
 import com.app.brainmap.repositories.UserRepository;
 import com.app.brainmap.services.MessageService;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -37,7 +37,8 @@ public class FileStorageServiceImpl implements FileStorageService {
             Files.createDirectories(dir);
             Path dest = dir.resolve(newName);
             Files.copy(file.getInputStream(), dest, StandardCopyOption.REPLACE_EXISTING);
-            return dest.toString();
+//            return dest.toString();
+            return basePath + "/" + subFolder + "/" + newName;
         } catch (IOException e) {
             throw new RuntimeException("Failed to store file", e);
         }

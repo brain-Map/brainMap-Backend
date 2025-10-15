@@ -1,4 +1,4 @@
-package com.app.brainmap.domain.dto;
+package com.app.brainmap.domain.dto.DomainExpert;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,13 +14,23 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class ServiceListingResponseDto {
-    private UUID ServiceId;
+    private UUID serviceId;
     private String title;
     private String subject;
     private String description;
-    private Double fee;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private UUID mentorId;
     private List<ServiceListingAvailabilityResponseDto> availabilities;
+    private String thumbnailUrl;
+    private Integer duration;
+    private String mentorFirstName;
+    private String mentorLastName;
+    private String mentorshipType;
+    private String mentorBio;
+    private String mentorAvatar;
+    private Double hourlyRatePerPerson;
+    private Double hourlyRatePerGroup;
+    private List<String> expertiseAreas;
+    private List<WhatYouGetDto> whatYouGet;
     }

@@ -84,4 +84,8 @@ public class DomainExperts {
     @OneToMany(mappedBy = "domainExpert", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<DomainExpertVerificationDocument> verificationDocuments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "domainExpert", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ServiceBooking> serviceBookings = new ArrayList<>();
 }

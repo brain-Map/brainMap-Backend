@@ -10,6 +10,7 @@ import com.app.brainmap.repositories.UserProjectRepository;
 import com.app.brainmap.services.ProjectService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,6 +37,12 @@ public class ProjectServiceImpl implements ProjectService {
     public List<Project> listProject(UUID userId) {
         return projectRepositiory.findAllByOwnerId(userId);
     }
+
+    @Override
+    public List<UserProject> getAcceptedProjects(UUID userId) {
+        return userProjectRepository.findAcceptedProjectsByUser(userId);
+    }
+
 
     @Override
     public Project createProject(Project project) {

@@ -1,6 +1,6 @@
 package com.app.brainmap.repositories;
 
-import com.app.brainmap.domain.entities.Message;
+import com.app.brainmap.domain.entities.Chat.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

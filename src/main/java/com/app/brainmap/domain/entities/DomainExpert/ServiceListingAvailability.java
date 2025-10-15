@@ -1,4 +1,4 @@
-package com.app.brainmap.domain.entities;
+package com.app.brainmap.domain.entities.DomainExpert;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

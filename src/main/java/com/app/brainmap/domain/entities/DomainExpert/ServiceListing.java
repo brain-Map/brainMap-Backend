@@ -1,5 +1,6 @@
-package com.app.brainmap.domain.entities;
+package com.app.brainmap.domain.entities.DomainExpert;
 
+import com.app.brainmap.domain.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,8 +31,14 @@ public class ServiceListing {
     @Column(name = "description", nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "fee", nullable = false)
-    private Double fee;
+    @Column(name = "hourly_rate_per_person")
+    private Double hourlyRatePerPerson;
+
+    @Column(name = "hourly_rate_per_group")
+    private Double hourlyRatePerGroup;
+
+    @OneToMany(mappedBy = "serviceListing", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ServiceListingOffer> offers;
 
     @Column(name = "created_at")
     @Builder.Default
@@ -47,5 +54,8 @@ public class ServiceListing {
 
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ServiceListingAvailability> availabilities;
+
+    @Column(name = "thumbnail_url")
+    private String thumbnailUrl;
 
 }
