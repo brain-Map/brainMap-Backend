@@ -70,7 +70,8 @@ public class SecurityConfig {
                                 "/api/v1/domain-experts/service-listings/**",
                                 "/uploads/services/**",
                                 "/uploads/experts/**",
-                                "/api/v1/domain-experts/**"
+                                "/api/v1/domain-experts/**",
+                                "api/v1/service-listings/**"
                                 ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                         .anyRequest().authenticated()
