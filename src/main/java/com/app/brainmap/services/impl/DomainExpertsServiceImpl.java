@@ -198,6 +198,7 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
                 .status(ServiceBookingStatus.PENDING)
                 .createdAt(java.time.LocalDateTime.now())
                 .updatedAt(java.time.LocalDateTime.now())
+                .sessionType(SessionType.valueOf(requestDto.getSessionType().toUpperCase()))
                 .build();
         booking = serviceBookingRepository.save(booking);
         return bookingMapper.toBookingResponseDto(booking);
