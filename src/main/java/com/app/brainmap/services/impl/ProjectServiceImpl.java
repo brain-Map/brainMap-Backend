@@ -2,19 +2,15 @@ package com.app.brainmap.services.impl;
 
 import com.app.brainmap.domain.ProjectCollaboratorAccept;
 import com.app.brainmap.domain.ProjectPositionType;
+import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
 import com.app.brainmap.domain.entities.*;
-import com.app.brainmap.repositories.KanbanBoardRepository;
-import com.app.brainmap.repositories.KanbanColumnRepository;
-import com.app.brainmap.repositories.ProjectRepositiory;
-import com.app.brainmap.repositories.UserProjectRepository;
+import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
+import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.ProjectService;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,12 +21,15 @@ public class ProjectServiceImpl implements ProjectService {
     private final KanbanBoardRepository kanbanBoardRepository;
     private final KanbanColumnRepository kanbanColumnRepository;
     private final UserProjectRepository userProjectRepository;
+    private final ServiceBookingRepository serviceBookingRepository;
 
-    public ProjectServiceImpl(ProjectRepositiory projectRepositiory, KanbanBoardRepository kanbanBoardRepository, KanbanColumnRepository kanbanColumnRepository, UserProjectRepository userProjectRepository) {
+    public ProjectServiceImpl(ProjectRepositiory projectRepositiory, KanbanBoardRepository kanbanBoardRepository, KanbanColumnRepository kanbanColumnRepository, UserProjectRepository userProjectRepository, ServiceBookingRepository serviceBookingRepository) {
         this.projectRepositiory = projectRepositiory;
         this.kanbanBoardRepository = kanbanBoardRepository;
         this.kanbanColumnRepository = kanbanColumnRepository;
         this.userProjectRepository = userProjectRepository;
+
+        this.serviceBookingRepository = serviceBookingRepository;
     }
 
     @Override
@@ -190,6 +189,14 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<UserProject> listUserProject(UUID projectId) {
         return userProjectRepository.findAllByProjectId(projectId);
+    }
+
+    @Override
+    public List<BookingDetailsDto> listHiredExperts(UUID userId) {
+        return serviceBookingRepository.findAllBookingDetailsByUserId(userId);
+      
+    public List<UserProject> getProjectOwners(UUID projectId) {
+        return userProjectRepository.findAllByProjectIdAndRole(projectId, ProjectPositionType.OWNER);
     }
 
 

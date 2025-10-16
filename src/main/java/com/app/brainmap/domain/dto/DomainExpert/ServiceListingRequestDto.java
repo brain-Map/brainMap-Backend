@@ -16,11 +16,8 @@ public class ServiceListingRequestDto {
     private String title;
     private String subject;
     private String description;
-    private String pricingType;
-    private Double minPrice;
-    private Double maxPrice;
-    private String serviceType;
-    private String mentorshipType;
+    private Double hourlyRatePerPerson;
+    private Double hourlyRatePerGroup;
     private MultipartFile thumbnail; // optional, for image upload
     private List<ServiceListingAvailabilityRequestDto> availabilities;
     private List<WhatYouGetDto> whatYouGet;

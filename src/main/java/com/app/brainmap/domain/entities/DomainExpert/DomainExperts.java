@@ -3,6 +3,7 @@ package com.app.brainmap.domain.entities.DomainExpert;
 import com.app.brainmap.domain.DomainExpertStatus;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.domain.entities.Wallet;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -84,4 +85,8 @@ public class DomainExperts {
     @OneToMany(mappedBy = "domainExpert", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<DomainExpertVerificationDocument> verificationDocuments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "domainExpert", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ServiceBooking> serviceBookings = new ArrayList<>();
 }
