@@ -3,6 +3,7 @@ package com.app.brainmap.domain.entities.DomainExpert;
 import com.app.brainmap.domain.DomainExpertStatus;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.domain.entities.Wallet;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
