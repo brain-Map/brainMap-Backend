@@ -1,6 +1,7 @@
 package com.app.brainmap.domain.entities.DomainExpert;
 
 import com.app.brainmap.domain.entities.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -27,10 +28,12 @@ public class ServiceBooking {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "domain_expert_id")
+    @JsonIgnore
     private DomainExperts domainExpert;
 
     private int duration;
