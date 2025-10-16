@@ -1,3 +1,4 @@
+// filepath: /home/axob12/Desktop/BrainMap/brainMap-Backend/src/main/java/com/app/brainmap/domain/entities/Notification.java
 package com.app.brainmap.domain.entities;
 
 import jakarta.persistence.*;
@@ -8,26 +9,43 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "notifications")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
 public class Notification {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID notificationId;
+    @Column(name = "id", nullable = false, updatable = false)
+    private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipient_id", nullable = false)
+    private User recipient;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String message;
+    @Column(name = "title")
+    private String title;
 
+    @Column(name = "body", columnDefinition = "TEXT")
+    private String body;
+
+    @Column(name = "type")
+    private String type;
+
+    @Column(name = "data", columnDefinition = "TEXT")
+    private String data; // optional JSON or extra payload
+
+    @Column(name = "is_read")
+    private Boolean isRead = false;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
-    public void prePersist() {
-        createdAt = LocalDateTime.now();
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        if (this.isRead == null) this.isRead = false;
     }
 }
+
