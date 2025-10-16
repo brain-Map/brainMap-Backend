@@ -76,19 +76,20 @@ ORDER BY EXTRACT(YEAR FROM u.createdAt), EXTRACT(MONTH FROM u.createdAt)
     Page<User> findAllByUserRole(UserRoleType userRole, Pageable pageable);
 
     @Query("""
-        SELECT u FROM User u
+            SELECT u FROM User u
             WHERE (:userRole IS NULL OR u.userRole = :userRole)
               AND (:userStatus IS NULL OR u.status = :userStatus)
-              AND (:search IS NULL OR (
-                  u.username ILIKE CONCAT('%',:search,'%') 
-                        OR u.firstName ILIKE CONCAT('%',:search,'%')
-                        OR u.lastName ILIKE CONCAT('%',:search,'%')
-                        OR u.email ILIKE CONCAT('%',:search,'%')
+              AND (COALESCE(:search, '') = '' OR (
+                    LOWER(u.username) LIKE LOWER(CONCAT('%', :search, '%'))
+                    OR LOWER(u.firstName) LIKE LOWER(CONCAT('%', :search, '%'))
+                    OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%'))
+                    OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%'))
               ))
-    """)
+        """)
     Page<User> findByFilters(
             @Param("userRole") UserRoleType userRole,
             @Param("userStatus") UserStatus userStatus,
             @Param("search") String search,
             Pageable pageable);
+
 }
