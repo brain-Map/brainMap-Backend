@@ -9,7 +9,9 @@ import lombok.*;
 @Getter
 @Setter
 public class UserTrendDto {
+    private int year;
     private String month;
-    private UserRoleType userRole;
-    private Long count;
+    private int modaratorCount;
+    private int mentorCount;
+    private int projectMemberCount;
 }
