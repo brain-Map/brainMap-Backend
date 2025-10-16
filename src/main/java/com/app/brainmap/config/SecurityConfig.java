@@ -71,7 +71,8 @@ public class SecurityConfig {
                                 "/uploads/services/**",
                                 "/uploads/experts/**",
                                 "/api/v1/domain-experts/**",
-                                "api/v1/service-listings/**"
+                                "api/v1/service-listings/**",
+                                "/api/v1/messages/**"
                                 ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                         .anyRequest().authenticated()

@@ -34,5 +34,10 @@ public class ServiceBookingResponseDto {
     private String rejectionReason;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private LocalTime updatedStartTime;
+    private LocalTime updatedEndTime;
+    private LocalDate updatedDate;
+    private BigDecimal updatedPrice;
 }
 

@@ -23,6 +23,7 @@ public interface ProjectService {
     boolean updateKanbanColumn(UUID projectId, KanbanColumn kanbanColumn);
     boolean deleteKanbanBoardColumn(UUID columnId);
     List<UserProject> listUserProject(UUID projectId);
+    List<UserProject> getProjectOwners(UUID projectId);
 
 
 }
