@@ -1,9 +1,12 @@
 // Updated file: src/main/java/com/app/brainmap/controllers/MessageController.java
 package com.app.brainmap.controllers;
 
+import com.app.brainmap.domain.dto.Chat.CreateGroupRequestDto;
+import com.app.brainmap.domain.dto.Chat.GroupDto;
 import com.app.brainmap.domain.dto.Chat.MessageDto;
 import com.app.brainmap.domain.dto.Chat.MessageSummaryDto;
 import com.app.brainmap.domain.dto.PrivateMessageDto;
+import com.app.brainmap.domain.entities.Chat.Group;
 import com.app.brainmap.domain.entities.Chat.Message;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.mappers.MessageMapper;
@@ -11,6 +14,7 @@ import com.app.brainmap.security.JwtUserDetails;
 import com.app.brainmap.services.MessageService;
 import com.app.brainmap.services.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -25,6 +29,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 @RequestMapping("/api/v1/messages")
 public class MessageController {
     private final MessageService messageService;
@@ -61,6 +66,16 @@ public class MessageController {
         return null; // Do not return to avoid unnecessary broadcast
     }
 
+    @MessageMapping("/group-message")
+    public void receiveGroupMessage(@Payload MessageDto messageDto) {
+        if ("GROUP_MESSAGE".equals(messageDto.getStatus())) {
+            messageService.saveFromDto(messageDto);
+            if (messageDto.getGroupId() != null) {
+                simpMessagingTemplate.convertAndSend("/group/" + messageDto.getGroupId() + "/messages", messageDto);
+            }
+        }
+    }
+
     private UUID getUserIdFromPrincipal(Principal principal) {
         if (principal == null) {
             System.out.println("Principal is null in MessageController");
@@ -87,11 +102,11 @@ public class MessageController {
         return ResponseEntity.ok(messageDtos);
     }
 
-@GetMapping("/chats/{userId}/summary")
-public ResponseEntity<List<MessageSummaryDto>> getChatSummaries(@PathVariable UUID userId) {
-    List<MessageSummaryDto> summaries = messageService.getMessageSummaries(userId);
-    return ResponseEntity.ok(summaries);
-}
+    @GetMapping("/chats/{userId}/summary")
+    public ResponseEntity<List<MessageSummaryDto>> getChatSummaries(@PathVariable UUID userId) {
+        List<MessageSummaryDto> summaries = messageService.getMessageSummaries(userId);
+        return ResponseEntity.ok(summaries);
+    }
 
     @GetMapping("/chats/{userId1}/{userId2}")
     public List<PrivateMessageDto> getChatMessages(@PathVariable UUID userId1, @PathVariable UUID userId2, Principal principal) {
@@ -104,8 +119,64 @@ public ResponseEntity<List<MessageSummaryDto>> getChatSummaries(@PathVariable UU
     }
 
 
+    /*    Group Management
+     */
+
     @GetMapping("/users/search")
     public List<User> searchUsers(@RequestParam String query) {
         return userService.searchUsers(query);
+    }
+
+    // Get groups for user
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<GroupDto>> getGroupsForUser(@PathVariable UUID userId) {
+        List<GroupDto> groups = messageService.getGroupsForUser(userId);
+        return ResponseEntity.ok(groups);
+    }
+
+    // Add user to a group
+    @PostMapping("/group/{groupId}/add-user/{userId}")
+    public ResponseEntity<GroupDto> addUserToGroup(@PathVariable UUID groupId, @PathVariable UUID userId) {
+        GroupDto updatedGroup = messageService.addUserToGroup(groupId, userId);
+        return ResponseEntity.ok(updatedGroup);
+    }
+
+    @GetMapping("/groups/{groupId}")
+    public ResponseEntity<List<MessageDto>> getGroupMessages(@PathVariable UUID groupId) {
+        List<Message> messages = messageService.getGroupMessages(groupId);
+        List<MessageDto> messageDtos = messages.stream()
+                .map(messageMapper::toDto)
+                .toList();
+        return ResponseEntity.ok(messageDtos);
+    }
+
+    // Create a new group
+    @PostMapping("/groups")
+    public ResponseEntity<GroupDto> createGroup(@RequestBody CreateGroupRequestDto requestDto, Principal principal) {
+        log.info("Creating group with members: " + requestDto);
+        GroupDto groupDto = messageService.createGroup(requestDto.getName(), requestDto.getMembers(), requestDto.getProjectId());
+        return ResponseEntity.ok(groupDto);
+    }
+
+    // Get all users in a group
+    @GetMapping("/group/{groupId}/get-all-users")
+    public ResponseEntity<List<UUID>> getAllUsersInGroup(@PathVariable UUID groupId) {
+        List<User> users = messageService.getAllUsersInGroup(groupId);
+        List<UUID> userIds = users.stream().map(User::getId).toList();
+        return ResponseEntity.ok(userIds);
+    }
+
+    // Get group ID by project ID
+    @GetMapping("/group/by-project/{projectId}")
+    public ResponseEntity<UUID> getGroupIdByProjectId(@PathVariable UUID projectId) {
+        UUID groupId = messageService.getGroupIdByProjectId(projectId);
+        return ResponseEntity.ok(groupId);
+    }
+
+    // Remove a user from a group
+    @DeleteMapping("/group/{groupId}/remove-user/{userId}")
+    public ResponseEntity<UUID> removeUserFromGroup(@PathVariable UUID groupId, @PathVariable UUID userId) {
+        UUID updatedGroupId = messageService.removeUserFromGroup(groupId, userId);
+        return ResponseEntity.ok(updatedGroupId);
     }
 }

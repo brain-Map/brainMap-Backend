@@ -1,5 +1,6 @@
 package com.app.brainmap.services;
 
+import com.app.brainmap.domain.dto.Chat.GroupDto;
 import com.app.brainmap.domain.dto.Chat.MessageDto;
 import com.app.brainmap.domain.dto.Chat.MessageSummaryDto;
 import com.app.brainmap.domain.entities.Chat.Message;
@@ -15,4 +16,12 @@ public interface MessageService {
     List<Message> getAllMessages();
     List<Message> getAllMessagesForUser(UUID userId);
     List<MessageSummaryDto> getMessageSummaries(UUID userId);
+    List<GroupDto> getGroupsForUser(UUID userId);
+    GroupDto addUserToGroup(UUID groupId, UUID userId);
+    UUID removeUserFromGroup(UUID groupId, UUID userId);
+    List<Message> getGroupMessages(UUID groupId);
+    GroupDto createGroup(String name, List<UUID> memberIds, UUID projectId);
+    List<User> getAllUsersInGroup(UUID groupId);
+    UUID getGroupIdByProjectId(UUID projectId);
 }
+
