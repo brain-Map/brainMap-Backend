@@ -192,5 +192,10 @@ public class ProjectServiceImpl implements ProjectService {
         return userProjectRepository.findAllByProjectId(projectId);
     }
 
+    @Override
+    public List<UserProject> getProjectOwners(UUID projectId) {
+        return userProjectRepository.findAllByProjectIdAndRole(projectId, ProjectPositionType.OWNER);
+    }
+
 
 }

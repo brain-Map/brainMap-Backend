@@ -138,9 +138,13 @@ public class ProjectController {
                 .toList();
     }
 
-
-
-
+    @GetMapping("/owners/{project_id}")
+    public List<UserProjectDto> getProjectOwners(@PathVariable("project_id") UUID projectId) {
+        return projectService.getProjectOwners(projectId)
+                .stream()
+                .map(userProjectMapper::toDto)
+                .toList();
+    }
 
 
 }
