@@ -1,9 +1,6 @@
 package com.app.brainmap.controllers;
 
-import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingRequestDto;
-import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
-import com.app.brainmap.domain.dto.DomainExpert.ServiceListingRequestDto;
-import com.app.brainmap.domain.dto.DomainExpert.ServiceListingResponseDto;
+import com.app.brainmap.domain.dto.DomainExpert.*;
 import com.app.brainmap.security.JwtUserDetails;
 import com.app.brainmap.services.DomainExpertsService;
 import com.app.brainmap.services.ServiceListingService;
@@ -162,9 +159,10 @@ public class ServiceListingController {
     @PutMapping("/service-booking/{bookingId}/reject")
     public ResponseEntity<?> rejectServiceBooking(
             @PathVariable UUID bookingId,
-            @RequestParam(required = false) String rejectionReason
-    ) {
+            @RequestBody RejectBookingRequestDto rejectionReason
+            ) {
         try {
+            log.info("Rejection Reason: " + rejectionReason.getReason());
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             JwtUserDetails userDetails = (authentication != null && authentication.getPrincipal() instanceof JwtUserDetails)
                     ? (JwtUserDetails) authentication.getPrincipal() : null;
@@ -172,8 +170,31 @@ public class ServiceListingController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User not authenticated");
             }
             ServiceBookingResponseDto booking = domainExpertsService.reviewServiceBooking(
-                    bookingId, false, null, rejectionReason, userDetails.getUserId());
+                    bookingId, false, null, rejectionReason.getReason(), userDetails.getUserId());
             return ResponseEntity.ok(booking);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    // Update a booking
+    @PutMapping("/service-booking/{bookingId}/update")
+    public ResponseEntity<?> updateServiceBooking(
+            @PathVariable UUID bookingId,
+            @RequestBody BookingUpdateDto updateDto
+    ) {
+        try {
+            log.info("Booking Update DTO: " + updateDto);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            JwtUserDetails userDetails = (authentication != null && authentication.getPrincipal() instanceof JwtUserDetails)
+                    ? (JwtUserDetails) authentication.getPrincipal() : null;
+            if (userDetails == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User not authenticated");
+            }
+            ServiceBookingResponseDto updatedBooking = domainExpertsService.updateServiceBooking(bookingId, updateDto, userDetails.getUserId());
+            return ResponseEntity.ok(updatedBooking);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
