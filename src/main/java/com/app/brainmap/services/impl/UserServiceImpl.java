@@ -215,5 +215,36 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
+    @Override
+    public User userUpdate(UUID id, User request) {
+        User user = getUserById(id);
+
+        // Update basic user fields
+        if (request.getFirstName() != null) {
+            user.setFirstName(request.getFirstName());
+        }
+        if (request.getLastName() != null) {
+            user.setLastName(request.getLastName());
+        }
+        if (request.getEmail() != null) {
+            user.setEmail(request.getEmail());
+        }
+        if (request.getMobileNumber() != null) {
+            user.setMobileNumber(request.getMobileNumber());
+        }
+        if (request.getGender() != null) {
+            user.setGender(request.getGender());
+        }
+        if (request.getDateOfBirth() != null) {
+            user.setDateOfBirth(request.getDateOfBirth());
+        }
+        if (request.getBio() != null) {
+            user.setBio(request.getBio());
+        }
+
+        // Save and return updated user
+        return userRepository.save(user);
+    }
+
 
 }
