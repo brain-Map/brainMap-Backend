@@ -16,7 +16,7 @@ public class TestController {
     
     private final PayHereConfig payHereConfig;
     
-    @GetMapping("/payhere-config")
+    @GetMapping("/payhere-config/test")
     public Map<String, Object> getPayHereConfig() {
         Map<String, Object> config = new HashMap<>();
         config.put("mode", payHereConfig.getMode());

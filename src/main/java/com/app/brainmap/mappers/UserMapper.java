@@ -45,14 +45,16 @@ public interface UserMapper {
     @Mapping(target = "socialLinks", source = "socialLinks")
     UpdateUser toUpdateUser(UpdateUserDto dto);
 
-    @Mapping(target = "createdAt", expression = "java(formatCreatedAt(user.getCreatedAt()))")
+    @Mapping(target = "createdAt", expression = "java(formatTime(user.getCreatedAt()))")
+    @Mapping(target = "updatedAt", expression = "java(formatTime(user.getUpdatedAt()))")
     AdminUserListDto toAdminUserListDto(User user);
 
-    default String formatCreatedAt(LocalDateTime createdAt) {
-        if (createdAt == null) {
+
+    default String formatTime(LocalDateTime formatTime) {
+        if (formatTime == null) {
             return null;
         }
-        return createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        return formatTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
     @Named("stringToUserRoleType")
