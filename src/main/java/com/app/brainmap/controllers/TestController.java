@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/test")
+@RequestMapping("/api/test2")
 @RequiredArgsConstructor
 public class TestController {
     

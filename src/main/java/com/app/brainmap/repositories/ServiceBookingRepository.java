@@ -35,5 +35,6 @@ public interface ServiceBookingRepository extends JpaRepository<ServiceBooking, 
     List<BookingDetailsDto> findAllBookingDetailsByUserId(UUID userId);
 
 
+    boolean existsByDomainExpertId(UUID id);
 }
 
