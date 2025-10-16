@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 public interface UserMapper {
 
     UserDto toDto(User user);
+    User toEntity(UserDto userDto);
 
     public default UserAllDataDto toAllDataDto(User user) {
      if (user == null) return null;
@@ -67,6 +68,7 @@ public interface UserMapper {
             throw new IllegalArgumentException("Invalid user role: " + role);
         }
     }
+
 
 
 }

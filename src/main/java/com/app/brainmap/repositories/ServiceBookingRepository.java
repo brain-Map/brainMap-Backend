@@ -2,6 +2,7 @@ package com.app.brainmap.repositories;
 
 import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
 import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
+import com.app.brainmap.domain.entities.DomainExpert.ServiceBookingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,6 +35,9 @@ public interface ServiceBookingRepository extends JpaRepository<ServiceBooking, 
     """)
     List<BookingDetailsDto> findAllBookingDetailsByUserId(UUID userId);
 
+
+    // In ServiceBookingRepository.java
+    boolean existsByDomainExpertIdAndStatusNot(UUID domainExpertId, ServiceBookingStatus status);
 
 }
 

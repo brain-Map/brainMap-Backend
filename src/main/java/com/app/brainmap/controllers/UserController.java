@@ -145,4 +145,17 @@ public class UserController {
         return ResponseEntity.ok(results);
     }
 
+    @PutMapping(path = "{userId}")
+    public ResponseEntity<UserDto> adminUpdateUser(@PathVariable UUID userId, @RequestBody UserDto userDto) {
+        User updateUserRequest = userMapper.toEntity(userDto);
+        User updatedUser = userService.userUpdate(userId, updateUserRequest);
+        log.info("UserDto: {}", userDto);
+        UserDto updatedUserDto = userMapper.toDto(updatedUser);
+
+        return new ResponseEntity<>(updatedUserDto, HttpStatus.OK);
+    }
+
+
+
+
 }
