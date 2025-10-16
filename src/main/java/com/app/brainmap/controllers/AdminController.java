@@ -4,9 +4,11 @@ import com.app.brainmap.domain.CreateUser;
 import com.app.brainmap.domain.UserRoleType;
 import com.app.brainmap.domain.UserStatus;
 import com.app.brainmap.domain.dto.*;
+import com.app.brainmap.domain.dto.Admin.CreateUserByAdminDto;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.mappers.UserMapper;
 import com.app.brainmap.services.AdminService;
+import com.app.brainmap.services.SupabaseService;
 import com.app.brainmap.services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ public class AdminController {
     private final AdminService adminService;
     private final UserService userService;
     private final UserMapper userMapper;
+    private final SupabaseService supabaseService;
 
     @GetMapping("dashboard/helthcheck")
     public ResponseEntity<String> healthCheck() {
@@ -83,8 +86,8 @@ public class AdminController {
         return userService.getUsersWithProjectCount();
     }
 
-    @PostMapping("/create-moderator")
-    public ResponseEntity<UserDto> createModerator(@RequestBody CreateUserDto createUserDto) {
+    @PostMapping("/create-moderator-account")
+    public ResponseEntity<UserDto> createModerator_a(@RequestBody CreateUserDto createUserDto) {
         log.info("Creating new Modarator: {}", createUserDto);
         CreateUser createUserRequest = userMapper.toCreateUser(createUserDto);
         User createdUser = userService.createUser(createUserRequest);
@@ -92,6 +95,12 @@ public class AdminController {
         UserDto createdUserDto = userMapper.toDto(createdUser);
         log.info("Created new user: {}", createdUserDto);
         return new ResponseEntity<>(createdUserDto, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/createModeroter")
+    public ResponseEntity<SupabaseUserResponse> createModerator(@RequestBody CreateUserByAdminDto request){
+        SupabaseUserResponse createdUser = supabaseService.createUser(request);
+        return ResponseEntity.ok(createdUser);
     }
 
 
