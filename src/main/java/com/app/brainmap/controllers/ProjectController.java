@@ -139,10 +139,19 @@ public class ProjectController {
                 .toList();
     }
 
+
     @GetMapping(path ="/hired-expert/{user_id}")
     public List<BookingDetailsDto> listHiredExperts(@PathVariable("user_id") UUID userId) {
         return projectService.listHiredExperts(userId)
                 .stream()
+                .toList();
+    }
+
+    @GetMapping("/owners/{project_id}")
+    public List<UserProjectDto> getProjectOwners(@PathVariable("project_id") UUID projectId) {
+        return projectService.getProjectOwners(projectId)
+                .stream()
+                .map(userProjectMapper::toDto)
                 .toList();
     }
 

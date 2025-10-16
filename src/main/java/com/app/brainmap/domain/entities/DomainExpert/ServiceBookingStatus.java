@@ -6,5 +6,6 @@ public enum ServiceBookingStatus {
     REJECTED,
     COMPLETED,
     CONFIRMED,
+    UPDATED,
 }
 

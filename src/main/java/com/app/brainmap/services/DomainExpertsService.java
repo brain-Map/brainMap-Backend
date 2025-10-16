@@ -1,9 +1,6 @@
 package com.app.brainmap.services;
 
-import com.app.brainmap.domain.dto.DomainExpert.CompleteDomainExpertProfileDto;
-import com.app.brainmap.domain.dto.DomainExpert.DomainExpertProfileDto;
-import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingRequestDto;
-import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
+import com.app.brainmap.domain.dto.DomainExpert.*;
 import com.app.brainmap.domain.entities.DomainExpert.DomainExperts;
 import org.springframework.data.domain.Page;
 
@@ -22,4 +19,5 @@ public interface DomainExpertsService {
     List<ServiceBookingResponseDto> getBookingsForUser(UUID userId);
     List<ServiceBookingResponseDto> getBookingsForDomainExpert(UUID expertId);
     List<ServiceBookingResponseDto> getBookingsForDomainExpertFiltered(UUID expertId, String status, String date);
+    ServiceBookingResponseDto updateServiceBooking(UUID bookingId, BookingUpdateDto updateDto, UUID userId);
 }

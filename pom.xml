@@ -98,14 +98,23 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
-
+        <!-- Apache Commons Codec for MD5 hashing -->
         <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.2.0</version> <!-- check latest version -->
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.15</version>
         </dependency>
-
-
+        <!-- Jackson for JSON processing (already included in Spring Boot, but explicit for payment metadata) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <!-- Hibernate Types for PostgreSQL JSONB support -->
+        <dependency>
+            <groupId>io.hypersistence</groupId>
+            <artifactId>hypersistence-utils-hibernate-63</artifactId>
+            <version>3.7.0</version>
+        </dependency>
     </dependencies>
 
     <build>

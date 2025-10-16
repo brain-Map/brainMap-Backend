@@ -16,5 +16,6 @@ public interface BookingMapper {
     @Mapping(source = "user.avatar", target = "userAvatar")
     @Mapping(source = "user.email", target = "userEmail")
     @Mapping(source = "sessionType", target = "sessionType")
+    @Mapping(source = "updatedDate", target = "updatedDate")
     ServiceBookingResponseDto toBookingResponseDto(ServiceBooking booking);
 }

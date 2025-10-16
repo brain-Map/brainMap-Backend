@@ -41,6 +41,13 @@ public class ServiceBooking {
     private LocalDate requestedDate;
     private LocalTime requestedStartTime;
     private LocalTime requestedEndTime;
+
+    private LocalDate updatedDate;
+    private LocalTime updatedStartTime;
+    private LocalTime updatedEndTime;
+    private BigDecimal updatedPrice;
+
+    @Column(nullable = false)
     private BigDecimal totalPrice;
     @Enumerated(EnumType.STRING)
     private SessionType sessionType;
@@ -51,7 +58,7 @@ public class ServiceBooking {
     private LocalDate acceptedDate;
     private LocalTime acceptedTime;
     private BigDecimal acceptedPrice;
-    private String rejectionReason;
+    private String reason;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
