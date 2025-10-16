@@ -1,5 +1,6 @@
 package com.app.brainmap.services.impl;
 
+import com.app.brainmap.domain.DomainExpertStatus;
 import com.app.brainmap.domain.InquiryStatus;
 import com.app.brainmap.domain.ProjctStatus;
 import com.app.brainmap.domain.UserRoleType;
@@ -44,7 +45,7 @@ public class AdminServiceImpl implements AdminService {
     public AdminDashboardStatusDto getAdminDashboardStatus() {
         long userCount = userRepository.count();
         long activeProjects = projectRepositiory.countByStatus(ProjctStatus.ACTIVE);
-        long pendingDomainExperts = domainExpertRepository.countByStatus("PENDING");
+        long pendingDomainExperts = domainExpertRepository.countByStatus(DomainExpertStatus.PENDING);
         long openInquiries = inquiryRepository.countByStatus(InquiryStatus.PENDING);
 
         return AdminDashboardStatusDto.builder()

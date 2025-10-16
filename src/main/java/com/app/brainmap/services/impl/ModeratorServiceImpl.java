@@ -39,11 +39,45 @@ public class ModeratorServiceImpl implements ModeratorService {
         // Convert 1-based page to 0-based for Spring Data
         Pageable pageable = PageRequest.of(page - 1, limit);
         
-        Page<DomainExperts> expertsPage = domainExpertRepository.findExpertsForModerator(
-            status, domain, search, pageable);
+        // Convert string status to enum if provided
+        DomainExpertStatus statusEnum = null;
+        if (status != null && !status.trim().isEmpty()) {
+            try {
+                statusEnum = DomainExpertStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                log.warn("Invalid status provided: {}", status);
+            }
+        }
+        
+        // Use appropriate repository method based on filters
+        Page<DomainExperts> expertsPage;
+        
+        if (statusEnum != null && domain != null && !domain.trim().isEmpty()) {
+            // Both status and domain filters
+            expertsPage = domainExpertRepository.findByStatusAndDomainContainingIgnoreCase(statusEnum, domain, pageable);
+        } else if (statusEnum != null) {
+            // Only status filter
+            expertsPage = domainExpertRepository.findByStatus(statusEnum, pageable);
+        } else if (domain != null && !domain.trim().isEmpty()) {
+            // Only domain filter
+            expertsPage = domainExpertRepository.findByDomainContainingIgnoreCase(domain, pageable);
+        } else {
+            // No filters
+            expertsPage = domainExpertRepository.findAll(pageable);
+        }
 
         List<ExpertRequest> expertRequests = expertsPage.getContent().stream()
                 .map(this::convertToExpertRequest)
+                .filter(expertRequest -> {
+                    // Apply search filter in memory to avoid database bytea issues
+                    if (search == null || search.trim().isEmpty()) {
+                        return true;
+                    }
+                    String searchLower = search.toLowerCase();
+                    return (expertRequest.getFirstName() != null && expertRequest.getFirstName().toLowerCase().contains(searchLower)) ||
+                           (expertRequest.getLastName() != null && expertRequest.getLastName().toLowerCase().contains(searchLower)) ||
+                           (expertRequest.getEmail() != null && expertRequest.getEmail().toLowerCase().contains(searchLower));
+                })
                 .collect(Collectors.toList());
 
         return ExpertRequestsResponse.builder()
@@ -54,6 +88,17 @@ public class ModeratorServiceImpl implements ModeratorService {
                 .hasNext(expertsPage.hasNext())
                 .hasPrevious(expertsPage.hasPrevious())
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ExpertRequest getExpertRequestById(UUID expertId) {
+        log.info("Fetching expert request by ID: {}", expertId);
+
+        DomainExperts expert = domainExpertRepository.findById(expertId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Domain expert not found with id: " + expertId));
+
+        return convertToExpertRequest(expert);
     }
 
     @Override

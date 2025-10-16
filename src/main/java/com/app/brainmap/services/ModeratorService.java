@@ -20,6 +20,13 @@ public interface ModeratorService {
     ExpertRequestsResponse getExpertRequests(int page, int limit, String status, String search, String domain);
     
     /**
+     * Get a single expert verification request by ID
+     * @param expertId The ID of the domain expert
+     * @return Expert request information
+     */
+    ExpertRequest getExpertRequestById(UUID expertId);
+    
+    /**
      * Update the verification status of a domain expert
      * @param expertId The ID of the domain expert
      * @param request The status update request
