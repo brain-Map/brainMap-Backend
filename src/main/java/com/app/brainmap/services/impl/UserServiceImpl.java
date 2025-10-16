@@ -9,6 +9,7 @@ import com.app.brainmap.domain.dto.UserProjectCountDto;
 import com.app.brainmap.domain.dto.UserProjectSaveDto;
 import com.app.brainmap.domain.entities.*;
 import com.app.brainmap.domain.entities.DomainExpert.DomainExperts;
+import com.app.brainmap.domain.entities.DomainExpert.ServiceBookingStatus;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.UserService;
 import jakarta.transaction.Transactional;
@@ -174,7 +175,11 @@ public class UserServiceImpl implements UserService {
         if (dto.role() == ProjectPositionType.MENTOR) {
             DomainExperts domainExpert = domainExpertRepository.findById(user.getId())
                     .orElseThrow(() -> new RuntimeException("Domain Expert not found with id: " + user.getId()));
-            boolean exists = serviceBookingRepository.existsByDomainExpertId(domainExpert.getId());
+            boolean exists = serviceBookingRepository.existsByDomainExpertIdAndStatusNot(
+                    domainExpert.getId(),
+                    ServiceBookingStatus.PENDING
+            );
+
             if (!exists) {
                 throw new IllegalStateException("Mentor is not present in ServiceBooking table");
             }
