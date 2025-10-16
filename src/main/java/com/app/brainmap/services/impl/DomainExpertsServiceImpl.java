@@ -9,6 +9,7 @@ import com.app.brainmap.mappers.ServiceListingResponseMapper;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.DomainExpertsService;
 import com.app.brainmap.services.FileStorageService;
+import com.app.brainmap.services.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,7 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
     private final ServiceBookingRepository serviceBookingRepository;
     private final ServiceListingRepository serviceListingRepository;
     private final BookingMapper bookingMapper;
+    private final NotificationService notificationService;
 
     @Override
     public List<DomainExperts> listDomainExperts() {
@@ -233,6 +235,24 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
         }
         booking.setUpdatedAt(java.time.LocalDateTime.now());
         booking = serviceBookingRepository.save(booking);
+
+        // create notification to booking user about the review (accepted/rejected)
+        try {
+            String title = accept ? "Booking Accepted" : "Booking Rejected";
+            String serviceTitle = booking.getService() != null ? booking.getService().getTitle() : "your service";
+            String body;
+            if (accept) {
+                body = String.format("Your booking for '%s' has been accepted. Date: %s", serviceTitle,
+                        booking.getAcceptedDate() != null ? booking.getAcceptedDate().toString() : booking.getRequestedDate());
+            } else {
+                body = String.format("Your booking for '%s' was rejected. Reason: %s", serviceTitle,
+                        booking.getReason() != null ? booking.getReason() : "No reason provided");
+            }
+            notificationService.createNotification(booking.getUser().getId(), title, body, "BOOKING_STATUS", booking.getId().toString());
+        } catch (Exception ex) {
+            log.warn("Failed to create notification for booking {}: {}", bookingId, ex.getMessage());
+        }
+
         return bookingMapper.toBookingResponseDto(booking);
     }
 
