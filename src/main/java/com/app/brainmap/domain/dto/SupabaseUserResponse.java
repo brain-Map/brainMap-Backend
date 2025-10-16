@@ -22,4 +22,3 @@ public class SupabaseUserResponse {
     private Map<String, Object> user_metadata;
     private Map<String, Object> app_metadata;
 }
-

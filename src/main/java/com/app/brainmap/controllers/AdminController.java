@@ -18,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -98,11 +100,21 @@ public class AdminController {
     }
 
     @PostMapping("/createModeroter")
-    public ResponseEntity<SupabaseUserResponse> createModerator(@RequestBody CreateUserByAdminDto request){
+    public ResponseEntity<SupabaseUserResponse> createModerator(@RequestBody @Valid CreateUserByAdminDto request){
+        log.info("Creating new Moderator: {}", request);
         SupabaseUserResponse createdUser = supabaseService.createUser(request);
+
+        // Persist in local users table using Supabase user ID
+        CreateUser createUserRequest = CreateUser.builder()
+                .userId(UUID.fromString(createdUser.getId()))
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .userRole(UserRoleType.valueOf(request.getUserRole().toUpperCase()))
+                .build();
+        userService.createUser(createUserRequest);
+
         return ResponseEntity.ok(createdUser);
     }
 
 
 }
-
