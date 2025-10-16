@@ -1,23 +1,19 @@
 package com.app.brainmap.controllers;
 
+import com.app.brainmap.domain.CreateUser;
 import com.app.brainmap.domain.UserRoleType;
 import com.app.brainmap.domain.UserStatus;
-import com.app.brainmap.domain.dto.AdminDashboardStatusDto;
-import com.app.brainmap.domain.dto.AdminUserListDto;
-import com.app.brainmap.domain.dto.UserTrendDto;
-import com.app.brainmap.domain.dto.UserProjectCountDto;
-import com.app.brainmap.domain.dto.UsersStatusDto;
+import com.app.brainmap.domain.dto.*;
 import com.app.brainmap.domain.entities.User;
+import com.app.brainmap.mappers.UserMapper;
 import com.app.brainmap.services.AdminService;
 import com.app.brainmap.services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,6 +24,7 @@ import java.util.List;
 public class AdminController {
     private final AdminService adminService;
     private final UserService userService;
+    private final UserMapper userMapper;
 
     @GetMapping("dashboard/helthcheck")
     public ResponseEntity<String> healthCheck() {
@@ -84,6 +81,17 @@ public class AdminController {
     @GetMapping("/project-count")
     public List<UserProjectCountDto> getUsersWithProjectCount() {
         return userService.getUsersWithProjectCount();
+    }
+
+    @PostMapping("/create-moderator")
+    public ResponseEntity<UserDto> createModerator(@RequestBody CreateUserDto createUserDto) {
+        log.info("Creating new Modarator: {}", createUserDto);
+        CreateUser createUserRequest = userMapper.toCreateUser(createUserDto);
+        User createdUser = userService.createUser(createUserRequest);
+
+        UserDto createdUserDto = userMapper.toDto(createdUser);
+        log.info("Created new user: {}", createdUserDto);
+        return new ResponseEntity<>(createdUserDto, HttpStatus.CREATED);
     }
 
 
