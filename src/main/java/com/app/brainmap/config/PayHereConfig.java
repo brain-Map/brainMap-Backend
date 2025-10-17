@@ -15,8 +15,15 @@ public class PayHereConfig {
     private String sandboxUrl = "https://sandbox.payhere.lk/pay/checkout";
     private String liveUrl = "https://www.payhere.lk/pay/checkout";
     
+    // Callback URLs (optional - can be overridden in properties)
+    private String returnUrl;
+    private String cancelUrl;
+    private String notifyUrl;
+    
     public String getPayHereUrl() {
-        return "sandbox".equals(mode) ? sandboxUrl : liveUrl;
+        // For sandbox, use the exact sandbox checkout URL
+        // For live, use the live checkout URL
+        return "sandbox".equalsIgnoreCase(mode) ? sandboxUrl : liveUrl;
     }
     
     public boolean isSandboxMode() {

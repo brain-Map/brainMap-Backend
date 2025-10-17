@@ -42,11 +42,18 @@ public class PayHereServiceImpl implements PayHereService {
     @Override
     public PaymentSessionResponse createPaymentSession(PaymentSessionRequest request, UUID userId) {
         try {
-            log.info("Creating payment session for user: {}, orderId: {}, amount: {}", 
-                    userId, request.getOrderId(), request.getAmount());
+            log.info("💳 Creating payment session for user: {}, orderId: {}, amount: {}", 
+                    userId != null ? userId : "ANONYMOUS", request.getOrderId(), request.getAmount());
             
-            // Get user
-            User user = userService.getUserById(userId);
+            // Get user if userId is provided (null for anonymous payments)
+            User user = null;
+            if (userId != null) {
+                try {
+                    user = userService.getUserById(userId);
+                } catch (Exception e) {
+                    log.warn("⚠️ Could not find user {}, proceeding with anonymous payment", userId);
+                }
+            }
             
             // Generate unique payment ID
             String paymentId = PayHereHashUtil.generatePaymentId();
@@ -54,20 +61,33 @@ public class PayHereServiceImpl implements PayHereService {
             // Use provided order ID or generate one
             String orderId = request.getOrderId() != null ? request.getOrderId() : PayHereHashUtil.generateOrderId();
             
+            log.info("🔑 Generated paymentId: {}, orderId: {}", paymentId, orderId);
+            
+            // Combine firstName and lastName for customerName
+            String customerName = (request.getFirstName() + " " + request.getLastName()).trim();
+            
+            // Use default item description if not provided
+            String itemDescription = request.getItemDescription() != null && !request.getItemDescription().isBlank() 
+                    ? request.getItemDescription() 
+                    : "Payment for order " + orderId;
+            
+            log.info("👤 Customer: {}, 📧 Email: {}, 💰 Amount: {} {}", 
+                    customerName, request.getEmail(), request.getAmount(), request.getCurrency());
+            
             // Create payment session
             PaymentSession paymentSession = PaymentSession.builder()
                     .paymentId(paymentId)
                     .orderId(orderId)
-                    .user(user)
+                    .user(user)  // Can be null for anonymous payments
                     .amount(request.getAmount())
                     .currency(request.getCurrency())
-                    .itemDescription(request.getItemDescription())
-                    .customerName(request.getCustomerName())
-                    .customerEmail(request.getCustomerEmail())
-                    .customerPhone(request.getCustomerPhone())
-                    .customerAddress(request.getCustomerAddress())
+                    .itemDescription(itemDescription)
+                    .customerName(customerName)
+                    .customerEmail(request.getEmail())
+                    .customerPhone(request.getPhone())
+                    .customerAddress(request.getAddress())
                     .city(request.getCity())
-                    .country(request.getCountry())
+                    .country(request.getCountry() != null ? request.getCountry() : "Sri Lanka")
                     .payHereMode(payHereConfig.getMode())
                     .payHereMerchantId(payHereConfig.getMerchantId())
                     .status(PaymentStatus.PENDING)
@@ -90,10 +110,11 @@ public class PayHereServiceImpl implements PayHereService {
             createStatusHistory(paymentSession, null, PaymentStatus.PENDING.name(), 
                               "SYSTEM", "Payment session created", null);
             
-            // Generate PayHere redirect URL
-            String redirectUrl = buildPayHereRedirectUrl(paymentSession, hash);
+            // Generate redirect URL to our auto-submit form endpoint
+            String redirectUrl = appConfig.getBackendUrl() + "/api/payments/payhere/redirect/" + paymentId;
             
-            log.info("Payment session created successfully: {}", paymentId);
+            log.info("✅ Payment session created successfully: {}", paymentId);
+            log.info("🎯 Redirect URL (auto-submit form): {}", redirectUrl);
             
             return PaymentSessionResponse.builder()
                     .paymentId(paymentId)
@@ -212,16 +233,116 @@ public class PayHereServiceImpl implements PayHereService {
         return PayHereHashUtil.verifyCallbackSignature(callbackData, payHereConfig.getMerchantSecret());
     }
     
+    @Override
+    public String generatePayHereForm(String paymentId) {
+        PaymentSession paymentSession = paymentSessionRepository.findByPaymentId(paymentId)
+                .orElseThrow(() -> new PaymentNotFoundException("Payment not found: " + paymentId));
+        
+        String payhereUrl = payHereConfig.getPayHereUrl();
+        String returnUrl = getReturnUrl();
+        String cancelUrl = getCancelUrl();
+        String notifyUrl = getNotifyUrl();
+        
+        log.info("🎨 Generating PayHere form for payment: {}", paymentId);
+        log.info("   📍 PayHere URL: {}", payhereUrl);
+        log.info("   🔐 Form Data:");
+        log.info("      merchant_id: {}", paymentSession.getPayHereMerchantId());
+        log.info("      order_id: {}", paymentSession.getOrderId());
+        log.info("      amount: {}", String.format("%.2f", paymentSession.getAmount()));
+        log.info("      currency: {}", paymentSession.getCurrency());
+        log.info("      hash: {}", paymentSession.getPayHereHash());
+        log.info("      return_url: {}", returnUrl);
+        log.info("      cancel_url: {}", cancelUrl);
+        log.info("      notify_url: {}", notifyUrl);
+        log.info("      items: {}", paymentSession.getItemDescription());
+        log.info("      first_name: {}", getFirstName(paymentSession.getCustomerName()));
+        log.info("      last_name: {}", getLastName(paymentSession.getCustomerName()));
+        log.info("      email: {}", paymentSession.getCustomerEmail());
+        log.info("      phone: {}", paymentSession.getCustomerPhone());
+        log.info("      address: {}", paymentSession.getCustomerAddress());
+        log.info("      city: {}", paymentSession.getCity());
+        log.info("      country: {}", paymentSession.getCountry());
+        
+        // Build HTML form that auto-submits to PayHere
+        StringBuilder html = new StringBuilder();
+        html.append("<!DOCTYPE html>\n");
+        html.append("<html>\n");
+        html.append("<head>\n");
+        html.append("    <meta charset=\"UTF-8\">\n");
+        html.append("    <title>Redirecting to PayHere...</title>\n");
+        html.append("    <style>\n");
+        html.append("        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }\n");
+        html.append("        .loader { border: 5px solid #f3f3f3; border-top: 5px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 20px auto; }\n");
+        html.append("        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\n");
+        html.append("    </style>\n");
+        html.append("</head>\n");
+        html.append("<body>\n");
+        html.append("    <h2>Redirecting to PayHere Payment Gateway...</h2>\n");
+        html.append("    <div class=\"loader\"></div>\n");
+        html.append("    <p>Please wait while we redirect you to the payment page.</p>\n");
+        html.append("    <form id=\"payhere_form\" method=\"POST\" action=\"").append(payhereUrl).append("\">\n");
+        html.append("        <input type=\"hidden\" name=\"merchant_id\" value=\"").append(paymentSession.getPayHereMerchantId()).append("\">\n");
+        html.append("        <input type=\"hidden\" name=\"return_url\" value=\"").append(returnUrl).append("\">\n");
+        html.append("        <input type=\"hidden\" name=\"cancel_url\" value=\"").append(cancelUrl).append("\">\n");
+        html.append("        <input type=\"hidden\" name=\"notify_url\" value=\"").append(notifyUrl).append("\">\n");
+        html.append("        <input type=\"hidden\" name=\"order_id\" value=\"").append(paymentSession.getOrderId()).append("\">\n");
+        html.append("        <input type=\"hidden\" name=\"items\" value=\"").append(escapeHtml(paymentSession.getItemDescription())).append("\">\n");
+        html.append("        <input type=\"hidden\" name=\"currency\" value=\"").append(paymentSession.getCurrency()).append("\">\n");
+        html.append("        <input type=\"hidden\" name=\"amount\" value=\"").append(String.format("%.2f", paymentSession.getAmount())).append("\">\n");
+        html.append("        <input type=\"hidden\" name=\"first_name\" value=\"").append(escapeHtml(getFirstName(paymentSession.getCustomerName()))).append("\">\n");
+        html.append("        <input type=\"hidden\" name=\"last_name\" value=\"").append(escapeHtml(getLastName(paymentSession.getCustomerName()))).append("\">\n");
+        html.append("        <input type=\"hidden\" name=\"email\" value=\"").append(escapeHtml(paymentSession.getCustomerEmail())).append("\">\n");
+        html.append("        <input type=\"hidden\" name=\"phone\" value=\"").append(escapeHtml(paymentSession.getCustomerPhone() != null ? paymentSession.getCustomerPhone() : "")).append("\">\n");
+        html.append("        <input type=\"hidden\" name=\"address\" value=\"").append(escapeHtml(paymentSession.getCustomerAddress() != null ? paymentSession.getCustomerAddress() : "")).append("\">\n");
+        html.append("        <input type=\"hidden\" name=\"city\" value=\"").append(escapeHtml(paymentSession.getCity())).append("\">\n");
+        html.append("        <input type=\"hidden\" name=\"country\" value=\"").append(escapeHtml(paymentSession.getCountry())).append("\">\n");
+        html.append("        <input type=\"hidden\" name=\"hash\" value=\"").append(paymentSession.getPayHereHash()).append("\">\n");
+        html.append("    </form>\n");
+        html.append("    <script>\n");
+        html.append("        document.getElementById('payhere_form').submit();\n");
+        html.append("    </script>\n");
+        html.append("</body>\n");
+        html.append("</html>");
+        
+        log.info("✅ PayHere form generated successfully");
+        
+        return html.toString();
+    }
+    
+    private String escapeHtml(String input) {
+        if (input == null) return "";
+        return input.replace("&", "&amp;")
+                   .replace("<", "&lt;")
+                   .replace(">", "&gt;")
+                   .replace("\"", "&quot;")
+                   .replace("'", "&#39;");
+    }
+    
     private String buildPayHereRedirectUrl(PaymentSession paymentSession, String hash) {
-        return UriComponentsBuilder.fromHttpUrl(payHereConfig.getPayHereUrl())
+        String baseUrl = payHereConfig.getPayHereUrl();
+        String returnUrl = getReturnUrl();
+        String cancelUrl = getCancelUrl();
+        String notifyUrl = getNotifyUrl();
+        
+        log.info("🏗️ Building PayHere redirect URL:");
+        log.info("   📍 Base URL: {}", baseUrl);
+        log.info("   🔙 Return URL: {}", returnUrl);
+        log.info("   ❌ Cancel URL: {}", cancelUrl);
+        log.info("   📨 Notify URL: {}", notifyUrl);
+        log.info("   🆔 Merchant ID: {}", paymentSession.getPayHereMerchantId());
+        log.info("   📦 Order ID: {}", paymentSession.getOrderId());
+        log.info("   💰 Amount: {}", paymentSession.getAmount());
+        log.info("   💱 Currency: {}", paymentSession.getCurrency());
+        
+        String redirectUrl = UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .queryParam("merchant_id", paymentSession.getPayHereMerchantId())
-                .queryParam("return_url", getReturnUrl())
-                .queryParam("cancel_url", getCancelUrl())
-                .queryParam("notify_url", getNotifyUrl())
+                .queryParam("return_url", returnUrl)
+                .queryParam("cancel_url", cancelUrl)
+                .queryParam("notify_url", notifyUrl)
                 .queryParam("order_id", paymentSession.getOrderId())
                 .queryParam("items", paymentSession.getItemDescription())
                 .queryParam("currency", paymentSession.getCurrency())
-                .queryParam("amount", paymentSession.getAmount().toString())
+                .queryParam("amount", String.format("%.2f", paymentSession.getAmount()))
                 .queryParam("first_name", getFirstName(paymentSession.getCustomerName()))
                 .queryParam("last_name", getLastName(paymentSession.getCustomerName()))
                 .queryParam("email", paymentSession.getCustomerEmail())
@@ -232,6 +353,11 @@ public class PayHereServiceImpl implements PayHereService {
                 .queryParam("hash", hash)
                 .build()
                 .toUriString();
+        
+        log.info("🔗 Generated PayHere Redirect URL: {}", redirectUrl);
+        log.info("🔗 URL Length: {} characters", redirectUrl.length());
+        
+        return redirectUrl;
     }
     
     private void updatePaymentStatus(PaymentSession paymentSession, Map<String, String> callbackData) {

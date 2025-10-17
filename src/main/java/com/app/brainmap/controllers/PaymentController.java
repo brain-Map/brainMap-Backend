@@ -37,6 +37,21 @@ public class PaymentController {
     
     private final PayHereService payHereService;
     
+    @GetMapping("/payhere/redirect/{paymentId}")
+    @Operation(summary = "PayHere Redirect Page", description = "Auto-submitting form to PayHere")
+    public ResponseEntity<String> payHereRedirect(@PathVariable String paymentId) {
+        try {
+            String html = payHereService.generatePayHereForm(paymentId);
+            return ResponseEntity.ok()
+                    .header("Content-Type", "text/html; charset=UTF-8")
+                    .body(html);
+        } catch (Exception e) {
+            log.error("❌ Error generating PayHere form for payment: {}", paymentId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("<html><body><h1>Payment Error</h1><p>" + e.getMessage() + "</p></body></html>");
+        }
+    }
+    
     @PostMapping("/create-session")
     @Operation(summary = "Create Payment Session", description = "Create a new PayHere payment session")
     @ApiResponses(value = {
@@ -50,24 +65,32 @@ public class PaymentController {
             Authentication authentication) {
         
         try {
-            UUID userId = getCurrentUserId(authentication);
-            log.info("Creating payment session for user: {}, orderId: {}", userId, request.getOrderId());
+            // Get userId if authenticated, null if anonymous payment
+            UUID userId = getCurrentUserIdOrNull(authentication);
+            
+            log.info("📥 Creating payment session for user: {}, orderId: {}, amount: {}", 
+                    userId != null ? userId : "ANONYMOUS", request.getOrderId(), request.getAmount());
+            log.info("📧 Customer: {} {} ({})", request.getFirstName(), request.getLastName(), request.getEmail());
             
             PaymentSessionResponse response = payHereService.createPaymentSession(request, userId);
             
+            log.info("✅ Payment session created successfully: {}", response.getPaymentId());
+            log.info("🔗 Redirect URL: {}", response.getRedirectUrl());
+            
             return ResponseEntity.ok(response);
         } catch (PaymentException e) {
-            log.error("Payment creation failed", e);
+            log.error("❌ Payment creation failed: {}", e.getMessage(), e);
             return ResponseEntity.badRequest().body(
                 PaymentSessionResponse.builder()
                     .message("Failed to create payment session: " + e.getMessage())
                     .build()
             );
         } catch (Exception e) {
-            log.error("Unexpected error creating payment session", e);
+            log.error("❌ Unexpected error creating payment session", e);
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 PaymentSessionResponse.builder()
-                    .message("An unexpected error occurred")
+                    .message("An unexpected error occurred: " + e.getMessage())
                     .build()
             );
         }
@@ -229,6 +252,18 @@ public class PaymentController {
     private UUID getCurrentUserId(Authentication authentication) {
         if (authentication == null || !(authentication.getPrincipal() instanceof JwtUserDetails)) {
             throw new PaymentException("User authentication required");
+        }
+        
+        JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
+        return userDetails.getUserId();
+    }
+    
+    /**
+     * Get current user ID or null if not authenticated (for anonymous payments)
+     */
+    private UUID getCurrentUserIdOrNull(Authentication authentication) {
+        if (authentication == null || !(authentication.getPrincipal() instanceof JwtUserDetails)) {
+            return null; // Allow anonymous payments
         }
         
         JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
