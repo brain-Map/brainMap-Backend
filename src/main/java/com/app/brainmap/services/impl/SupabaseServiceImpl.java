@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +50,22 @@ public class SupabaseServiceImpl implements SupabaseService {
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(SupabaseUserResponse.class)
+                .block();
+    }
+
+    @Override
+    public void deleteUser(UUID userId) {
+        String endpoint = supabaseUrl + "/auth/v1/admin/users/" + userId;
+
+        WebClient webClient = webClientBuilder.build();
+
+        webClient
+                .delete()
+                .uri(endpoint)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + serviceRoleKey)
+                .header("apikey", serviceRoleKey)
+                .retrieve()
+                .bodyToMono(Void.class)
                 .block();
     }
 }

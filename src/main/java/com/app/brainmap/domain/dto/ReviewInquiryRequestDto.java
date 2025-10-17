@@ -1,0 +1,22 @@
+package com.app.brainmap.domain.dto;
+
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.UUID;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ReviewInquiryRequestDto {
+    @NotNull
+    private UUID resolverId;
+
+    @NotNull
+    private String responseContent;
+}
+
