@@ -36,4 +36,12 @@ public class CommunityCommentController {
     public ResponseEntity<List<TopCommenterDto>> getTopCommentersByPost(@PathVariable("postId") UUID postId) {
         return ResponseEntity.ok(commentService.getTopCommentersByPost(postId));
     }
+    
+    @DeleteMapping("/{postId}/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(
+            @PathVariable("postId") UUID postId,
+            @PathVariable("commentId") UUID commentId) {
+        commentService.deleteComment(postId, commentId);
+        return ResponseEntity.noContent().build();
+    }
 }

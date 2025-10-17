@@ -21,6 +21,9 @@ public interface CommunityCommentRepository extends JpaRepository<CommunityComme
     // Find replies to a specific comment
     List<CommunityComment> findByParentComment(CommunityComment parentComment);
     
+    // Find replies by parent comment ID
+    List<CommunityComment> findByParentCommentCommunityCommentId(UUID parentCommentId);
+    
     // Find all comments and replies for a post with proper ordering
     @Query("SELECT c FROM CommunityComment c WHERE c.post = :post ORDER BY c.parentComment.communityCommentId ASC NULLS FIRST, c.createdAt ASC")
     List<CommunityComment> findByPostOrderedHierarchically(@Param("post") CommunityPost post);

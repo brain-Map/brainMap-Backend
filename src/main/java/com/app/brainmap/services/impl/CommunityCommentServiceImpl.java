@@ -221,6 +221,87 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         return dto;
     }
 
+    @Override
+    @Transactional
+    public void deleteComment(UUID postId, UUID commentId) {
+        log.info("Attempting to delete comment: {} from post: {}", commentId, postId);
+        
+        // 1. Find the comment
+        CommunityComment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> {
+                    log.error("Comment not found with id: {}", commentId);
+                    return new NoSuchElementException("Comment not found");
+                });
+        
+        // 2. Validate that the comment belongs to the specified post
+        if (!comment.getPost().getCommunityPostId().equals(postId)) {
+            log.error("Comment {} does not belong to post {}", commentId, postId);
+            throw new IllegalArgumentException("Comment does not belong to this post");
+        }
+        
+        // 3. Verify ownership - user can only delete their own comments
+        User currentUser = getCurrentUser();
+        if (!comment.getAuthor().getId().equals(currentUser.getId())) {
+            log.error("User {} attempted to delete comment {} owned by user {}", 
+                    currentUser.getId(), commentId, comment.getAuthor().getId());
+            throw new SecurityException("You can only delete your own comments");
+        }
+        
+        log.info("User {} authorized to delete comment {}", currentUser.getId(), commentId);
+        
+        // 4. Count total comments to be deleted (including nested replies)
+        int totalDeleted = countCommentsRecursively(comment);
+        log.info("Will delete {} comment(s) including replies", totalDeleted);
+        
+        // 5. Cascade delete: Delete the comment and all its replies (handled by JPA cascade)
+        // The @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) in CommunityComment
+        // will automatically delete all child comments
+        deleteCommentAndRepliesRecursively(comment);
+        
+        // 6. Update post comment count
+        CommunityPost post = comment.getPost();
+        int currentCount = post.getComments().size();
+        log.info("Post {} comment count before: {}, after: {}", postId, currentCount, currentCount - totalDeleted);
+        
+        // Refresh the post to get updated comment count
+        postRepository.save(post);
+        
+        log.info("Successfully deleted comment {} and {} replies", commentId, totalDeleted - 1);
+    }
+    
+    /**
+     * Recursively count all comments including nested replies
+     */
+    private int countCommentsRecursively(CommunityComment comment) {
+        int count = 1; // Count the comment itself
+        List<CommunityComment> replies = commentRepository.findByParentCommentCommunityCommentId(comment.getCommunityCommentId());
+        for (CommunityComment reply : replies) {
+            count += countCommentsRecursively(reply);
+        }
+        return count;
+    }
+    
+    /**
+     * Recursively delete comment and all its replies
+     * This will also delete all associated likes due to cascade settings
+     */
+    private void deleteCommentAndRepliesRecursively(CommunityComment comment) {
+        UUID commentId = comment.getCommunityCommentId();
+        
+        // 1. Find all direct replies
+        List<CommunityComment> replies = commentRepository.findByParentCommentCommunityCommentId(commentId);
+        
+        // 2. Recursively delete all replies first
+        for (CommunityComment reply : replies) {
+            deleteCommentAndRepliesRecursively(reply);
+        }
+        
+        // 3. Delete the comment itself
+        // The cascade settings on CommunityComment.likes will automatically delete associated likes
+        log.info("Deleting comment: {}", commentId);
+        commentRepository.delete(comment);
+    }
+
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails userDetails = (authentication != null && authentication.getPrincipal() != null)

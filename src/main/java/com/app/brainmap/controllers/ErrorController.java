@@ -31,6 +31,7 @@ public class ErrorController {
     public ResponseEntity<ApiErrorResponse> handleException(Exception e) {
         log.error("An error occurred: {}", e);
         ApiErrorResponse error = new ApiErrorResponse().builder()
+                .error("Internal Server Error")
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message("An unexpected error occurred")
                 .build();
@@ -41,6 +42,7 @@ public class ErrorController {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
         ApiErrorResponse error = ApiErrorResponse.builder()
+                .error("Bad Request")
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(e.getMessage())
                 .build();
@@ -51,11 +53,34 @@ public class ErrorController {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleEntityNotFoundException(EntityNotFoundException e) {
         ApiErrorResponse error = ApiErrorResponse.builder()
+                .error("Not Found")
                 .status(HttpStatus.NOT_FOUND.value())
                 .message(e.getMessage())
                 .build();
 
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(java.util.NoSuchElementException.class)
+    public ResponseEntity<ApiErrorResponse> handleNoSuchElementException(java.util.NoSuchElementException e) {
+        ApiErrorResponse error = ApiErrorResponse.builder()
+                .error("Not Found")
+                .status(HttpStatus.NOT_FOUND.value())
+                .message(e.getMessage() != null ? e.getMessage() : "Not Found")
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<ApiErrorResponse> handleSecurityException(SecurityException e) {
+        ApiErrorResponse error = ApiErrorResponse.builder()
+                .error("Forbidden")
+                .status(HttpStatus.FORBIDDEN.value())
+                .message(e.getMessage())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
 
 

@@ -51,4 +51,8 @@ public interface CommunityLikeRepository extends JpaRepository<CommunityLike, UU
     
     @Query("SELECT cl.comment.id, COUNT(cl) FROM CommunityLike cl WHERE cl.comment.id IN :commentIds GROUP BY cl.comment.id")
     List<Object[]> countLikesByCommentIds(@Param("commentIds") List<UUID> commentIds);
+    
+    // Delete all likes for a comment
+    @Query("DELETE FROM CommunityLike cl WHERE cl.comment.id = :commentId")
+    void deleteByCommentId(@Param("commentId") UUID commentId);
 }

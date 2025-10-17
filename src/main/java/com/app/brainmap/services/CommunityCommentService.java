@@ -11,4 +11,5 @@ public interface CommunityCommentService {
     CommunityCommentDto createComment(UUID postId, CreateCommunityCommentRequestDto dto);
     List<CommunityCommentDto> getCommentsByPost(UUID postId);
     List<TopCommenterDto> getTopCommentersByPost(UUID postId);
+    void deleteComment(UUID postId, UUID commentId);
 }
