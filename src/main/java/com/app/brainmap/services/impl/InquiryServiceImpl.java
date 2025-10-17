@@ -90,4 +90,12 @@ public class InquiryServiceImpl implements InquiryService {
         Inquiry saved = inquiryRepository.save(inquiry);
         return inquiryMapper.toDto(saved);
     }
+
+    @Override
+    public Void deleteInquiry(java.util.UUID inquiryId) {
+        Inquiry inquiry = inquiryRepository.findById(inquiryId)
+                .orElseThrow(() -> new NoSuchElementException("Inquiry not found with id: " + inquiryId));
+        inquiryRepository.delete(inquiry);
+        return null;
+    }
 }
