@@ -12,6 +12,7 @@ public record BookingDetailsDto(
          String serviceTitl,
          ServiceBookingStatus status,
          String description,
+         UUID mentorId,
          String expertFirstName,
          String expertLastName,
          String expertEmail

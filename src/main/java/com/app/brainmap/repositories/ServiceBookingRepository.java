@@ -24,6 +24,7 @@ public interface ServiceBookingRepository extends JpaRepository<ServiceBooking, 
         s.title,
         sb.status,
         s.description,
+        de.id,
         u.firstName,
         u.lastName,
         u.email
