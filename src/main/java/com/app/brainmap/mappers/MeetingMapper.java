@@ -23,7 +23,6 @@ public interface MeetingMapper {
     @Mapping(target = "startTime", ignore = true)
     @Mapping(target = "endTime", ignore = true)
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "creator", ignore = true)
     Meeting toEntity(CreateMeetingRequestDto dto);
 
     MeetingResponseDto toDto(Meeting entity);

@@ -46,9 +46,18 @@ public class MeetingController {
             @Valid @RequestBody CreateMeetingRequestDto request,
             @AuthenticationPrincipal JwtUserDetails userDetails) {
         
-        log.info("Creating meeting request received for user: {}", userDetails.getUserId());
-        MeetingResponseDto meeting = meetingService.createMeeting(request, userDetails.getUserId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(meeting);
+        try {
+            log.info("📹 Creating meeting request received - Title: '{}', User: {}", 
+                    request.getTitle(), userDetails.getUserId());
+            MeetingResponseDto meeting = meetingService.createMeeting(request, userDetails.getUserId());
+            log.info("✅ Meeting created successfully - ID: {}, Room: {}", 
+                    meeting.getId(), meeting.getRoomName());
+            return ResponseEntity.status(HttpStatus.CREATED).body(meeting);
+        } catch (Exception e) {
+            log.error("❌ Error creating meeting for user {}: {}", 
+                    userDetails.getUserId(), e.getMessage(), e);
+            throw e;
+        }
     }
 
     @Operation(summary = "Get meeting details", description = "Retrieves meeting details for joining")

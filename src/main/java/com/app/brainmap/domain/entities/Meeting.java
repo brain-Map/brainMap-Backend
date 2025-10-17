@@ -57,9 +57,9 @@ public class Meeting {
     @Column(name = "password", length = 100)
     private String password;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by", referencedColumnName = "id", insertable = false, updatable = false)
-    private User creator;
+    // Removed @ManyToOne relationship to avoid duplicate mapping conflict
+    // The createdBy UUID field above is sufficient for storing the creator's ID
+    // If you need the full User object, fetch it separately using createdBy
 
     @PreUpdate
     protected void onUpdate() {
