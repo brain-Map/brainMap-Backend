@@ -25,18 +25,20 @@ public class PaymentSessionRequest {
     @NotBlank
     private String orderId;
     
-    @NotBlank
     private String itemDescription;
     
     @NotBlank
     @Email
-    private String customerEmail;
+    private String email;
     
     @NotBlank
-    private String customerName;
+    private String firstName;
     
-    private String customerPhone;
-    private String customerAddress;
+    @NotBlank
+    private String lastName;
+    
+    private String phone;
+    private String address;
     
     @Builder.Default
     private String city = "Colombo";

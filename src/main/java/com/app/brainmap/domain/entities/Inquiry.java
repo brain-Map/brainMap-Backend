@@ -1,6 +1,7 @@
 package com.app.brainmap.domain.entities;
 
 import com.app.brainmap.domain.InquiryStatus;
+import com.app.brainmap.domain.InquiryType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,19 +21,30 @@ public class Inquiry {
     private UUID inquiryId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "UserId", nullable = false)
     private User user;
 
-    private String subject;
-    
+    @ManyToOne
+    @JoinColumn(name = "ResolverId")
+    private User resolver;
+
+    @Enumerated(EnumType.STRING)
+    private InquiryType inquiryType;
+
+    private String title;
+
     @Column(columnDefinition = "TEXT")
-    private String message;
+    private String inquiryContent;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private InquiryStatus status;
 
     private LocalDateTime createdAt;
+
+    private LocalDateTime resolvedAt;
+
+    private String ResponseContent;
 
     @PrePersist
     public void prePersist() {

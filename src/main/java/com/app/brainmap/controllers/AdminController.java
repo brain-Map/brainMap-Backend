@@ -31,7 +31,7 @@ public class AdminController {
     private final UserMapper userMapper;
     private final SupabaseService supabaseService;
 
-    @GetMapping("dashboard/helthcheck")
+    @GetMapping("/dashboard/helthcheck")
     public ResponseEntity<String> healthCheck() {
         return ResponseEntity.ok("Admin service is up and running");
     }
@@ -99,7 +99,7 @@ public class AdminController {
         return new ResponseEntity<>(createdUserDto, HttpStatus.CREATED);
     }
 
-    @PostMapping("/createModeroter")
+    @PostMapping("/createUser")
     public ResponseEntity<SupabaseUserResponse> createModerator(@RequestBody @Valid CreateUserByAdminDto request){
         log.info("Creating new Moderator: {}", request);
         SupabaseUserResponse createdUser = supabaseService.createUser(request);
@@ -114,6 +114,17 @@ public class AdminController {
         userService.createUser(createUserRequest);
 
         return ResponseEntity.ok(createdUser);
+    }
+
+    @DeleteMapping("/deleteUser/{userId}")
+    public ResponseEntity<Valid> deleteUser(@PathVariable UUID userId) {
+        // delete from supabase auth
+        supabaseService.deleteUser(userId);
+        // delete from local users table
+        userService.deleteUser(userId);
+        log.info("Deleting user: {}", userId);
+
+        return ResponseEntity.noContent().build();
     }
 
 

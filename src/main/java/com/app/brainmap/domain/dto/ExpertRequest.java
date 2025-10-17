@@ -37,6 +37,7 @@ public class ExpertRequest {
         private String contentType;
         private Long size;
         private String status; // Document status (PENDING, APPROVED, REJECTED)
+        private String reviewNotes; // Optional review notes (rejection reason, etc.)
         private LocalDateTime uploadedAt;
     }
 }

@@ -19,7 +19,7 @@ public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "report_id", updatable = false, nullable = false)
-    private UUID reprottId;
+    private UUID reprotId;
 
     @Column(name = "title", nullable = false)
     private String title;

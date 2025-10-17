@@ -38,6 +38,9 @@ public class DomainExpertVerificationDocument {
     @Column(name = "status")
     private String status; // PENDING / APPROVED / REJECTED
 
+    @Column(name = "review_notes", columnDefinition = "TEXT")
+    private String reviewNotes; // Optional notes for review (e.g., rejection reason)
+
     @Column(name = "uploaded_at")
     private LocalDateTime uploadedAt;
 
