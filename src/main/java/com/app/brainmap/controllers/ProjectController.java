@@ -29,7 +29,6 @@ public class ProjectController {
     private final UserProjectMapper userProjectMapper;
     private final CollaborateProjectMapper collaborateProjectMapper;
 
-
     public ProjectController(ProjectService projectService, ProjectMapper projectMapper, KanbanBoardMapper kanbanBoardMapper, UserProjectMapper userProjectMapper, CollaborateProjectMapper collaborateProjectMapper) {
         this.projectService = projectService;
         this.projectMapper = projectMapper;
