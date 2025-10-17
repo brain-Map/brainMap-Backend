@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 public class UpdateExpertStatusRequest {
     
     @NotBlank(message = "Status is required")
-    @Pattern(regexp = "VERIFIED|PENDING|UNVERIFIED|REJECTED", 
-             message = "Status must be one of: VERIFIED, PENDING, UNVERIFIED, REJECTED")
+    @Pattern(regexp = "APPROVED|PENDING|REJECTED", 
+             message = "Status must be one of: APPROVED, PENDING, REJECTED")
     private String status;
     
-    private String rejectionReason; // Optional field for rejection reason
+    private String reviewNotes; // Optional field for review notes (rejection reason, etc.)
 }

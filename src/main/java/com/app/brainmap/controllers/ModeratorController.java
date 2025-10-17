@@ -62,14 +62,14 @@ public class ModeratorController {
 
     @GetMapping("/expert-requests/{id}")
     @Operation(summary = "Get single expert verification request", 
-               description = "Retrieve detailed information about a specific domain expert verification request")
+               description = "Retrieve detailed information. Can accept either Document ID or Expert ID")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved expert request"),
-        @ApiResponse(responseCode = "404", description = "Expert not found"),
+        @ApiResponse(responseCode = "404", description = "Expert or document not found"),
         @ApiResponse(responseCode = "403", description = "Access denied - insufficient permissions")
     })
     public ResponseEntity<ExpertRequest> getExpertRequestById(
-            @Parameter(description = "Domain expert ID", required = true)
+            @Parameter(description = "Expert ID or Document ID", required = true)
             @PathVariable UUID id) {
         
         log.info("GET /api/moderator/expert-requests/{}", id);
@@ -83,15 +83,15 @@ public class ModeratorController {
 
     @PutMapping("/expert-requests/{id}/status")
     @Operation(summary = "Update expert verification status", 
-               description = "Update the verification status of a domain expert (approve, reject, or set pending)")
+               description = "Update the verification status. Can accept either a Document ID (updates single document) or Expert ID (updates all documents for that expert)")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successfully updated expert status"),
+        @ApiResponse(responseCode = "200", description = "Successfully updated status"),
         @ApiResponse(responseCode = "400", description = "Invalid request data"),
-        @ApiResponse(responseCode = "404", description = "Expert not found"),
+        @ApiResponse(responseCode = "404", description = "Expert or document not found"),
         @ApiResponse(responseCode = "403", description = "Access denied - insufficient permissions")
     })
     public ResponseEntity<ExpertRequest> updateExpertStatus(
-            @Parameter(description = "Domain expert ID", required = true)
+            @Parameter(description = "Expert ID or Document ID", required = true)
             @PathVariable UUID id,
             
             @Parameter(description = "Status update request", required = true)
@@ -99,10 +99,15 @@ public class ModeratorController {
         
         log.info("PUT /api/moderator/expert-requests/{}/status - status: {}", id, request.getStatus());
 
-        ExpertRequest updatedExpert = moderatorService.updateExpertStatus(id, request);
-        
-        return ResponseEntity.ok()
-                .header("Content-Type", "application/json")
-                .body(updatedExpert);
+        try {
+            ExpertRequest updatedExpert = moderatorService.updateExpertStatus(id, request);
+            
+            return ResponseEntity.ok()
+                    .header("Content-Type", "application/json")
+                    .body(updatedExpert);
+        } catch (Exception e) {
+            log.error("Error updating expert status for ID: {}", id, e);
+            throw e;
+        }
     }
 }

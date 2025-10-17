@@ -20,17 +20,17 @@ public interface ModeratorService {
     ExpertRequestsResponse getExpertRequests(int page, int limit, String status, String search, String domain);
     
     /**
-     * Get a single expert verification request by ID
-     * @param expertId The ID of the domain expert
+     * Get a single expert verification request by verification document ID
+     * @param documentId The ID of the verification document
      * @return Expert request information
      */
-    ExpertRequest getExpertRequestById(UUID expertId);
+    ExpertRequest getExpertRequestById(UUID documentId);
     
     /**
-     * Update the verification status of a domain expert
-     * @param expertId The ID of the domain expert
+     * Update the verification status of a verification document
+     * @param documentId The ID of the verification document
      * @param request The status update request
      * @return Updated expert request information
      */
-    ExpertRequest updateExpertStatus(UUID expertId, UpdateExpertStatusRequest request);
+    ExpertRequest updateExpertStatus(UUID documentId, UpdateExpertStatusRequest request);
 }
