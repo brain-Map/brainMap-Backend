@@ -219,7 +219,6 @@ public class ModeratorServiceImpl implements ModeratorService {
                 .lastName(expert.getUser().getLastName())
                 .email(expert.getUser().getEmail())
                 .domain(expert.getDomain())
-                .experience(expert.getExperience())
                 .status(expert.getStatus().name())
                 .submittedAt(document.getUploadedAt()) // Use document upload time as submission time
                 .documents(documents)
@@ -240,7 +239,6 @@ public class ModeratorServiceImpl implements ModeratorService {
                 .lastName(expert.getUser().getLastName())
                 .email(expert.getUser().getEmail())
                 .domain(expert.getDomain())
-                .experience(expert.getExperience())
                 .status(expert.getStatus().name())
                 .submittedAt(expert.getUser().getCreatedAt())
                 .documents(documents)

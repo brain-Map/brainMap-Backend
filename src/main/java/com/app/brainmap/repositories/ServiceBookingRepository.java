@@ -39,5 +39,7 @@ public interface ServiceBookingRepository extends JpaRepository<ServiceBooking, 
     // In ServiceBookingRepository.java
     boolean existsByDomainExpertIdAndStatusNot(UUID domainExpertId, ServiceBookingStatus status);
 
-}
+    // Count bookings for domain expert by status
+    long countByDomainExpert_IdAndStatus(UUID domainExpertId, ServiceBookingStatus status);
 
+}
