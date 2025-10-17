@@ -19,4 +19,7 @@ public class InquiryDto {
     private LocalDateTime createdAt;
     private LocalDateTime resolvedAt;
     private String ResponseContent;
+    // New embedded objects for richer responses
+    private UserDto user;
+    private UserDto resolverUser;
 }

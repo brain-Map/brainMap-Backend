@@ -11,5 +11,7 @@ public interface InquiryMapper {
 
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "resolver", source = "resolver.id")
+    @Mapping(target = "user", expression = "java(com.app.brainmap.domain.dto.UserDto.fromEntity(inquiry.getUser()))")
+    @Mapping(target = "resolverUser", expression = "java(inquiry.getResolver() != null ? com.app.brainmap.domain.dto.UserDto.fromEntity(inquiry.getResolver()) : null)")
     InquiryDto toDto(Inquiry inquiry);
 }
