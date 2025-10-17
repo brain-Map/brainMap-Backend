@@ -46,4 +46,9 @@ public interface PayHereService {
      * Verify PayHere callback signature
      */
     boolean verifyCallbackSignature(Map<String, String> callbackData);
+    
+    /**
+     * Generate HTML form for PayHere payment
+     */
+    String generatePayHereForm(String paymentId);
 }

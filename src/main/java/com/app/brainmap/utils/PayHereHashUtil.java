@@ -12,15 +12,33 @@ public class PayHereHashUtil {
     /**
      * Generate PayHere MD5 hash for payment session
      * Hash format: merchant_id + order_id + amount + currency + md5(merchant_secret)
+     * Amount must be formatted with 2 decimal places (e.g., 1000.00)
      */
     public static String generatePaymentHash(String merchantId, String orderId, 
                                            BigDecimal amount, String currency, String merchantSecret) {
         try {
+            // Format amount with exactly 2 decimal places (PayHere requirement)
+            String amountFormatted = String.format("%.2f", amount);
+            
+            // Generate MD5 hash of merchant secret and convert to UPPERCASE
             String merchantSecretHash = DigestUtils.md5Hex(merchantSecret).toUpperCase();
-            String hashString = merchantId + orderId + amount.toString() + currency + merchantSecretHash;
+            
+            // Build hash string: merchant_id + order_id + amount + currency + md5(merchant_secret)
+            String hashString = merchantId + orderId + amountFormatted + currency + merchantSecretHash;
+            
+            // Generate final MD5 hash and convert to UPPERCASE
             String hash = DigestUtils.md5Hex(hashString).toUpperCase();
             
-            log.debug("Generated PayHere hash for orderId: {}, hash: {}", orderId, hash);
+            log.info("🔐 PayHere Hash Generation:");
+            log.info("   Merchant ID: {}", merchantId);
+            log.info("   Order ID: {}", orderId);
+            log.info("   Amount: {} (formatted from {})", amountFormatted, amount);
+            log.info("   Currency: {}", currency);
+            log.info("   Merchant Secret: {}... (first 10 chars)", merchantSecret.substring(0, Math.min(10, merchantSecret.length())));
+            log.info("   Merchant Secret Hash: {}", merchantSecretHash);
+            log.info("   Hash String: {}", hashString);
+            log.info("   Final Hash: {}", hash);
+            
             return hash;
         } catch (Exception e) {
             log.error("Error generating PayHere hash for orderId: {}", orderId, e);
