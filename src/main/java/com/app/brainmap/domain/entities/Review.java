@@ -1,5 +1,6 @@
 package com.app.brainmap.domain.entities;
 
+import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,8 +40,8 @@ public class Review {
 
 
     @OneToOne
-    @JoinColumn(name = "promise_id", nullable = false, foreignKey = @ForeignKey(name = "fk_promise_review", foreignKeyDefinition = "FOREIGN KEY (promise_id) REFERENCES promises(promise_id) ON DELETE CASCADE"))
-    private Promise promise;
+    @JoinColumn(name = "booked_id", nullable = false, foreignKey = @ForeignKey(name = "fk_booked_review", foreignKeyDefinition = "FOREIGN KEY (booked_id) REFERENCES serviceBooking(id) ON DELETE CASCADE"))
+    private ServiceBooking serviceBooking;
 
 
     @ManyToOne
