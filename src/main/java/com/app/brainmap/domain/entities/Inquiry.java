@@ -24,6 +24,10 @@ public class Inquiry {
     @JoinColumn(name = "UserId", nullable = false)
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "ResolverId")
+    private User resolver;
+
     @Enumerated(EnumType.STRING)
     private InquiryType inquiryType;
 
@@ -39,6 +43,8 @@ public class Inquiry {
     private LocalDateTime createdAt;
 
     private LocalDateTime resolvedAt;
+
+    private String ResponseContent;
 
     @PrePersist
     public void prePersist() {

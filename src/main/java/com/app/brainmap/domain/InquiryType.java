@@ -4,9 +4,10 @@ public enum InquiryType {
     ISSUE,
     POST,
     COMMENT,
-    MESSAGE,
     REVIEW,
     PROJECT,
-    PROJECT_MEMBER,
-    MENTOR
+    ACCOUNT,
+    PAYMENT,
+    SUPPORT,
+    OTHER
 }
