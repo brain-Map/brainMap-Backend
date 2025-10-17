@@ -114,8 +114,6 @@ public class UserServiceImpl implements UserService {
             User tempUser = user;
             DomainExperts domainExperts = domainExpertRepository.findById(user.getId())
                     .orElseThrow(() -> new NoSuchElementException("Domain Expert not found with id: " + tempUser.getId()));
-            domainExperts.setAvailability(request.getAvailability());
-            domainExperts.setExperience(request.getExperience());
 
             domainExpertRepository.save(domainExperts);
         }

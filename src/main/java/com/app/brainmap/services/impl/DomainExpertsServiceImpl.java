@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,12 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
     private final DomainExpertVerificationDocumentRepository domainExpertVerificationDocumentRepository;
     private final FileStorageService fileStorageService;
 
+    // new dependencies used for public profile
+    private final ServiceListingRepository serviceListingRepository;
+    private final com.app.brainmap.mappers.ServiceListingResponseMapper serviceListingResponseMapper;
+    private final ReviewRepository reviewRepository;
+    private final ServiceBookingRepository serviceBookingRepository;
+
     @Override
     public List<DomainExperts> listDomainExperts() {
         return domainExpertRepository.findAll();
@@ -40,15 +47,48 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
         DomainExperts expert = domainExpertRepository.findById(id).orElseThrow(() -> new RuntimeException("Expert not found"));
         User user = expert.getUser();
 
-        return DomainExpertProfileDto.builder()
+        DomainExpertProfileDto dto = DomainExpertProfileDto.builder()
                 .id(expert.getId().toString())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .username(user.getUsername())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
-//                .status(expert.getStatus().toString())
+                .email(user.getEmail())
+                .phone(user.getMobileNumber())
+                .dateOfBirth(user.getDateOfBirth() != null ? user.getDateOfBirth().toString() : null)
+                .location(user.getCity() != null ? user.getCity() : expert.getLocation())
+                .gender(user.getGender())
+                .bio(user.getBio())
+                .workExperience(expert.getWorkExperience())
+                .linkedinProfile(expert.getLinkedinProfile())
+                .portfolio(expert.getPortfolio())
+                .profilePhotoUrl(expert.getProfilePhotoUrl())
                 .build();
+
+        // expertise areas
+        dto.setExpertiseAreas(expert.getExpertiseAreas().stream()
+                .map(a -> ExpertiseAreaDto.builder().expertise(a.getExpertise()).experience(a.getExperience()).build())
+                .collect(Collectors.toList()));
+
+        // education
+        dto.setEducation(expert.getEducations().stream()
+                .map(e -> EducationDto.builder().degree(e.getDegree()).school(e.getSchool()).year(e.getYear()).build())
+                .collect(Collectors.toList()));
+
+        // verification documents
+        dto.setVerificationDocs(expert.getVerificationDocuments().stream()
+                .map(d -> VerificationDocumentDto.builder()
+                        .id(d.getId())
+                        .fileName(d.getFileName())
+                        .fileUrl(d.getFileUrl())
+                        .contentType(d.getContentType())
+                        .size(d.getSize())
+                        .status(d.getStatus())
+                        .uploadedAt(d.getUploadedAt())
+                        .build())
+                .collect(Collectors.toList()));
+
     }
 
     @Override
@@ -71,19 +111,9 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
         }
         if (profileDto.getLocation() != null) user.setCity(profileDto.getLocation());
 
-        // Update expert extended fields
-        expert.setMentorshipType(profileDto.getMentorshipType());
-        expert.setAvailability(profileDto.getAvailability());
-        if (profileDto.getHourlyRate() != null) {
-            try { expert.setHourlyRate(new BigDecimal(profileDto.getHourlyRate())); } catch (NumberFormatException ex) { log.warn("Hourly rate parse error: {}", ex.getMessage()); }
-        }
-        if (profileDto.getMaxMentees() != null) {
-            try { expert.setMaxMentees(Integer.parseInt(profileDto.getMaxMentees())); } catch (NumberFormatException ex) { log.warn("Max mentees parse error: {}", ex.getMessage()); }
-        }
         expert.setWorkExperience(profileDto.getWorkExperience());
         expert.setLinkedinProfile(profileDto.getLinkedinProfile());
         expert.setPortfolio(profileDto.getPortfolio());
-        expert.setAddress(profileDto.getAddress());
         expert.setLocation(profileDto.getLocation());
         expert.setStatus(DomainExpertStatus.PENDING);
 
@@ -159,6 +189,13 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
     }
 
     @Override
+    @Transactional
+    public UUID updateDomainExpertProfile(UUID id, CompleteDomainExpertProfileDto profileDto) {
+        // reuse the same behavior as completeDomainExpertProfile for now (updates same fields)
+        return completeDomainExpertProfile(id, profileDto);
+    }
+
+    @Override
     public Boolean isProfileComplete(UUID userId) {
         return domainExpertRepository.findById(userId)
                 .map(expert -> expert.getStatus() == DomainExpertStatus.VERIFIED || expert.getStatus() == DomainExpertStatus.PENDING)
@@ -169,6 +206,61 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
     * Service Bookings
     */
 
+    @Override
+    @Transactional(readOnly = true)
+    public DomainExpertDto getDomainExpertPublicProfile(UUID userId) {
+        DomainExperts expert = domainExpertRepository.findById(userId).orElseThrow(() -> new RuntimeException("Domain expert not found"));
+        User user = expert.getUser();
 
+        // Basic fields
+        DomainExpertDto dto = DomainExpertDto.builder()
+                .id(expert.getId().toString())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .username(user.getUsername())
+                .avatar(user.getAvatar())
+                .profilePhotoUrl(expert.getProfilePhotoUrl())
+                .status(expert.getStatus() != null ? expert.getStatus().toString() : null)
+                .domain(expert.getDomain())
+                .bio(user.getBio())
+                .workExperience(expert.getWorkExperience())
+                .linkedinProfile(expert.getLinkedinProfile())
+                .portfolio(expert.getPortfolio())
+                .location(user.getCity() != null ? user.getCity() : expert.getLocation())
+                .createdAt(user.getCreatedAt())
+                .build();
+
+        // expertise areas
+        dto.setExpertiseAreas(expert.getExpertiseAreas().stream()
+                .map(a -> ExpertiseAreaDto.builder().expertise(a.getExpertise()).experience(a.getExperience()).build())
+                .collect(Collectors.toList()));
+
+        // education
+        dto.setEducations(expert.getEducations().stream()
+                .map(e -> EducationDto.builder().degree(e.getDegree()).school(e.getSchool()).year(e.getYear()).build())
+                .collect(Collectors.toList()));
+
+        // services
+        List<ServiceListingResponseDto> services = serviceListingRepository.findByMentor_Id(user.getId()).stream()
+                .map(serviceListingResponseMapper::toServiceListingResponseDto)
+                .collect(Collectors.toList());
+        dto.setServices(services);
+
+        // social links
+        dto.setSocialLinks(user.getSocialLinks().stream()
+                .map(sl -> com.app.brainmap.domain.dto.UserSocialLinkDto.builder().platform(sl.getPlatform()).url(sl.getUrl()).build())
+                .collect(Collectors.toList()));
+
+        // rating & reviews
+        Double avg = reviewRepository.findAverageRatingByMentorId(user.getId());
+        dto.setRating(avg != null ? avg : 0.0);
+        dto.setReviewsCount(reviewRepository.countByMentor_Id(user.getId()));
+
+        // completed bookings
+        long completed = serviceBookingRepository.countByDomainExpert_IdAndStatus(expert.getId(), ServiceBookingStatus.COMPLETED);
+        dto.setCompletedBookingsCount(completed);
+
+        return dto;
+    }
 
 }

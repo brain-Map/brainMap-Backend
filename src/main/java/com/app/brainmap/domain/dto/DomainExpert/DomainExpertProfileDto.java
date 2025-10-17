@@ -18,9 +18,6 @@ public class DomainExpertProfileDto {
     private String username;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-//    private String status;
-
-    // Fields matching CompleteDomainExpertProfileDto
     private String email;
     private String phone;
     private String dateOfBirth;

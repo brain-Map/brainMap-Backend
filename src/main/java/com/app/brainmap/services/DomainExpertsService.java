@@ -12,6 +12,8 @@ public interface DomainExpertsService {
     List<DomainExperts> listDomainExperts();
     DomainExpertProfileDto getDomainExpertProfile(UUID userId);
     UUID completeDomainExpertProfile(UUID id, CompleteDomainExpertProfileDto profileDto);
+    UUID updateDomainExpertProfile(UUID id, CompleteDomainExpertProfileDto profileDto);
     Boolean isProfileComplete(UUID userId);
+    DomainExpertDto getDomainExpertPublicProfile(UUID userId);
 
 }
