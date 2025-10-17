@@ -258,10 +258,13 @@ public class ModeratorServiceImpl implements ModeratorService {
         
         // Update expert status accordingly
         if (allApproved && !allDocs.isEmpty()) {
+            // All documents approved → Expert is VERIFIED
             expert.setStatus(DomainExpertStatus.VERIFIED);
         } else if (anyRejected) {
-            expert.setStatus(DomainExpertStatus.REJECTED);
+            // Any document rejected → Expert remains UNVERIFIED (they need to resubmit)
+            expert.setStatus(DomainExpertStatus.UNVERIFIED);
         } else {
+            // Some documents still pending → Expert is PENDING review
             expert.setStatus(DomainExpertStatus.PENDING);
         }
         
