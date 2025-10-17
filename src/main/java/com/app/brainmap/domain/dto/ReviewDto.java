@@ -11,5 +11,5 @@ public record ReviewDto(
     LocalDateTime updatedAt,
     UUID memberId,
     UUID mentorId,
-    UUID promiseId
+    UUID bookedId
 ) {}

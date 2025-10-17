@@ -2,6 +2,7 @@ package com.app.brainmap.repositories;
 
 import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
 import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
+import com.app.brainmap.domain.entities.DomainExpert.ServiceListing;
 import com.app.brainmap.domain.entities.DomainExpert.ServiceBookingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,6 +23,8 @@ public interface ServiceBookingRepository extends JpaRepository<ServiceBooking, 
         s.serviceId,
         s.title,
         sb.status,
+        s.description,
+        de.id,
         u.firstName,
         u.lastName,
         u.email

@@ -73,7 +73,8 @@ public class SecurityConfig {
                                 "/api/v1/domain-experts/**",
                                 "api/v1/service-listings/**",
                                 "/project-member/projects/**",
-                                "/api/v1/messages/**"
+                                "/api/v1/messages/**",
+                                "/api/reviews/**"
                                 ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                         .anyRequest().authenticated()
