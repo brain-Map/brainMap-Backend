@@ -233,17 +233,23 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
                     return new NoSuchElementException("Comment not found");
                 });
         
+        // Force lazy loading of post and author to avoid LazyInitializationException
+        CommunityPost post = comment.getPost();
+        User author = comment.getAuthor();
+        UUID postIdFromComment = post.getCommunityPostId();
+        UUID authorId = author.getId();
+        
         // 2. Validate that the comment belongs to the specified post
-        if (!comment.getPost().getCommunityPostId().equals(postId)) {
+        if (!postIdFromComment.equals(postId)) {
             log.error("Comment {} does not belong to post {}", commentId, postId);
             throw new IllegalArgumentException("Comment does not belong to this post");
         }
         
         // 3. Verify ownership - user can only delete their own comments
         User currentUser = getCurrentUser();
-        if (!comment.getAuthor().getId().equals(currentUser.getId())) {
+        if (!authorId.equals(currentUser.getId())) {
             log.error("User {} attempted to delete comment {} owned by user {}", 
-                    currentUser.getId(), commentId, comment.getAuthor().getId());
+                    currentUser.getId(), commentId, authorId);
             throw new SecurityException("You can only delete your own comments");
         }
         
@@ -257,14 +263,6 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         // The @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) in CommunityComment
         // will automatically delete all child comments
         deleteCommentAndRepliesRecursively(comment);
-        
-        // 6. Update post comment count
-        CommunityPost post = comment.getPost();
-        int currentCount = post.getComments().size();
-        log.info("Post {} comment count before: {}, after: {}", postId, currentCount, currentCount - totalDeleted);
-        
-        // Refresh the post to get updated comment count
-        postRepository.save(post);
         
         log.info("Successfully deleted comment {} and {} replies", commentId, totalDeleted - 1);
     }
