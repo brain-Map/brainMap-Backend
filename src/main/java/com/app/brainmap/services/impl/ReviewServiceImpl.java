@@ -7,6 +7,7 @@ import com.app.brainmap.domain.entities.*;
 import com.app.brainmap.domain.entities.Community.CommunityComment;
 import com.app.brainmap.domain.entities.Community.CommunityLike;
 import com.app.brainmap.domain.entities.Community.CommunityPost;
+import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
 import com.app.brainmap.mappers.ReviewMapper;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.LikeService;
@@ -26,17 +27,19 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewMapper reviewMapper;
     private final UserRepository userRepository;
     private final PromiseRepository promiseRepository;
+    private final ServiceBookingRepository serviceBookingRepository;
 
     public ReviewServiceImpl(
             ReviewRepository reviewRepository,
             ReviewMapper reviewMapper,
             UserRepository userRepository,
-            PromiseRepository promiseRepository
-    ) {
+            PromiseRepository promiseRepository,
+            ServiceBookingRepository serviceBookingRepository) {
         this.reviewRepository = reviewRepository;
         this.reviewMapper = reviewMapper;
         this.userRepository = userRepository;
         this.promiseRepository = promiseRepository;
+        this.serviceBookingRepository = serviceBookingRepository;
     }
 
     @Override
@@ -55,12 +58,12 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
         User mentor = userRepository.findById(reviewDto.mentorId())
                 .orElseThrow(() -> new IllegalArgumentException("Mentor not found"));
-        Promise promise = promiseRepository.findById(reviewDto.promiseId())
-                .orElseThrow(() -> new IllegalArgumentException("Promise not found"));
+        ServiceBooking serviceBooking = serviceBookingRepository.findById(reviewDto.bookedId())
+                .orElseThrow(() -> new IllegalArgumentException("service not found"));
 
         review.setMember(member);
         review.setMentor(mentor);
-        review.setPromise(promise);
+        review.setServiceBooking(serviceBooking);
 
         Review saved = reviewRepository.save(review);
         return reviewMapper.toDto(saved);
