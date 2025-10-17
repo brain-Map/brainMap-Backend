@@ -18,10 +18,9 @@ public interface ServiceBookingRepository extends JpaRepository<ServiceBooking, 
     @Query("""
     SELECT new com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto(
         sb.id,
-        s.id,
+        s.serviceId,
         s.title,
         sb.status,
-        s.subject,
         u.firstName,
         u.lastName,
         u.email
