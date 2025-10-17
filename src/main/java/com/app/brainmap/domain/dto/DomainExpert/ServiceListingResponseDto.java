@@ -16,21 +16,18 @@ import java.util.UUID;
 public class ServiceListingResponseDto {
     private UUID serviceId;
     private String title;
-    private String subject;
+    private String category;
     private String description;
+    private java.util.List<String> availabilityModes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private UUID mentorId;
-    private List<ServiceListingAvailabilityResponseDto> availabilities;
     private String thumbnailUrl;
-    private Integer duration;
     private String mentorFirstName;
     private String mentorLastName;
-    private String mentorshipType;
     private String mentorBio;
     private String mentorAvatar;
-    private Double hourlyRatePerPerson;
-    private Double hourlyRatePerGroup;
+    private List<ServiceListingPricingResponseDto> pricings;
     private List<String> expertiseAreas;
     private List<WhatYouGetDto> whatYouGet;
     }

@@ -1,13 +1,14 @@
 package com.app.brainmap.domain.dto.DomainExpert;
 
 import com.app.brainmap.domain.entities.DomainExpert.ServiceBookingStatus;
-import com.app.brainmap.domain.entities.DomainExpert.SessionType;
+import com.app.brainmap.domain.entities.DomainExpert.BookingMode;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.List;
 
 @Data
 public class ServiceBookingResponseDto {
@@ -22,16 +23,18 @@ public class ServiceBookingResponseDto {
     private String userAvatar;
     private int duration;
     private String projectDetails;
+    private BookingMode bookingMode;
+    private List<String> requestedMonths;
+    private List<String> updatedMonths;
+    private LocalDate projectDeadline;
     private LocalDate requestedDate;
     private LocalTime requestedStartTime;
     private LocalTime requestedEndTime;
     private BigDecimal totalPrice;
     private ServiceBookingStatus status;
-    private SessionType sessionType;
     private LocalDate acceptedDate;
     private LocalTime acceptedTime;
     private BigDecimal acceptedPrice;
-    private String rejectionReason;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -39,5 +42,8 @@ public class ServiceBookingResponseDto {
     private LocalTime updatedEndTime;
     private LocalDate updatedDate;
     private BigDecimal updatedPrice;
-}
 
+    private UUID selectedPricingId;
+    private String selectedPricingType;
+    private Double selectedPricingPrice;
+}

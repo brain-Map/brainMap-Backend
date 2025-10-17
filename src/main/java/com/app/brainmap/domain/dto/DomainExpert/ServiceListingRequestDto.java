@@ -14,11 +14,10 @@ import java.util.List;
 @Builder
 public class ServiceListingRequestDto {
     private String title;
-    private String subject;
+    private String category;
     private String description;
-    private Double hourlyRatePerPerson;
-    private Double hourlyRatePerGroup;
-    private MultipartFile thumbnail; // optional, for image upload
-    private List<ServiceListingAvailabilityRequestDto> availabilities;
+    private List<String> availabilityModes;
     private List<WhatYouGetDto> whatYouGet;
+    private List<ServiceListingPricingRequestDto> pricings;
+    private MultipartFile thumbnail; // optional, for image upload
 }

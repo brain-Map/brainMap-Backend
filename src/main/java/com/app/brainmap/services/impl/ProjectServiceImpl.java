@@ -196,6 +196,7 @@ public class ProjectServiceImpl implements ProjectService {
         return serviceBookingRepository.findAllBookingDetailsByUserId(userId);
     }
 
+    @Override
     public List<UserProject> getProjectOwners(UUID projectId) {
         return userProjectRepository.findAllByProjectIdAndRole(projectId, ProjectPositionType.OWNER);
     }
