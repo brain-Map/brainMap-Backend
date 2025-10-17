@@ -1,5 +1,6 @@
 package com.app.brainmap.services;
 
+import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
 import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
 import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
 import com.app.brainmap.domain.entities.KanbanBoard;
@@ -28,6 +29,7 @@ public interface ProjectService {
     List<UserProject> getProjectOwners(UUID projectId);
 
     List<BookingDetailsDto> listHiredExperts(UUID userId);
+    List<ServiceBookingResponseDto> getBookingsForDomainExpertFiltered(UUID bookingId);
 
 
 }

@@ -1,6 +1,7 @@
 package com.app.brainmap.controllers;
 
 import com.app.brainmap.domain.dto.*;
+import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
 import com.app.brainmap.domain.dto.MessageResponse;
 import com.app.brainmap.domain.dto.Project.AllProjectUserDto;
 import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
@@ -151,6 +152,13 @@ public class ProjectController {
                 .stream()
                 .map(userProjectMapper::toDto)
                 .toList();
+    }
+
+    @GetMapping("/{bookingId}/bookings/filter")
+    public ResponseEntity<List<ServiceBookingResponseDto>> getFilteredBookingsForDomainExpert(
+            @PathVariable UUID bookingId) {
+        List<ServiceBookingResponseDto> bookings = projectService.getBookingsForDomainExpertFiltered(bookingId);
+        return ResponseEntity.ok(bookings);
     }
 
 
