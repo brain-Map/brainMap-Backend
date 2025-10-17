@@ -1,23 +1,25 @@
 package com.app.brainmap.controllers;
 
-import com.app.brainmap.domain.dto.AdminDashboardStatusDto;
-import com.app.brainmap.domain.dto.AdminUserListDto;
-import com.app.brainmap.domain.dto.UserTrendDto;
-import com.app.brainmap.domain.dto.UserProjectCountDto;
-import com.app.brainmap.domain.dto.UsersStatusDto;
+import com.app.brainmap.domain.CreateUser;
+import com.app.brainmap.domain.UserRoleType;
+import com.app.brainmap.domain.UserStatus;
+import com.app.brainmap.domain.dto.*;
+import com.app.brainmap.domain.dto.Admin.CreateUserByAdminDto;
 import com.app.brainmap.domain.entities.User;
+import com.app.brainmap.mappers.UserMapper;
 import com.app.brainmap.services.AdminService;
+import com.app.brainmap.services.SupabaseService;
 import com.app.brainmap.services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -26,6 +28,23 @@ import java.util.List;
 public class AdminController {
     private final AdminService adminService;
     private final UserService userService;
+    private final UserMapper userMapper;
+    private final SupabaseService supabaseService;
+
+    @GetMapping("dashboard/helthcheck")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("Admin service is up and running");
+    }
+
+    @GetMapping("/dashboard/dbcheck")
+    public ResponseEntity<String> dbCheck() {
+        try {
+            long userCount = adminService.getAdminDashboardStatus().getUserCount();
+            return ResponseEntity.ok("Database connection is healthy");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Database connection failed: " + e.getMessage());
+        }
+    }
 
     @GetMapping("/dashboard/overview")
     public ResponseEntity<AdminDashboardStatusDto> getDashboardStatus() {
@@ -53,12 +72,15 @@ public class AdminController {
     public ResponseEntity<Page<AdminUserListDto>> getUserList(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "id") String sortBy
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(required = false) UserRoleType userRole,
+            @RequestParam(required = false) UserStatus userStatus,
+            @RequestParam(required = false) String search
     ){
-        Page<AdminUserListDto> users = adminService.getAllUsers(page, size, sortBy);
+        Page<AdminUserListDto> users = adminService.getAllUsers(page, size, userRole, userStatus, search, sortBy);
         return ResponseEntity.ok()
                 .header("content-type", "application/json")
-                .body(adminService.getAllUsers(page, size, sortBy));
+                .body(users);
     }
 
     @GetMapping("/project-count")
@@ -66,6 +88,33 @@ public class AdminController {
         return userService.getUsersWithProjectCount();
     }
 
+    @PostMapping("/create-moderator-account")
+    public ResponseEntity<UserDto> createModerator_a(@RequestBody CreateUserDto createUserDto) {
+        log.info("Creating new Modarator: {}", createUserDto);
+        CreateUser createUserRequest = userMapper.toCreateUser(createUserDto);
+        User createdUser = userService.createUser(createUserRequest);
+
+        UserDto createdUserDto = userMapper.toDto(createdUser);
+        log.info("Created new user: {}", createdUserDto);
+        return new ResponseEntity<>(createdUserDto, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/createModeroter")
+    public ResponseEntity<SupabaseUserResponse> createModerator(@RequestBody @Valid CreateUserByAdminDto request){
+        log.info("Creating new Moderator: {}", request);
+        SupabaseUserResponse createdUser = supabaseService.createUser(request);
+
+        // Persist in local users table using Supabase user ID
+        CreateUser createUserRequest = CreateUser.builder()
+                .userId(UUID.fromString(createdUser.getId()))
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .userRole(UserRoleType.valueOf(request.getUserRole().toUpperCase()))
+                .build();
+        userService.createUser(createUserRequest);
+
+        return ResponseEntity.ok(createdUser);
+    }
+
 
 }
-

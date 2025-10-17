@@ -21,4 +21,6 @@ public class AdminUserListDto {
     private UserRoleType userRole;
     private UserStatus status;
     private String createdAt;
+    private String updatedAt;
+    private String avatar;
 }
