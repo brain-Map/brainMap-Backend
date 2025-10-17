@@ -41,6 +41,8 @@ public class ServiceBooking {
     private ServiceListingPricing selectedPricing;
 
     private int duration;
+
+    @Column(columnDefinition = "TEXT")
     private String projectDetails;
 
     @Enumerated(EnumType.STRING)
