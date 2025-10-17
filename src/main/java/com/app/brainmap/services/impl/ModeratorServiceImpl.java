@@ -237,7 +237,8 @@ public class ModeratorServiceImpl implements ModeratorService {
     }
 
     /**
-     * Update the domain expert's overall status based on their verification documents
+     * Update the domain expert's status based on document status
+     * Maps document status to corresponding expert status
      */
     private void updateExpertStatusBasedOnDocuments(DomainExperts expert) {
         List<DomainExpertVerificationDocument> allDocs = verificationDocumentRepository.findByDomainExpertId(expert.getId());
@@ -248,26 +249,29 @@ public class ModeratorServiceImpl implements ModeratorService {
             return;
         }
 
-        // Check if all documents are approved
-        boolean allApproved = allDocs.stream()
-                .allMatch(doc -> "APPROVED".equals(doc.getStatus()));
+        // Get the status from the first document (or most recent)
+        // Since all documents for an expert will have the same status when updated together
+        String documentStatus = allDocs.get(0).getStatus();
         
-        // Check if any document is rejected
-        boolean anyRejected = allDocs.stream()
-                .anyMatch(doc -> "REJECTED".equals(doc.getStatus()));
-        
-        // Update expert status accordingly
-        if (allApproved && !allDocs.isEmpty()) {
-            // All documents approved → Expert is VERIFIED
-            expert.setStatus(DomainExpertStatus.VERIFIED);
-        } else if (anyRejected) {
-            // Any document rejected → Expert remains UNVERIFIED (they need to resubmit)
-            expert.setStatus(DomainExpertStatus.UNVERIFIED);
-        } else {
-            // Some documents still pending → Expert is PENDING review
-            expert.setStatus(DomainExpertStatus.PENDING);
+        // Map document status to expert status
+        DomainExpertStatus expertStatus;
+        switch (documentStatus.toUpperCase()) {
+            case "APPROVED":
+                expertStatus = DomainExpertStatus.VERIFIED;
+                break;
+            case "REJECTED":
+                expertStatus = DomainExpertStatus.UNVERIFIED;
+                break;
+            case "PENDING":
+            default:
+                expertStatus = DomainExpertStatus.PENDING;
+                break;
         }
         
+        log.info("Updating expert {} status from document status '{}' to expert status '{}'", 
+                 expert.getId(), documentStatus, expertStatus);
+        
+        expert.setStatus(expertStatus);
         domainExpertRepository.save(expert);
     }
 }
