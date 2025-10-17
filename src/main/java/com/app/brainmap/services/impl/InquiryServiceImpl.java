@@ -4,6 +4,7 @@ import com.app.brainmap.domain.InquiryStatus;
 import com.app.brainmap.domain.InquiryType;
 import com.app.brainmap.domain.dto.CreateInquiryRequestDto;
 import com.app.brainmap.domain.dto.InquiryDto;
+import com.app.brainmap.domain.dto.InquiryOverviewDto;
 import com.app.brainmap.domain.entities.Inquiry;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.mappers.InquiryMapper;
@@ -56,5 +57,19 @@ public class InquiryServiceImpl implements InquiryService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
         String q = (search == null) ? "" : search.trim();
         return inquiryRepository.findByFilters(status, type, q, pageable).map(inquiryMapper::toDto);
+    }
+
+    @Override
+    public InquiryOverviewDto getOverview() {
+        long total = inquiryRepository.count();
+        long pending = inquiryRepository.countByStatus(InquiryStatus.PENDING);
+        long resolved = inquiryRepository.countByStatus(InquiryStatus.RESOLVED);
+        long reviewed = inquiryRepository.countByStatus(InquiryStatus.REVIEWED);
+        return InquiryOverviewDto.builder()
+                .totalInquiries(total)
+                .pending(pending)
+                .resolved(resolved)
+                .reviewed(reviewed)
+                .build();
     }
 }

@@ -4,6 +4,7 @@ import com.app.brainmap.domain.InquiryStatus;
 import com.app.brainmap.domain.InquiryType;
 import com.app.brainmap.domain.dto.CreateInquiryRequestDto;
 import com.app.brainmap.domain.dto.InquiryDto;
+import com.app.brainmap.domain.dto.InquiryOverviewDto;
 import com.app.brainmap.services.InquiryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,11 @@ public class InquiryController {
     ){
         Page<InquiryDto> inquiries = inquiryService.filterInquiries(status, type, search, page, size, sortBy, direction);
         return ResponseEntity.ok(inquiries);
+    }
+
+    @GetMapping("/overview")
+    public ResponseEntity<InquiryOverviewDto> getOverview() {
+        return ResponseEntity.ok(inquiryService.getOverview());
     }
 
 }
