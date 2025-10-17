@@ -1,9 +1,7 @@
 package com.app.brainmap.controllers;
 
 import com.app.brainmap.domain.dto.*;
-import com.app.brainmap.domain.dto.DomainExpert.CompleteDomainExpertProfileDto;
-import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingRequestDto;
-import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
+import com.app.brainmap.domain.dto.DomainExpert.*;
 import com.app.brainmap.mappers.DomainExpertsMapper;
 import com.app.brainmap.security.JwtUserDetails;
 import com.app.brainmap.services.DomainExpertsService;
@@ -23,7 +21,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(path="/api/v1/domain-experts")
+    @RequestMapping(path="/api/v1/domain-experts")
 @RequiredArgsConstructor
 @Slf4j
 public class DomainExpertsController {
@@ -73,6 +71,26 @@ public class DomainExpertsController {
         }
     }
 
+    // PUT endpoint to update an existing domain expert profile (same payload as profile-complete)
+    @PutMapping(path = "/{id}/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UUID> updateDomainExpertProfile(
+            @PathVariable UUID id,
+            @RequestPart("profile") CompleteDomainExpertProfileDto profileDto,
+            @RequestPart(value = "profilePhoto", required = false) MultipartFile profilePhoto,
+            @RequestPart(value = "verificationDocs", required = false) List<MultipartFile> verificationDocs
+    ) {
+        try {
+            if (profilePhoto != null) profileDto.setProfilePhoto(profilePhoto);
+            if (verificationDocs != null) profileDto.setVerificationDocs(verificationDocs);
+            UUID updatedId = domainExpertsService.updateDomainExpertProfile(id, profileDto);
+            return ResponseEntity.ok(updatedId);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @GetMapping("/{expertId}/bookings")
     public ResponseEntity<List<ServiceBookingResponseDto>> getAllBookingsForDomainExpert(@PathVariable UUID expertId) {
         log.info("DOmainExper id" + expertId);
@@ -87,5 +105,31 @@ public class DomainExpertsController {
             @RequestParam(required = false) String date) {
         List<ServiceBookingResponseDto> bookings = serviceListingService.getBookingsForDomainExpertFiltered(expertId, status, date);
         return ResponseEntity.ok(bookings);
+    }
+
+    // New endpoint: public profile
+    @GetMapping("/{id}/public-profile")
+    public ResponseEntity<DomainExpertDto> getPublicProfile(@PathVariable UUID id) {
+        try {
+            DomainExpertDto dto = domainExpertsService.getDomainExpertPublicProfile(id);
+            return ResponseEntity.ok(dto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // Get full domain expert profile (same data saved by profile-complete)
+    @GetMapping(path = "/{id}/profile")
+    public ResponseEntity<DomainExpertProfileDto> getDomainExpertProfile(@PathVariable UUID id) {
+        try {
+            DomainExpertProfileDto dto = domainExpertsService.getDomainExpertProfile(id);
+            return ResponseEntity.ok(dto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
