@@ -25,17 +25,14 @@ public class ServiceListing {
     @Column(name = "title",columnDefinition = "TEXT",  nullable = false)
     private String title;
 
-    @Column(name = "subject", columnDefinition = "TEXT", nullable = false)
-    private String subject;
+    @Column(name = "category", columnDefinition = "TEXT")
+    private String category;
 
     @Column(name = "description", nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "hourly_rate_per_person")
-    private Double hourlyRatePerPerson;
-
-    @Column(name = "hourly_rate_per_group")
-    private Double hourlyRatePerGroup;
+    @OneToMany(mappedBy = "serviceListing", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ServiceListingPricing> pricings;
 
     @OneToMany(mappedBy = "serviceListing", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ServiceListingOffer> offers;
@@ -52,8 +49,10 @@ public class ServiceListing {
     @JoinColumn(name = "mentor_id")
     private User mentor;
 
-    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ServiceListingAvailability> availabilities;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "service_listing_availability_modes", joinColumns = @JoinColumn(name = "service_id"))
+    @Column(name = "availability_mode")
+    private List<String> availabilityModes;
 
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;

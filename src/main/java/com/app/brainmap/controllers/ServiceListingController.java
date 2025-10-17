@@ -2,7 +2,6 @@ package com.app.brainmap.controllers;
 
 import com.app.brainmap.domain.dto.DomainExpert.*;
 import com.app.brainmap.security.JwtUserDetails;
-import com.app.brainmap.services.DomainExpertsService;
 import com.app.brainmap.services.ServiceListingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +23,6 @@ import java.util.UUID;
 @Slf4j
 public class ServiceListingController {
     private final ServiceListingService serviceListingService;
-    private final DomainExpertsService domainExpertsService;
 
 
     @PostMapping(path = "/{userId}/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -120,7 +118,7 @@ public class ServiceListingController {
             if (userDetails == null) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User not authenticated");
             }
-            ServiceBookingResponseDto booking = domainExpertsService.createServiceBooking(requestDto, userDetails.getUserId());
+            ServiceBookingResponseDto booking = serviceListingService.createServiceBooking(requestDto, userDetails.getUserId());
             return ResponseEntity.ok(booking);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -143,7 +141,7 @@ public class ServiceListingController {
             if (userDetails == null) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User not authenticated");
             }
-            ServiceBookingResponseDto booking = domainExpertsService.reviewServiceBooking(
+            ServiceBookingResponseDto booking = serviceListingService.reviewServiceBooking(
                     bookingId, true, adjustmentDto, null, userDetails.getUserId());
             return ResponseEntity.ok(booking);
         } catch (RuntimeException e) {
@@ -169,7 +167,7 @@ public class ServiceListingController {
             if (userDetails == null) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User not authenticated");
             }
-            ServiceBookingResponseDto booking = domainExpertsService.reviewServiceBooking(
+            ServiceBookingResponseDto booking = serviceListingService.reviewServiceBooking(
                     bookingId, false, null, rejectionReason.getReason(), userDetails.getUserId());
             return ResponseEntity.ok(booking);
         } catch (RuntimeException e) {
@@ -193,7 +191,7 @@ public class ServiceListingController {
             if (userDetails == null) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User not authenticated");
             }
-            ServiceBookingResponseDto updatedBooking = domainExpertsService.updateServiceBooking(bookingId, updateDto, userDetails.getUserId());
+            ServiceBookingResponseDto updatedBooking = serviceListingService.updateServiceBooking(bookingId, updateDto, userDetails.getUserId());
             return ResponseEntity.ok(updatedBooking);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -205,14 +203,14 @@ public class ServiceListingController {
     // Get bookings for a service
     @GetMapping("/service-listings/{serviceId}/bookings")
     public ResponseEntity<List<ServiceBookingResponseDto>> getBookingsForService(@PathVariable UUID serviceId) {
-        List<ServiceBookingResponseDto> bookings = domainExpertsService.getBookingsForService(serviceId);
+        List<ServiceBookingResponseDto> bookings = serviceListingService.getBookingsForService(serviceId);
         return ResponseEntity.ok(bookings);
     }
 
     // Get bookings for a user
     @GetMapping("/user/{userId}/bookings")
     public ResponseEntity<List<ServiceBookingResponseDto>> getBookingsForUser(@PathVariable UUID userId) {
-        List<ServiceBookingResponseDto> bookings = domainExpertsService.getBookingsForUser(userId);
+        List<ServiceBookingResponseDto> bookings = serviceListingService.getBookingsForUser(userId);
         return ResponseEntity.ok(bookings);
     }
 
@@ -221,5 +219,23 @@ public class ServiceListingController {
     public ResponseEntity<List<ServiceListingResponseDto>> getServiceListingsByMentorId(@PathVariable UUID mentorId) {
         List<ServiceListingResponseDto> listings = serviceListingService.getServiceListingsByMentorId(mentorId);
         return ResponseEntity.ok(listings);
+    }
+
+    // Get bookings for a domain expert (mentor)
+    @GetMapping("/mentor/{mentorId}/bookings")
+    public ResponseEntity<List<ServiceBookingResponseDto>> getBookingsForDomainExpert(@PathVariable UUID mentorId) {
+        List<ServiceBookingResponseDto> bookings = serviceListingService.getBookingsForDomainExpert(mentorId);
+        return ResponseEntity.ok(bookings);
+    }
+
+    // Get bookings for a domain expert with optional filtering by status and date
+    @GetMapping("/mentor/{mentorId}/bookings/filter")
+    public ResponseEntity<List<ServiceBookingResponseDto>> getBookingsForDomainExpertFiltered(
+            @PathVariable UUID mentorId,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String date
+    ) {
+        List<ServiceBookingResponseDto> bookings = serviceListingService.getBookingsForDomainExpertFiltered(mentorId, status, date);
+        return ResponseEntity.ok(bookings);
     }
 }

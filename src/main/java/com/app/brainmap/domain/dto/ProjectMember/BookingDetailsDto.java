@@ -10,7 +10,6 @@ public record BookingDetailsDto(
          UUID serviceId,
          String serviceTitl,
          ServiceBookingStatus status,
-         String serviceSubject,
          String expertFirstName,
          String expertLastName,
          String expertEmail
