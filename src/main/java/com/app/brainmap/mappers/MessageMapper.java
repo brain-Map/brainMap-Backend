@@ -14,6 +14,7 @@ public interface MessageMapper {
     @Mapping(target = "senderId", source = "senderId.id")
     @Mapping(target = "receiverId", source = "receiverId.id")
     @Mapping(target = "message", source = "content")
+    @Mapping(source = "group.id", target = "groupId")
     MessageDto toDto(Message message);
 
     @Mapping(target = "senderId", source = "senderId.id")

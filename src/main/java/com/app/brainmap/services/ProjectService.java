@@ -1,5 +1,7 @@
 package com.app.brainmap.services;
 
+import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
+import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
 import com.app.brainmap.domain.entities.KanbanBoard;
 import com.app.brainmap.domain.entities.KanbanColumn;
 import com.app.brainmap.domain.entities.Project;
@@ -23,6 +25,9 @@ public interface ProjectService {
     boolean updateKanbanColumn(UUID projectId, KanbanColumn kanbanColumn);
     boolean deleteKanbanBoardColumn(UUID columnId);
     List<UserProject> listUserProject(UUID projectId);
+    List<UserProject> getProjectOwners(UUID projectId);
+
+    List<BookingDetailsDto> listHiredExperts(UUID userId);
 
 
 }

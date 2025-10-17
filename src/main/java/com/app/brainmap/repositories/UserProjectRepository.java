@@ -17,4 +17,6 @@ public interface UserProjectRepository extends JpaRepository<UserProject, UserPr
             "WHERE up.user.id = :userId AND up.status = 'ACCEPTED' AND up.role != 'OWNER'")
     List<UserProject> findAcceptedProjectsByUser(@Param("userId") UUID userId);
 
+    List<UserProject> findAllByProjectIdAndRole(UUID projectId, com.app.brainmap.domain.ProjectPositionType role);
+
 }
