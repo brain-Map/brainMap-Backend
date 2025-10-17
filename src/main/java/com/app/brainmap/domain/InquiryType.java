@@ -1,6 +1,6 @@
 package com.app.brainmap.domain;
 
-public enum IinquiryType {
+public enum InquiryType {
     ISSUE,
     POST,
     COMMENT,
