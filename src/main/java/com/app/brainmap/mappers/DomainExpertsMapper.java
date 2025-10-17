@@ -2,7 +2,6 @@ package com.app.brainmap.mappers;
 
 import com.app.brainmap.domain.dto.DomainExpertsDto;
 import com.app.brainmap.domain.entities.DomainExpert.DomainExperts;
-import com.app.brainmap.domain.entities.DomainExpert.ServiceListingAvailability;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -11,9 +10,5 @@ public interface DomainExpertsMapper {
     DomainExpertsDto toDto(DomainExperts domainExperts);
 
     DomainExperts toEntity(DomainExpertsDto domainExpertsDto);
-
-    Object toAvailabilityRequestDto(ServiceListingAvailability avail);
-
-    Object toAvailabilityResponseDto(ServiceListingAvailability serviceListingAvailability);
 
 }
