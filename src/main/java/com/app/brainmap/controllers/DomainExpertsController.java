@@ -7,6 +7,7 @@ import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
 import com.app.brainmap.mappers.DomainExpertsMapper;
 import com.app.brainmap.security.JwtUserDetails;
 import com.app.brainmap.services.DomainExpertsService;
+import com.app.brainmap.services.ServiceListingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ public class DomainExpertsController {
 
     private final DomainExpertsService domainExpertsService;
     private final DomainExpertsMapper domainExpertsMapper;
+    private final ServiceListingService serviceListingService;
 
     @GetMapping
     public List<DomainExpertsDto> listDomainExperts() {
@@ -74,7 +76,7 @@ public class DomainExpertsController {
     @GetMapping("/{expertId}/bookings")
     public ResponseEntity<List<ServiceBookingResponseDto>> getAllBookingsForDomainExpert(@PathVariable UUID expertId) {
         log.info("DOmainExper id" + expertId);
-        List<ServiceBookingResponseDto> bookings = domainExpertsService.getBookingsForDomainExpert(expertId);
+        List<ServiceBookingResponseDto> bookings = serviceListingService.getBookingsForDomainExpert(expertId);
         return ResponseEntity.ok(bookings);
     }
 
@@ -83,7 +85,7 @@ public class DomainExpertsController {
             @PathVariable UUID expertId,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String date) {
-        List<ServiceBookingResponseDto> bookings = domainExpertsService.getBookingsForDomainExpertFiltered(expertId, status, date);
+        List<ServiceBookingResponseDto> bookings = serviceListingService.getBookingsForDomainExpertFiltered(expertId, status, date);
         return ResponseEntity.ok(bookings);
     }
 }
