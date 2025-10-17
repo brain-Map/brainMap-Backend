@@ -25,8 +25,12 @@ public class Message {
     private User senderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_id", nullable = false)
-    private User receiverId;
+    @JoinColumn(name = "receiver_id")
+    private User receiverId; // nullable for group messages
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id")
+    private Group group; // nullable for private messages
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;

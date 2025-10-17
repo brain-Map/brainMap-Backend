@@ -1,10 +1,7 @@
 package com.app.brainmap.services.impl;
 
 import com.app.brainmap.domain.DomainExpertStatus;
-import com.app.brainmap.domain.dto.DomainExpert.CompleteDomainExpertProfileDto;
-import com.app.brainmap.domain.dto.DomainExpert.DomainExpertProfileDto;
-import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingRequestDto;
-import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
+import com.app.brainmap.domain.dto.DomainExpert.*;
 import com.app.brainmap.domain.entities.DomainExpert.*;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.mappers.BookingMapper;
@@ -12,6 +9,7 @@ import com.app.brainmap.mappers.ServiceListingResponseMapper;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.DomainExpertsService;
 import com.app.brainmap.services.FileStorageService;
+import com.app.brainmap.services.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -40,6 +38,7 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
     private final ServiceBookingRepository serviceBookingRepository;
     private final ServiceListingRepository serviceListingRepository;
     private final BookingMapper bookingMapper;
+    private final NotificationService notificationService;
 
     @Override
     public List<DomainExperts> listDomainExperts() {
@@ -176,6 +175,10 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
                 .orElse(false);
     }
 
+    /*
+    * Service Bookings
+    */
+
     @Override
     public ServiceBookingResponseDto createServiceBooking(ServiceBookingRequestDto requestDto, UUID userId) {
         ServiceListing service = serviceListingRepository.findById(requestDto.getServiceId())
@@ -225,13 +228,31 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
                 booking.setAcceptedTime(booking.getAcceptedTime());
                 booking.setAcceptedPrice(booking.getTotalPrice());
             }
-            booking.setRejectionReason(null);
+            booking.setReason(null);
         } else {
             booking.setStatus(ServiceBookingStatus.REJECTED);
-            booking.setRejectionReason(rejectionReason);
+            booking.setReason(rejectionReason);
         }
         booking.setUpdatedAt(java.time.LocalDateTime.now());
         booking = serviceBookingRepository.save(booking);
+
+        // create notification to booking user about the review (accepted/rejected)
+        try {
+            String title = accept ? "Booking Accepted" : "Booking Rejected";
+            String serviceTitle = booking.getService() != null ? booking.getService().getTitle() : "your service";
+            String body;
+            if (accept) {
+                body = String.format("Your booking for '%s' has been accepted. Date: %s", serviceTitle,
+                        booking.getAcceptedDate() != null ? booking.getAcceptedDate().toString() : booking.getRequestedDate());
+            } else {
+                body = String.format("Your booking for '%s' was rejected. Reason: %s", serviceTitle,
+                        booking.getReason() != null ? booking.getReason() : "No reason provided");
+            }
+            notificationService.createNotification(booking.getUser().getId(), title, body, "BOOKING_STATUS", booking.getId().toString());
+        } catch (Exception ex) {
+            log.warn("Failed to create notification for booking {}: {}", bookingId, ex.getMessage());
+        }
+
         return bookingMapper.toBookingResponseDto(booking);
     }
 
@@ -267,6 +288,25 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
                 .toList();
         }
         return bookings.stream().map(bookingMapper::toBookingResponseDto).toList();
+    }
+
+    @Override
+    @Transactional
+    public ServiceBookingResponseDto updateServiceBooking(UUID bookingId, BookingUpdateDto updateDto, UUID userId) {
+        ServiceBooking booking = serviceBookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        if (!booking.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Not authorized to update this booking");
+        }
+        if (updateDto.getUpdatedDate() != null) booking.setUpdatedDate(updateDto.getUpdatedDate());
+        if (updateDto.getUpdatedStartTime() != null) booking.setUpdatedStartTime(updateDto.getUpdatedStartTime());
+        if (updateDto.getUpdatedEndTime() != null) booking.setUpdatedEndTime(updateDto.getUpdatedEndTime());
+        if (updateDto.getUpdatedPrice() != null) booking.setUpdatedPrice(updateDto.getUpdatedPrice());
+        if (updateDto.getReason() != null) booking.setReason(updateDto.getReason());
+        booking.setStatus(ServiceBookingStatus.UPDATED);
+        booking.setUpdatedAt(java.time.LocalDateTime.now());
+        booking = serviceBookingRepository.save(booking);
+        return bookingMapper.toBookingResponseDto(booking);
     }
 
 }

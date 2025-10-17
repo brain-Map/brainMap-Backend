@@ -1,6 +1,7 @@
 package com.app.brainmap.services.impl;
 
 import com.app.brainmap.domain.CreateUser;
+import com.app.brainmap.domain.ProjectPositionType;
 import com.app.brainmap.domain.UpdateUser;
 import com.app.brainmap.domain.UserRoleType;
 import com.app.brainmap.domain.dto.Chat.MessageSearchResultDto;
@@ -8,6 +9,7 @@ import com.app.brainmap.domain.dto.UserProjectCountDto;
 import com.app.brainmap.domain.dto.UserProjectSaveDto;
 import com.app.brainmap.domain.entities.*;
 import com.app.brainmap.domain.entities.DomainExpert.DomainExperts;
+import com.app.brainmap.domain.entities.DomainExpert.ServiceBookingStatus;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.UserService;
 import jakarta.transaction.Transactional;
@@ -28,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final ProjectMemberRepository projectMemberRepository;
     private final UserProjectRepository userProjectRepository;
     private final ProjectRepositiory projectRepository;
+    private final ServiceBookingRepository serviceBookingRepository;
 
 
     @Override
@@ -168,11 +171,24 @@ public class UserServiceImpl implements UserService {
         Project project = projectRepository.findById(dto.projectId())
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        // ✅ Use convenience constructor
-        UserProject userProject = new UserProject(user, project, dto.role(), dto.status());
+        // Check if user is a mentor and must exist in ServiceBooking as DomainExpert
+        if (dto.role() == ProjectPositionType.MENTOR) {
+            DomainExperts domainExpert = domainExpertRepository.findById(user.getId())
+                    .orElseThrow(() -> new RuntimeException("Domain Expert not found with id: " + user.getId()));
+            boolean exists = serviceBookingRepository.existsByDomainExpertIdAndStatusNot(
+                    domainExpert.getId(),
+                    ServiceBookingStatus.PENDING
+            );
 
+            if (!exists) {
+                throw new IllegalStateException("Mentor is not present in ServiceBooking table");
+            }
+        }
+
+        UserProject userProject = new UserProject(user, project, dto.role(), dto.status());
         userProjectRepository.save(userProject);
     }
+
 
     @Override
     public void updateAvatar(UUID userId, String imageUrl) {
@@ -197,6 +213,37 @@ public class UserServiceImpl implements UserService {
                         .avatarUrl(user.getAvatar())
                         .build())
                 .toList();
+    }
+
+    @Override
+    public User userUpdate(UUID id, User request) {
+        User user = getUserById(id);
+
+        // Update basic user fields
+        if (request.getFirstName() != null) {
+            user.setFirstName(request.getFirstName());
+        }
+        if (request.getLastName() != null) {
+            user.setLastName(request.getLastName());
+        }
+        if (request.getEmail() != null) {
+            user.setEmail(request.getEmail());
+        }
+        if (request.getMobileNumber() != null) {
+            user.setMobileNumber(request.getMobileNumber());
+        }
+        if (request.getGender() != null) {
+            user.setGender(request.getGender());
+        }
+        if (request.getDateOfBirth() != null) {
+            user.setDateOfBirth(request.getDateOfBirth());
+        }
+        if (request.getBio() != null) {
+            user.setBio(request.getBio());
+        }
+
+        // Save and return updated user
+        return userRepository.save(user);
     }
 
 

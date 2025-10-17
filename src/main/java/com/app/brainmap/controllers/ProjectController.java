@@ -3,6 +3,7 @@ package com.app.brainmap.controllers;
 import com.app.brainmap.domain.dto.*;
 import com.app.brainmap.domain.dto.MessageResponse;
 import com.app.brainmap.domain.dto.Project.AllProjectUserDto;
+import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
 import com.app.brainmap.domain.entities.Project;
 import com.app.brainmap.mappers.CollaborateProjectMapper;
 import com.app.brainmap.mappers.KanbanBoardMapper;
@@ -139,7 +140,20 @@ public class ProjectController {
     }
 
 
+    @GetMapping(path ="/hired-expert/{user_id}")
+    public List<BookingDetailsDto> listHiredExperts(@PathVariable("user_id") UUID userId) {
+        return projectService.listHiredExperts(userId)
+                .stream()
+                .toList();
+    }
 
+    @GetMapping("/owners/{project_id}")
+    public List<UserProjectDto> getProjectOwners(@PathVariable("project_id") UUID projectId) {
+        return projectService.getProjectOwners(projectId)
+                .stream()
+                .map(userProjectMapper::toDto)
+                .toList();
+    }
 
 
 

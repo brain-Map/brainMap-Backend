@@ -10,13 +10,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/test")
+@RequestMapping("/api/test2")
 @RequiredArgsConstructor
 public class TestController {
     
     private final PayHereConfig payHereConfig;
     
-    @GetMapping("/payhere-config")
+    @GetMapping("/payhere-config/test")
     public Map<String, Object> getPayHereConfig() {
         Map<String, Object> config = new HashMap<>();
         config.put("mode", payHereConfig.getMode());

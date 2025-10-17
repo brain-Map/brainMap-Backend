@@ -14,5 +14,5 @@ public class AdminDashboardStatusDto {
     private long userCount;
     private long activeProjects;
     private long pendingDomainExperts;
-    private long openIsquiries;
+    private long openIssues;
 }

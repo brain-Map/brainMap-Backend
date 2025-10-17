@@ -13,6 +13,7 @@ import java.util.UUID;
 public class MessageDto {
     private UUID senderId;
     private UUID receiverId;
+    private UUID groupId;
     private String message;
     private String status;
 }

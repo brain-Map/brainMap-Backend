@@ -1,6 +1,7 @@
 package com.app.brainmap.domain.entities.DomainExpert;
 
 import com.app.brainmap.domain.entities.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -27,10 +28,12 @@ public class ServiceBooking {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "domain_expert_id")
+    @JsonIgnore
     private DomainExperts domainExpert;
 
     private int duration;
@@ -38,6 +41,13 @@ public class ServiceBooking {
     private LocalDate requestedDate;
     private LocalTime requestedStartTime;
     private LocalTime requestedEndTime;
+
+    private LocalDate updatedDate;
+    private LocalTime updatedStartTime;
+    private LocalTime updatedEndTime;
+    private BigDecimal updatedPrice;
+
+    @Column(nullable = false)
     private BigDecimal totalPrice;
     @Enumerated(EnumType.STRING)
     private SessionType sessionType;
@@ -48,7 +58,7 @@ public class ServiceBooking {
     private LocalDate acceptedDate;
     private LocalTime acceptedTime;
     private BigDecimal acceptedPrice;
-    private String rejectionReason;
+    private String reason;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
