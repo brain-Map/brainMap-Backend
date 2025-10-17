@@ -5,6 +5,7 @@ import com.app.brainmap.domain.InquiryType;
 import com.app.brainmap.domain.dto.CreateInquiryRequestDto;
 import com.app.brainmap.domain.dto.InquiryDto;
 import com.app.brainmap.domain.dto.InquiryOverviewDto;
+import com.app.brainmap.domain.dto.RespondInquiryRequestDto;
 import com.app.brainmap.domain.entities.Inquiry;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.mappers.InquiryMapper;
@@ -71,5 +72,22 @@ public class InquiryServiceImpl implements InquiryService {
                 .resolved(resolved)
                 .reviewed(reviewed)
                 .build();
+    }
+
+    @Override
+    public InquiryDto respondToInquiry(java.util.UUID inquiryId, java.util.UUID resolverId, RespondInquiryRequestDto request) {
+        Inquiry inquiry = inquiryRepository.findById(inquiryId)
+                .orElseThrow(() -> new NoSuchElementException("Inquiry not found with id: " + inquiryId));
+
+        User resolver = userRepository.findById(resolverId)
+                .orElseThrow(() -> new NoSuchElementException("Resolver user not found with id: " + resolverId));
+
+        inquiry.setResolver(resolver);
+        inquiry.setStatus(request.getStatus());
+        inquiry.setResponseContent(request.getResponseContent());
+        inquiry.setResolvedAt(java.time.LocalDateTime.now());
+
+        Inquiry saved = inquiryRepository.save(inquiry);
+        return inquiryMapper.toDto(saved);
     }
 }
