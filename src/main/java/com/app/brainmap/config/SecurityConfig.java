@@ -75,9 +75,7 @@ public class SecurityConfig {
                                 "/project-member/projects/**",
                                 "/api/v1/messages/**",
                                 "/api/reviews/**",
-                                "/api/payments/create-session",
-                                "/api/payments/payhere/redirect/**",
-                                "/api/payments/payhere/callback"
+                                "/api/payments/**"
                                 ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                         .anyRequest().authenticated()
