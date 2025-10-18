@@ -32,13 +32,10 @@ public class Transaction {
     private LocalDateTime createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "member_id", nullable = false)
-    private User member;
+    @JoinColumn(name = "sender_id", nullable = false)
+    private User sender;
 
     @ManyToOne
-    @JoinColumn(name = "mentor_id", nullable = false)
-    private User mentor;
-
-
-
+    @JoinColumn(name = "receiver_id", nullable = false)
+    private User receiver;
 }
