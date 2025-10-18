@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public interface AdminService {
      AdminDashboardStatusDto getAdminDashboardStatus();
@@ -18,4 +19,5 @@ public interface AdminService {
      Page<AdminUserListDto> getAllUsers(int page, int size, UserRoleType userRole, UserStatus userStatus, String search, String sortBy);
      List<UserProjectCountDto> getUsersWithProjectCount();
      List<UserTrendDto> getUserTrendsLast12Months();
+     void updateUserStatus(UUID userId, UserStatus status);
 }

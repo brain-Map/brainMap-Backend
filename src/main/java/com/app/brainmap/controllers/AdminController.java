@@ -127,5 +127,14 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+@PutMapping("/userStateUpdate/{userId}/{status}")
+    public ResponseEntity<Void> updateUserStatus(
+            @PathVariable UUID userId,
+            @PathVariable UserStatus status) {
+        log.info("Updating user status: {} -> {}", userId, status);
+        adminService.updateUserStatus(userId, status);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
