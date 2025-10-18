@@ -89,6 +89,8 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
                         .build())
                 .collect(Collectors.toList()));
 
+        return dto;
+
     }
 
     @Override
