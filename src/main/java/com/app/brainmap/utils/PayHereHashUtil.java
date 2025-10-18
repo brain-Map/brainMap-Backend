@@ -5,6 +5,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Base64;
 
 @Slf4j
 public class PayHereHashUtil {
@@ -20,8 +21,12 @@ public class PayHereHashUtil {
             // Format amount with exactly 2 decimal places (PayHere requirement)
             String amountFormatted = String.format("%.2f", amount);
             
+            // If merchantSecret was accidentally stored base64-encoded (common mistake),
+            // decode it before hashing. This keeps behavior backward-compatible.
+            String secretToUse = maybeDecodeBase64(merchantSecret);
+
             // Generate MD5 hash of merchant secret and convert to UPPERCASE
-            String merchantSecretHash = DigestUtils.md5Hex(merchantSecret).toUpperCase();
+            String merchantSecretHash = DigestUtils.md5Hex(secretToUse).toUpperCase();
             
             // Build hash string: merchant_id + order_id + amount + currency + md5(merchant_secret)
             String hashString = merchantId + orderId + amountFormatted + currency + merchantSecretHash;
@@ -65,7 +70,9 @@ public class PayHereHashUtil {
                 return false;
             }
             
-            String merchantSecretHash = DigestUtils.md5Hex(merchantSecret).toUpperCase();
+            // Same base64-decoding tolerance as in generatePaymentHash
+            String secretToUse = maybeDecodeBase64(merchantSecret);
+            String merchantSecretHash = DigestUtils.md5Hex(secretToUse).toUpperCase();
             String hashString = merchantId + orderId + amount + currency + statusCode + merchantSecretHash;
             String calculatedHash = DigestUtils.md5Hex(hashString).toUpperCase();
             
@@ -83,6 +90,29 @@ public class PayHereHashUtil {
             log.error("Error verifying PayHere callback signature", e);
             return false;
         }
+    }
+
+    /**
+     * If the provided string looks like Base64, attempt to decode it and return
+     * the decoded value. If decoding fails or the decoded value is identical to
+     * the input (or non-printable), return the original input.
+     */
+    private static String maybeDecodeBase64(String s) {
+        if (s == null) return null;
+        // Heuristic: Base64 strings commonly contain '=' padding or only base64 chars
+        if (!s.matches("^[A-Za-z0-9+/=\\r\\n]+$")) return s;
+        try {
+            byte[] decoded = Base64.getDecoder().decode(s.trim());
+            String decodedStr = new String(decoded);
+            // If decoded looks printable and different, return it
+            if (!decodedStr.equals(s) && decodedStr.chars().allMatch(c -> c >= 32 && c <= 126)) {
+                log.debug("Detected Base64-encoded merchant secret; using decoded value for hashing");
+                return decodedStr;
+            }
+        } catch (IllegalArgumentException ex) {
+            // Not valid Base64, fall through
+        }
+        return s;
     }
     
     /**
