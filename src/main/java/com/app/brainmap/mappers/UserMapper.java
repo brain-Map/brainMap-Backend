@@ -40,6 +40,8 @@ public interface UserMapper {
 
     @Mapping(target = "userRole", source = "userRole", qualifiedByName = "stringToUserRoleType")
     @Mapping(target = "userId", expression = "java(java.util.UUID.fromString(dto.getUserId()))")
+    @Mapping(source = "firstName", target = "firstName")
+    @Mapping(source = "lastName", target = "lastName")
     CreateUser toCreateUser(CreateUserDto dto);
 
     @Mapping(target = "socialLinks", source = "socialLinks")
