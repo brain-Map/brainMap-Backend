@@ -21,6 +21,7 @@ public interface ProjectService {
     Optional<Project> getProject(UUID id);
     Project updateProject(UUID projectId, Project project);
     void deleteProject(UUID projectId);
+    void removeCollaborator(UUID projectId, UUID userId);
     Optional<KanbanBoard> getKanbanBoardDetails(UUID projectId);
 
     boolean updateKanbanColumn(UUID projectId, KanbanColumn kanbanColumn);
