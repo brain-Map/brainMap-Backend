@@ -2,9 +2,13 @@
 package com.app.brainmap.controllers;
 
 import com.app.brainmap.domain.dto.NotificationResponseDto;
+import com.app.brainmap.domain.dto.UserProjectDto;
+import com.app.brainmap.domain.dto.UserProjectSaveDto;
 import com.app.brainmap.domain.entities.Notification;
+import com.app.brainmap.domain.entities.UserProject;
 import com.app.brainmap.security.JwtUserDetails;
 import com.app.brainmap.services.NotificationService;
+import com.app.brainmap.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -12,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -21,6 +26,7 @@ import java.util.stream.Collectors;
 public class NotificationController {
 
     private final NotificationService notificationService;
+    private final UserService userService;
 
     @GetMapping
     public ResponseEntity<List<NotificationResponseDto>> getNotificationsForUser() {
@@ -65,5 +71,13 @@ public class NotificationController {
                 .build();
         return ResponseEntity.ok(dto);
     }
+
+
+    @PutMapping(path = "/projects/{id}/approve")
+    public ResponseEntity<Map<String, String>> updateProjectApprovalStatus(@PathVariable("id") UUID userId, @RequestBody UserProjectDto userProjectDto) {
+        userService.updateAccess(userId,userProjectDto);
+        return ResponseEntity.ok(Map.of("message", "Project approved successfully"));
+    }
+
 }
 

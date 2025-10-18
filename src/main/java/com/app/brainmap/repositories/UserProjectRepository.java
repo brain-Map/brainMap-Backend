@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserProjectRepository extends JpaRepository<UserProject, UserProjectCompositeKey> {
@@ -24,5 +25,9 @@ public interface UserProjectRepository extends JpaRepository<UserProject, UserPr
     List<UserProject> findAcceptedProjectsByUserAndRole(@Param("userId") UUID userId, @Param("role") ProjectPositionType role);
 
     List<UserProject> findAllByProjectIdAndRole(UUID projectId, ProjectPositionType role);
+
+    // java
+    Optional<UserProject> findByUserIdAndProjectId(UUID userId, UUID projectId);
+
 
 }

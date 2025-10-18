@@ -4,6 +4,7 @@ import com.app.brainmap.domain.CreateUser;
 import com.app.brainmap.domain.UpdateUser;
 import com.app.brainmap.domain.dto.Chat.MessageSearchResultDto;
 import com.app.brainmap.domain.dto.UserProjectCountDto;
+import com.app.brainmap.domain.dto.UserProjectDto;
 import com.app.brainmap.domain.dto.UserProjectSaveDto;
 import com.app.brainmap.domain.dto.UserTrendDto;
 import com.app.brainmap.domain.entities.User;
@@ -23,7 +24,9 @@ public interface UserService {
     List<UserProjectCountDto> getUsersWithProjectCount();
     List<User> searchUsers(String query, String type);
     void addCollaboration(UserProjectSaveDto dto);
+    void updateAccess(UUID userId, UserProjectDto dto);
     void updateAvatar(UUID userId, String imageUrl);
     List<MessageSearchResultDto> searchUserForChat(String query);
     User userUpdate(UUID id, User request);
+    UserProjectDto getProjectCollaborator(UUID projectId, UUID userId);
 }
