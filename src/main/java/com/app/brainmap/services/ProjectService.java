@@ -1,8 +1,8 @@
 package com.app.brainmap.services;
 
+import com.app.brainmap.domain.ProjectPositionType;
 import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
 import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
-import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
 import com.app.brainmap.domain.entities.KanbanBoard;
 import com.app.brainmap.domain.entities.KanbanColumn;
 import com.app.brainmap.domain.entities.Project;
@@ -16,6 +16,7 @@ public interface ProjectService {
 
     List<Project> listProject(UUID userId);
     List<UserProject> getAcceptedProjects(UUID userId);
+    List<UserProject> getAcceptedProjectsByUserAndRole(UUID userId, ProjectPositionType role);
 
     Project createProject(Project project);
     Optional<Project> getProject(UUID id);
