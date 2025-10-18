@@ -100,7 +100,7 @@ public class AdminController {
     }
 
     @PostMapping("/createUser")
-    public ResponseEntity<SupabaseUserResponse> createModerator(@RequestBody @Valid CreateUserByAdminDto request){
+    public ResponseEntity<SupabaseUserResponse> createUser(@RequestBody @Valid CreateUserByAdminDto request){
         log.info("Creating new Moderator: {}", request);
         SupabaseUserResponse createdUser = supabaseService.createUser(request);
 
