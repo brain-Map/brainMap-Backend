@@ -26,6 +26,8 @@ import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RequiredArgsConstructor
 @RestController
@@ -36,6 +38,7 @@ public class MessageController {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final UserService userService;
     private final MessageMapper messageMapper;
+    private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
     @MessageMapping("/private-message")
     public MessageDto receivePrivateMessage(@Payload MessageDto messageDto, Principal principal) {
@@ -68,10 +71,13 @@ public class MessageController {
 
     @MessageMapping("/group-message")
     public void receiveGroupMessage(@Payload MessageDto messageDto) {
+        logger.info("Received STOMP group-message payload: {}", messageDto);
         if ("GROUP_MESSAGE".equals(messageDto.getStatus())) {
-            messageService.saveFromDto(messageDto);
-            if (messageDto.getGroupId() != null) {
-                simpMessagingTemplate.convertAndSend("/group/" + messageDto.getGroupId() + "/messages", messageDto);
+            try {
+                messageService.saveFromDto(messageDto);
+                logger.info("Saved group message from {} to group {}", messageDto.getSenderId(), messageDto.getGroupId());
+            } catch (Exception e) {
+                logger.error("Failed to save group message", e);
             }
         }
     }
