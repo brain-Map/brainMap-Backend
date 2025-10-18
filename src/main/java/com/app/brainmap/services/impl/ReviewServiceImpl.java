@@ -26,19 +26,16 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewMapper reviewMapper;
     private final UserRepository userRepository;
-    private final PromiseRepository promiseRepository;
     private final ServiceBookingRepository serviceBookingRepository;
 
     public ReviewServiceImpl(
             ReviewRepository reviewRepository,
             ReviewMapper reviewMapper,
             UserRepository userRepository,
-            PromiseRepository promiseRepository,
             ServiceBookingRepository serviceBookingRepository) {
         this.reviewRepository = reviewRepository;
         this.reviewMapper = reviewMapper;
         this.userRepository = userRepository;
-        this.promiseRepository = promiseRepository;
         this.serviceBookingRepository = serviceBookingRepository;
     }
 
