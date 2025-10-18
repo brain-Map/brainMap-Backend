@@ -8,6 +8,7 @@ import com.app.brainmap.domain.dto.UserProjectSaveDto;
 import com.app.brainmap.domain.entities.*;
 import com.app.brainmap.domain.entities.DomainExpert.DomainExperts;
 import com.app.brainmap.domain.entities.DomainExpert.ServiceBookingStatus;
+import com.app.brainmap.mappers.UserProjectMapper;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.UserService;
 import jakarta.transaction.Transactional;
@@ -32,6 +33,7 @@ public class UserServiceImpl implements UserService {
     private final ProjectRepositiory projectRepository;
     private final ServiceBookingRepository serviceBookingRepository;
     private final NotificationRepository notificationRepository;
+    private final UserProjectMapper userProjectMapper;
 
 
     @Override
@@ -304,6 +306,14 @@ public class UserServiceImpl implements UserService {
 
         // Save and return updated user
         return userRepository.save(user);
+    }
+
+    @Override
+    public UserProjectDto getProjectCollaborator(UUID projectId, UUID userId) {
+        UserProject userProject = userProjectRepository.findByUserIdAndProjectId(userId, projectId)
+                .orElseThrow(() -> new NoSuchElementException("No collaboration found for user " + userId + " and project " + projectId));
+
+        return userProjectMapper.toDto(userProject);
     }
 
 
