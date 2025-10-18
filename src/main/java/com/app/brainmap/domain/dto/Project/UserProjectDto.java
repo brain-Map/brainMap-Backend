@@ -4,9 +4,7 @@ import com.app.brainmap.domain.ProjectCollaboratorAccept;
 import com.app.brainmap.domain.ProjectPositionType;
 
 public record UserProjectDto(
-    java.util.UUID userId,
     java.util.UUID projectId,
-    ProjectCollaboratorAccept status,
-    ProjectPositionType role
+    ProjectCollaboratorAccept status
 ) {
 }
