@@ -1,11 +1,9 @@
 package com.app.brainmap.services.impl;
 
-import com.app.brainmap.domain.CreateUser;
-import com.app.brainmap.domain.ProjectPositionType;
-import com.app.brainmap.domain.UpdateUser;
-import com.app.brainmap.domain.UserRoleType;
+import com.app.brainmap.domain.*;
 import com.app.brainmap.domain.dto.Chat.MessageSearchResultDto;
 import com.app.brainmap.domain.dto.UserProjectCountDto;
+import com.app.brainmap.domain.dto.UserProjectDto;
 import com.app.brainmap.domain.dto.UserProjectSaveDto;
 import com.app.brainmap.domain.entities.*;
 import com.app.brainmap.domain.entities.DomainExpert.DomainExperts;
@@ -18,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+
+import static io.netty.handler.codec.http2.HttpConversionUtil.parseStatus;
 
 @Service
 @RequiredArgsConstructor
@@ -193,6 +193,7 @@ public class UserServiceImpl implements UserService {
                         .recipient(user)
                         .title(project.getTitle() != null ? project.getTitle() : "Project")
                         .body("You have a new project" + (project.getTitle() != null ? project.getTitle() :" invitation waiting for you. Accept now to join!"))
+                        .data(project.getId().toString())
                         .type("PROJECT_REQUEST")
                         .build();
                 notificationRepository.save(notification);
@@ -205,6 +206,48 @@ public class UserServiceImpl implements UserService {
 
 
     }
+
+    private ProjectCollaboratorAccept parseStatus(String status) {
+        if (status == null || status.isBlank()) {
+            return ProjectCollaboratorAccept.PENDING;
+        }
+        try {
+            return ProjectCollaboratorAccept.valueOf(status.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Invalid ProjectCollaboratorAccept value: " + status, ex);
+        }
+    }
+
+
+    @Override
+    public void updateAccess(UUID userId, UserProjectDto dto) {
+//        UUID userId = userId;
+        UUID projectId = dto.projectId();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        Optional<UserProject> opt = userProjectRepository.findByUserIdAndProjectId(userId, projectId);
+        if (opt.isEmpty()) {
+            throw new NoSuchElementException("No collaboration found for user " + userId + " and project " + projectId);
+        }
+
+        UserProject userProject = opt.get();
+
+        ProjectCollaboratorAccept statusEnum = parseStatus(dto.status());
+
+        if (statusEnum == ProjectCollaboratorAccept.ACCEPTED) {
+            userProject.setStatus(statusEnum);
+            userProjectRepository.save(userProject);
+        } else{
+            userProjectRepository.delete(userProject);
+        }
+    }
+
+
+
 
 
     @Override
