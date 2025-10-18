@@ -125,8 +125,18 @@ public class ModeratorServiceImpl implements ModeratorService {
             String newStatus = request.getStatus().toUpperCase();
             document.setStatus(newStatus);
 
-            if (request.getReviewNotes() != null && !request.getReviewNotes().isBlank()) {
-                log.info("Document {} updated with review notes: {}", id, request.getReviewNotes());
+            // Save review notes only if status is REJECTED
+            if ("REJECTED".equals(newStatus)) {
+                document.setReviewNotes(request.getReviewNotes());
+                if (request.getReviewNotes() != null && !request.getReviewNotes().isBlank()) {
+                    log.info("Document {} rejected with review notes: {}", id, request.getReviewNotes());
+                } else {
+                    log.info("Document {} rejected without review notes", id);
+                }
+            } else {
+                // Clear review notes for APPROVED/PENDING status
+                document.setReviewNotes(null);
+                log.info("Document {} status updated to {}, review notes cleared", id, newStatus);
             }
 
             DomainExperts expert = document.getDomainExpert();
@@ -164,11 +174,24 @@ public class ModeratorServiceImpl implements ModeratorService {
             for (DomainExpertVerificationDocument doc : documents) {
                 log.info("Updating document {} to status {}", doc.getId(), newStatus);
                 doc.setStatus(newStatus);
+                
+                // Save review notes only if status is REJECTED
+                if ("REJECTED".equals(newStatus)) {
+                    doc.setReviewNotes(request.getReviewNotes());
+                } else {
+                    // Clear review notes for APPROVED/PENDING status
+                    doc.setReviewNotes(null);
+                }
+                
                 verificationDocumentRepository.save(doc);
             }
 
-            if (request.getReviewNotes() != null && !request.getReviewNotes().isBlank()) {
-                log.info("Expert {} documents updated with review notes: {}", id, request.getReviewNotes());
+            if ("REJECTED".equals(newStatus) && request.getReviewNotes() != null && !request.getReviewNotes().isBlank()) {
+                log.info("Expert {} documents rejected with review notes: {}", id, request.getReviewNotes());
+            } else if ("REJECTED".equals(newStatus)) {
+                log.info("Expert {} documents rejected without review notes", id);
+            } else {
+                log.info("Expert {} documents updated to status {}, review notes cleared", id, newStatus);
             }
 
             // Update expert status based on all documents
@@ -196,7 +219,6 @@ public class ModeratorServiceImpl implements ModeratorService {
                 .lastName(expert.getUser().getLastName())
                 .email(expert.getUser().getEmail())
                 .domain(expert.getDomain())
-                .experience(expert.getExperience())
                 .status(expert.getStatus().name())
                 .submittedAt(document.getUploadedAt()) // Use document upload time as submission time
                 .documents(documents)
@@ -217,7 +239,6 @@ public class ModeratorServiceImpl implements ModeratorService {
                 .lastName(expert.getUser().getLastName())
                 .email(expert.getUser().getEmail())
                 .domain(expert.getDomain())
-                .experience(expert.getExperience())
                 .status(expert.getStatus().name())
                 .submittedAt(expert.getUser().getCreatedAt())
                 .documents(documents)
@@ -232,6 +253,7 @@ public class ModeratorServiceImpl implements ModeratorService {
                 .contentType(doc.getContentType())
                 .size(doc.getSize())
                 .status(doc.getStatus())
+                .reviewNotes(doc.getReviewNotes())
                 .uploadedAt(doc.getUploadedAt())
                 .build();
     }

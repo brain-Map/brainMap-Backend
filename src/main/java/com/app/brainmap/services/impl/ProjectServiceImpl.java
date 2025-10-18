@@ -2,9 +2,11 @@ package com.app.brainmap.services.impl;
 
 import com.app.brainmap.domain.ProjectCollaboratorAccept;
 import com.app.brainmap.domain.ProjectPositionType;
+import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
 import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
 import com.app.brainmap.domain.entities.*;
 import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
+import com.app.brainmap.mappers.BookingMapper;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.ProjectService;
 import org.springframework.stereotype.Service;
@@ -22,14 +24,16 @@ public class ProjectServiceImpl implements ProjectService {
     private final KanbanColumnRepository kanbanColumnRepository;
     private final UserProjectRepository userProjectRepository;
     private final ServiceBookingRepository serviceBookingRepository;
+    private final BookingMapper bookingMapper;
 
-    public ProjectServiceImpl(ProjectRepositiory projectRepositiory, KanbanBoardRepository kanbanBoardRepository, KanbanColumnRepository kanbanColumnRepository, UserProjectRepository userProjectRepository, ServiceBookingRepository serviceBookingRepository) {
+    public ProjectServiceImpl(ProjectRepositiory projectRepositiory, KanbanBoardRepository kanbanBoardRepository, KanbanColumnRepository kanbanColumnRepository, UserProjectRepository userProjectRepository, ServiceBookingRepository serviceBookingRepository, BookingMapper bookingMapper) {
         this.projectRepositiory = projectRepositiory;
         this.kanbanBoardRepository = kanbanBoardRepository;
         this.kanbanColumnRepository = kanbanColumnRepository;
         this.userProjectRepository = userProjectRepository;
 
         this.serviceBookingRepository = serviceBookingRepository;
+        this.bookingMapper = bookingMapper;
     }
 
     @Override
@@ -196,6 +200,13 @@ public class ProjectServiceImpl implements ProjectService {
         return serviceBookingRepository.findAllBookingDetailsByUserId(userId);
     }
 
+    @Override
+    public List<ServiceBookingResponseDto> getBookingsForDomainExpertFiltered(UUID bookingId) {
+        Optional<ServiceBooking> bookings = serviceBookingRepository.findById(bookingId);
+        return bookings.stream().map(bookingMapper::toBookingResponseDto).toList();
+    }
+
+    @Override
     public List<UserProject> getProjectOwners(UUID projectId) {
         return userProjectRepository.findAllByProjectIdAndRole(projectId, ProjectPositionType.OWNER);
     }

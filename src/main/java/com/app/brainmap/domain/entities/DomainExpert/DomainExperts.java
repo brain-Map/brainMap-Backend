@@ -38,22 +38,9 @@ public class DomainExperts {
     @Column(name = "domain", nullable = true)
     private String domain;
 
-    private String experience;
-    private String availability;
-
     @OneToOne
     @JoinColumn(name = "wallet_id", nullable = true)
     private Wallet wallet;
-
-    // --- New extended profile fields ---
-    @Column(name = "mentorship_type")
-    private String mentorshipType;
-
-    @Column(name = "hourly_rate", precision = 10, scale = 2)
-    private BigDecimal hourlyRate;
-
-    @Column(name = "max_mentees")
-    private Integer maxMentees;
 
     @Column(name = "work_experience", columnDefinition = "TEXT")
     private String workExperience;
@@ -64,14 +51,11 @@ public class DomainExperts {
     @Column(name = "portfolio_url")
     private String portfolio;
 
-    @Column(name = "address")
-    private String address;
+    @Column(name = "profile_photo_url", columnDefinition = "TEXT")
+    private String profilePhotoUrl;
 
     @Column(name = "location")
     private String location;
-
-    @Column(name = "profile_photo_url", columnDefinition = "TEXT")
-    private String profilePhotoUrl;
 
     // Relationships
     @OneToMany(mappedBy = "domainExpert", cascade = CascadeType.ALL, orphanRemoval = true)

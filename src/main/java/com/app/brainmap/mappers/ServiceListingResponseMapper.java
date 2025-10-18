@@ -13,9 +13,11 @@ public interface ServiceListingResponseMapper {
     @Mapping(source = "mentor.lastName", target = "mentorLastName")
     @Mapping(source = "mentor.bio", target = "mentorBio")
     @Mapping(source = "mentor.avatar", target = "mentorAvatar")
+    @Mapping(source = "category", target = "category")
+    @Mapping(source = "availabilityModes", target = "availabilityModes")
+    @Mapping(source = "thumbnailUrl", target = "thumbnailUrl")
     @Mapping(target = "expertiseAreas", expression = "java(getExpertiseAreas(serviceListing))")
-    @Mapping(source = "hourlyRatePerPerson", target = "hourlyRatePerPerson")
-    @Mapping(source = "hourlyRatePerGroup", target = "hourlyRatePerGroup")
+    @Mapping(target = "pricings", expression = "java(mapPricings(serviceListing))")
     @Mapping(target = "whatYouGet", expression = "java(mapOffers(serviceListing))")
     ServiceListingResponseDto toServiceListingResponseDto(ServiceListing serviceListing);
 
@@ -27,6 +29,17 @@ public interface ServiceListingResponseMapper {
         if (serviceListing.getMentor().getDomainExpert().getExpertiseAreas() == null) return java.util.Collections.emptyList();
         return serviceListing.getMentor().getDomainExpert().getExpertiseAreas().stream()
                 .map(area -> area.getExpertise())
+                .toList();
+    }
+
+    default java.util.List<com.app.brainmap.domain.dto.DomainExpert.ServiceListingPricingResponseDto> mapPricings(ServiceListing serviceListing) {
+        if (serviceListing.getPricings() == null) return java.util.Collections.emptyList();
+        return serviceListing.getPricings().stream()
+                .map(p -> com.app.brainmap.domain.dto.DomainExpert.ServiceListingPricingResponseDto.builder()
+                        .pricingId(p.getPricingId())
+                        .pricingType(p.getPricingType())
+                        .price(p.getPrice())
+                        .build())
                 .toList();
     }
 

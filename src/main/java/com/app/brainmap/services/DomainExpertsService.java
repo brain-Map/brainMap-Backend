@@ -12,12 +12,8 @@ public interface DomainExpertsService {
     List<DomainExperts> listDomainExperts();
     DomainExpertProfileDto getDomainExpertProfile(UUID userId);
     UUID completeDomainExpertProfile(UUID id, CompleteDomainExpertProfileDto profileDto);
+    UUID updateDomainExpertProfile(UUID id, CompleteDomainExpertProfileDto profileDto);
     Boolean isProfileComplete(UUID userId);
-    ServiceBookingResponseDto createServiceBooking(ServiceBookingRequestDto requestDto, UUID userId);
-    ServiceBookingResponseDto reviewServiceBooking(UUID bookingId, boolean accept, ServiceBookingRequestDto adjustmentDto, String rejectionReason, UUID expertId);
-    List<ServiceBookingResponseDto> getBookingsForService(UUID serviceId);
-    List<ServiceBookingResponseDto> getBookingsForUser(UUID userId);
-    List<ServiceBookingResponseDto> getBookingsForDomainExpert(UUID expertId);
-    List<ServiceBookingResponseDto> getBookingsForDomainExpertFiltered(UUID expertId, String status, String date);
-    ServiceBookingResponseDto updateServiceBooking(UUID bookingId, BookingUpdateDto updateDto, UUID userId);
+    DomainExpertDto getDomainExpertPublicProfile(UUID userId);
+
 }

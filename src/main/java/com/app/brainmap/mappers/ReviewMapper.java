@@ -13,23 +13,12 @@ import java.util.UUID;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ReviewMapper {
-    @Mapping(source = "member.id", target = "memberId")
-    @Mapping(source = "mentor.id", target = "mentorId")
-    @Mapping(source = "promise", target = "promiseId", qualifiedByName = "mapPromiseToPromiseId")
+
+    @Mapping(target = "memberId", source = "member.id")
+    @Mapping(target = "mentorId", source = "mentor.id")
+    @Mapping(target = "bookedId", source = "serviceBooking.id")
     ReviewDto toDto(Review review);
 
-    @Mapping(target = "member.id", ignore = true, source = "memberId")
-    @Mapping(target = "mentor.id", ignore = true ,source = "mentorId")
-    @Mapping(target = "promise.promiseId", ignore = true, source = "promiseId")
     Review toEntity(ReviewDto dto);
 
-//    @Named("mapUserToUserId")
-//    default UUID mapUserToUserId(User user) {
-//        return user != null ? (UUID) user.getUserId() : null;
-//    }
-
-    @Named("mapPromiseToPromiseId")
-    default UUID mapPromiseToPromiseId(Promise promise) {
-        return promise != null ? promise.getPromiseId() : null;
-    }
 }

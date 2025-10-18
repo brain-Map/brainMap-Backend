@@ -36,8 +36,30 @@ public class ServiceBooking {
     @JsonIgnore
     private DomainExperts domainExpert;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "selected_pricing_id")
+    private ServiceListingPricing selectedPricing;
+
     private int duration;
+
+    @Column(columnDefinition = "TEXT")
     private String projectDetails;
+
+    @Enumerated(EnumType.STRING)
+    private BookingMode bookingMode;
+
+    // For monthly bookings: list of months requested (e.g., "2025-11", "2025-12")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "service_booking_requested_months", joinColumns = @JoinColumn(name = "booking_id"))
+    @Column(name = "requested_month")
+    private java.util.List<String> requestedMonths;
+
+    // For project-based bookings: approximate ending date / deadline
+    private java.time.LocalDate projectDeadline;
+
+    // Additional structured project info
+    private String projectState;
+
     private LocalDate requestedDate;
     private LocalTime requestedStartTime;
     private LocalTime requestedEndTime;
@@ -47,10 +69,14 @@ public class ServiceBooking {
     private LocalTime updatedEndTime;
     private BigDecimal updatedPrice;
 
+    // Months set when a booking is updated (e.g., user changes monthly selection)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "service_booking_updated_months", joinColumns = @JoinColumn(name = "booking_id"))
+    @Column(name = "updated_month")
+    private java.util.List<String> updatedMonths;
+
     @Column(nullable = false)
     private BigDecimal totalPrice;
-    @Enumerated(EnumType.STRING)
-    private SessionType sessionType;
 
     @Enumerated(EnumType.STRING)
     private ServiceBookingStatus status;

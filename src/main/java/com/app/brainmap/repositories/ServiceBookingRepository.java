@@ -5,24 +5,24 @@ import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
 import com.app.brainmap.domain.entities.DomainExpert.ServiceBookingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.List;
 
 public interface ServiceBookingRepository extends JpaRepository<ServiceBooking, UUID> {
     List<ServiceBooking> findByService_ServiceId(UUID serviceId);
     List<ServiceBooking> findByUserId(UUID userId);
-
     List<ServiceBooking> findByDomainExpert_Id(UUID domainExpertId);
 
     @Query("""
     SELECT new com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto(
         sb.id,
-        s.id,
+        s.serviceId,
         s.title,
         sb.status,
-        s.subject,
+        s.description,
+        de.id,
         u.firstName,
         u.lastName,
         u.email
@@ -39,5 +39,7 @@ public interface ServiceBookingRepository extends JpaRepository<ServiceBooking, 
     // In ServiceBookingRepository.java
     boolean existsByDomainExpertIdAndStatusNot(UUID domainExpertId, ServiceBookingStatus status);
 
-}
+    // Count bookings for domain expert by status
+    long countByDomainExpert_IdAndStatus(UUID domainExpertId, ServiceBookingStatus status);
 
+}
