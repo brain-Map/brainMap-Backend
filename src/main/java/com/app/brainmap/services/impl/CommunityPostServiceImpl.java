@@ -9,12 +9,14 @@ import com.app.brainmap.services.CommunityPostService;
 import com.app.brainmap.services.CommunityTagService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CommunityPostServiceImpl implements CommunityPostService {
 
     private final CommunityTagService communityTagService;
@@ -57,15 +59,45 @@ public class CommunityPostServiceImpl implements CommunityPostService {
     }
 
     @Override
+    @Transactional
     public Void deletePostById(UUID postId, UUID userId) throws IllegalArgumentException {
+        log.info("Attempting to delete post: {} by user: {}", postId, userId);
+        
+        // 1. Find the post
         CommunityPost post = communityPostRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException("Post not found with id: " + postId));
+                .orElseThrow(() -> {
+                    log.error("Post not found with id: {}", postId);
+                    return new NoSuchElementException("Post not found");
+                });
 
-        if (!post.getAuthor().getId().equals(userId)) {
-            throw new IllegalArgumentException("You are not authorized to delete this post");
+        // 2. Force lazy loading of author to avoid LazyInitializationException
+        User author = post.getAuthor();
+        UUID authorId = author.getId();
+        
+        // 3. Verify ownership - user can only delete their own posts
+        if (!authorId.equals(userId)) {
+            log.error("User {} attempted to delete post {} owned by user {}", userId, postId, authorId);
+            throw new SecurityException("You can only delete your own posts");
         }
-
-        communityPostRepository.deleteById(postId);
+        
+        log.info("User {} authorized to delete post {}", userId, postId);
+        
+        // 4. Get counts for logging
+        int commentsCount = post.getComments() != null ? post.getComments().size() : 0;
+        int likesCount = post.getLikes() != null ? post.getLikes().size() : 0;
+        int tagsCount = post.getTags() != null ? post.getTags().size() : 0;
+        
+        log.info("Deleting post {} with {} comments, {} likes, and {} tags", 
+                postId, commentsCount, likesCount, tagsCount);
+        
+        // 5. Delete the post
+        // Due to cascade settings:
+        // - All comments (and their nested replies) will be automatically deleted
+        // - All likes on the post will be automatically deleted
+        // - Post-tag associations will be removed (but tags themselves remain)
+        communityPostRepository.delete(post);
+        
+        log.info("Successfully deleted post {} and all associated data", postId);
         return null;
     }
 

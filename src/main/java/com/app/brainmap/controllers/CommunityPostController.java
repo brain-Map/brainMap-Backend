@@ -94,6 +94,8 @@ public class CommunityPostController {
 
     @DeleteMapping(path = "/{postId}")
     public ResponseEntity<Void> deletePostById(@PathVariable UUID postId) {
+        log.info("DELETE request for post: {}", postId);
+        
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails userDetails = (authentication != null && authentication.getPrincipal() != null)
                 ? authentication.getPrincipal() instanceof JwtUserDetails
@@ -101,11 +103,18 @@ public class CommunityPostController {
                 : null
                 : null;
 
-        UUID userId = userDetails.getUserId();
-        log.info("UserId: {}", userId);
+        UUID userId = userDetails != null ? userDetails.getUserId() : null;
+        
+        if (userId == null) {
+            log.error("No authenticated user found for delete request");
+            throw new SecurityException("Authentication required");
+        }
+        
+        log.info("User {} attempting to delete post {}", userId, postId);
 
         communityPostService.deletePostById(postId, userId);
-
+        
+        log.info("Successfully deleted post {}", postId);
         return ResponseEntity.noContent().build();
     }
     @PutMapping(path = "/{postId}")
