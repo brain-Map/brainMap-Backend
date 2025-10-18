@@ -22,6 +22,12 @@ public class CreateUserDto {
     @NotBlank(message = "Email cannot be empty")
     private String email;
 
+    @NotBlank(message = "First Name cannot be empty")
+    private String firstName;
+
+    @NotBlank(message = "Last Name cannot be empty")
+    private String lastName;
+
     @NotBlank(message = "User Role cannot be empty")
     private String userRole;
 

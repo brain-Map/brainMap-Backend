@@ -21,4 +21,6 @@ public class CreateUser {
     private String username;
     private String email;
     private UserRoleType userRole;
+    private String firstName;
+    private String lastName;
 }

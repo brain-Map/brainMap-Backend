@@ -28,7 +28,6 @@ public class NotificationServiceImpl implements NotificationService {
                 .orElseThrow(() -> new RuntimeException("Recipient user not found"));
 
         Notification notification = Notification.builder()
-                .id(UUID.randomUUID())
                 .recipient(recipient)
                 .title(title)
                 .body(body)
@@ -62,6 +61,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public List<Notification> getNotificationsForUser(UUID userId) {
+        System.out.println("Fetching notifications for userId: " + userId);
         return notificationRepository.findByRecipient_IdOrderByCreatedAtDesc(userId);
     }
 
