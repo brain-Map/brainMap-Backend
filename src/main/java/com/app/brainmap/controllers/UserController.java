@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -154,6 +155,22 @@ public class UserController {
 
         return new ResponseEntity<>(updatedUserDto, HttpStatus.OK);
     }
+
+
+    @GetMapping(path = "/getProjectCollaborator/{projectId}/{userId}")
+    public ResponseEntity<Object> getProjectCollaborator(
+            @PathVariable UUID projectId,
+            @PathVariable UUID userId
+    ) {
+        try {
+            UserProjectDto userProjectDto = userService.getProjectCollaborator(projectId, userId);
+            return ResponseEntity.ok(userProjectDto);
+        } catch (NoSuchElementException ex) {
+            // return an empty JSON object
+            return ResponseEntity.ok(Map.of());
+        }
+    }
+
 
 
 
