@@ -75,7 +75,7 @@ public class SecurityConfig {
                                 "/project-member/projects/**",
                                 "/api/v1/messages/**",
                                 "/api/reviews/**",
-                                "/api/v1/notes/**"
+                                "/api/payments/**"
                                 ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                         .anyRequest().authenticated()
