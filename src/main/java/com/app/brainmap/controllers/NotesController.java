@@ -33,12 +33,14 @@ public class NotesController {
     @GetMapping
     public ResponseEntity<List<NotesDto>> getAllNotes() {
         List<Notes> notes = notesService.getAllNotes();
-        List<NotesDto> notesDtos = notes.stream().map(notesMapper::toDto).toList();
+        List<NotesDto> notesDtos = (notes == null)
+                ? List.of()
+                : notes.stream().map(notesMapper::toDto).toList();
 
         return ResponseEntity.ok(notesDtos);
     }
 
-    @GetMapping(path = "/user")
+    @GetMapping(path = "/currentUser")
     public ResponseEntity<List<NotesDto>> getNotesByUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails userDetails = (authentication != null && authentication.getPrincipal() != null)
@@ -46,12 +48,29 @@ public class NotesController {
                 ? (JwtUserDetails) authentication.getPrincipal()
                 : null
                 : null;
+        if (userDetails == null) {
+            log.warn("Unauthenticated request to getNotesByUser");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         UUID userId = userDetails.getUserId();
         log.info("Getting notes for user: {}", userId);
-        
+
         List<Notes> notes = notesService.getNotesByUser(userId);
-        List<NotesDto> notesDtos = notes.stream().map(notesMapper::toDto).toList();
+        List<NotesDto> notesDtos = (notes == null)
+                ? List.of()
+                : notes.stream().map(notesMapper::toDto).toList();
+
+        return ResponseEntity.ok(notesDtos);
+    }
+
+    @GetMapping(path = "/user/{userId}")
+    public ResponseEntity<List<NotesDto>> getNotesByUserId(@PathVariable UUID userId) {
+        log.info("Getting notes for user: {}", userId);
+        List<Notes> notes = notesService.getNotesByUser(userId);
+        List<NotesDto> notesDtos = (notes == null)
+                ? List.of()
+                : notes.stream().map(notesMapper::toDto).toList();
 
         return ResponseEntity.ok(notesDtos);
     }

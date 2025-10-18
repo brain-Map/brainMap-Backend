@@ -26,7 +26,8 @@ public class NotesServiceImpl implements NotesService {
 
     @Override
     public List<Notes> getNotesByUser(UUID userId) {
-        return notesRepository.findByUserId(userId);
+         List<Notes> notes = notesRepository.findByUser_Id(userId);
+         return (notes == null) ? List.of() : notes;
     }
 
     @Override
