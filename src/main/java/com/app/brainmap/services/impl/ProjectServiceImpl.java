@@ -46,6 +46,10 @@ public class ProjectServiceImpl implements ProjectService {
         return userProjectRepository.findAcceptedProjectsByUser(userId);
     }
 
+    @Override
+    public List<UserProject> getAcceptedProjectsByUserAndRole(UUID userId, ProjectPositionType role) {
+        return userProjectRepository.findAcceptedProjectsByUserAndRole(userId, role);
+    }
 
     @Override
     public Project createProject(Project project) {

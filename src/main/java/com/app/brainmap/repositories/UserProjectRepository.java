@@ -1,5 +1,6 @@
 package com.app.brainmap.repositories;
 
+import com.app.brainmap.domain.ProjectPositionType;
 import com.app.brainmap.domain.entities.UserProject;
 import com.app.brainmap.domain.entities.UserProjectCompositeKey;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,6 +18,11 @@ public interface UserProjectRepository extends JpaRepository<UserProject, UserPr
             "WHERE up.user.id = :userId AND up.status = 'ACCEPTED' AND up.role != 'OWNER'")
     List<UserProject> findAcceptedProjectsByUser(@Param("userId") UUID userId);
 
-    List<UserProject> findAllByProjectIdAndRole(UUID projectId, com.app.brainmap.domain.ProjectPositionType role);
+    @Query("SELECT up FROM UserProject up " +
+            "JOIN FETCH up.project p " +
+            "WHERE up.user.id = :userId AND up.status = 'ACCEPTED' AND up.role = :role")
+    List<UserProject> findAcceptedProjectsByUserAndRole(@Param("userId") UUID userId, @Param("role") ProjectPositionType role);
+
+    List<UserProject> findAllByProjectIdAndRole(UUID projectId, ProjectPositionType role);
 
 }
