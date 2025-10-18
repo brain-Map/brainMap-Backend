@@ -31,6 +31,7 @@ public class UserServiceImpl implements UserService {
     private final UserProjectRepository userProjectRepository;
     private final ProjectRepositiory projectRepository;
     private final ServiceBookingRepository serviceBookingRepository;
+    private final NotificationRepository notificationRepository;
 
 
     @Override
@@ -184,7 +185,25 @@ public class UserServiceImpl implements UserService {
         }
 
         UserProject userProject = new UserProject(user, project, dto.role(), dto.status());
-        userProjectRepository.save(userProject);
+        UserProject saved = userProjectRepository.save(userProject);
+        if(saved != null) {
+            // create notification to the user added to the project
+            try {
+                Notification notification = Notification.builder()
+                        .recipient(user)
+                        .title(project.getTitle() != null ? project.getTitle() : "Project")
+                        .body("You have a new project" + (project.getTitle() != null ? project.getTitle() :" invitation waiting for you. Accept now to join!"))
+                        .type("PROJECT_REQUEST")
+                        .build();
+                notificationRepository.save(notification);
+            } catch (Exception ex) {
+                log.warn("Failed to create project notification for user {} on project {}: {}", user.getId(), project.getId(), ex.getMessage());
+            }
+        }
+
+
+
+
     }
 
 

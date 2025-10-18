@@ -3,6 +3,7 @@ package com.app.brainmap.domain.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -17,6 +18,8 @@ import java.util.UUID;
 public class Notification {
 
     @Id
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
