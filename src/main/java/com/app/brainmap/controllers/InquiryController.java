@@ -73,4 +73,10 @@ public class InquiryController {
         InquiryDto updated = inquiryService.respondToInquiry(inquiryId, resolverId, request);
         return ResponseEntity.ok(updated);
     }
+
+    @DeleteMapping("/{inquiryId}")
+    public ResponseEntity<Void> deleteInquiry(@PathVariable java.util.UUID inquiryId) {
+        inquiryService.deleteInquiry(inquiryId);
+        return ResponseEntity.noContent().build();
+    }
 }

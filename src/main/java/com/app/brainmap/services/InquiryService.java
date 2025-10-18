@@ -16,4 +16,5 @@ public interface InquiryService {
     Page<InquiryDto> filterInquiries(InquiryStatus status, InquiryType type, String search, int page, int size, String sortBy, String direction);
     InquiryOverviewDto getOverview();
     InquiryDto respondToInquiry(UUID inquiryId, UUID resolverId, RespondInquiryRequestDto request);
+    Void deleteInquiry(UUID inquiryId);
 }

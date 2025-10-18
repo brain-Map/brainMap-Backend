@@ -25,7 +25,7 @@ public class Message {
     private User senderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_id")
+    @JoinColumn(name = "receiver_id", nullable = true)
     private User receiverId; // nullable for group messages
 
     @ManyToOne(fetch = FetchType.LAZY)
