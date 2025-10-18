@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -152,6 +153,14 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void deleteProject(UUID projectId) {
         projectRepositiory.deleteById(projectId);
+    }
+
+    @Override
+    public void removeCollaborator(UUID projectId, UUID userId) {
+        UserProject userProject = userProjectRepository.findByUserIdAndProjectId(userId, projectId)
+                .orElseThrow(() -> new NoSuchElementException("No collaboration found for user " + userId + " and project " + projectId));
+
+        userProjectRepository.delete(userProject);
     }
 
     @Override

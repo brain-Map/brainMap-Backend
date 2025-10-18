@@ -149,6 +149,15 @@ public class ProjectController {
                 .toList();
     }
 
+    @DeleteMapping(path="/collaborators/{project_id}/{user_id}")
+    public ResponseEntity<MessageResponse> removeCollaborator(
+            @PathVariable("project_id") UUID projectId,
+            @PathVariable("user_id") UUID userId
+    ){
+        projectService.removeCollaborator(projectId, userId);
+        return ResponseEntity.ok(new MessageResponse("Collaborator removed successfully"));
+    }
+
 
     @GetMapping(path ="/hired-expert/{user_id}")
     public List<BookingDetailsDto> listHiredExperts(@PathVariable("user_id") UUID userId) {
