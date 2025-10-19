@@ -9,10 +9,14 @@ import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
 import com.app.brainmap.domain.entities.EventProject;
 import com.app.brainmap.domain.entities.Project;
 import com.app.brainmap.mappers.*;
+import com.app.brainmap.services.FileStorageService;
 import com.app.brainmap.services.ProjectService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,14 +32,16 @@ public class ProjectController {
     private final UserProjectMapper userProjectMapper;
     private final CollaborateProjectMapper collaborateProjectMapper;
     private final EventProjectMapper eventProjectMapper;
+    private final FileStorageService fileStorageService;
 
-    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, KanbanBoardMapper kanbanBoardMapper, UserProjectMapper userProjectMapper, CollaborateProjectMapper collaborateProjectMapper, EventProjectMapper eventProjectMapper) {
+    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, KanbanBoardMapper kanbanBoardMapper, UserProjectMapper userProjectMapper, CollaborateProjectMapper collaborateProjectMapper, EventProjectMapper eventProjectMapper, FileStorageService fileStorageService) {
         this.projectService = projectService;
         this.projectMapper = projectMapper;
         this.kanbanBoardMapper = kanbanBoardMapper;
         this.userProjectMapper = userProjectMapper;
         this.collaborateProjectMapper = collaborateProjectMapper;
         this.eventProjectMapper = eventProjectMapper;
+        this.fileStorageService = fileStorageService;
     }
 
     @GetMapping(path = "/all/{user_id}")
@@ -200,6 +206,35 @@ public class ProjectController {
         projectService.deleteEventProject(eventId);
         return ResponseEntity.ok(new MessageResponse("Event deleted successfully"));
     }
+
+    @PostMapping(
+            path = "/upload/project-files/{projectId}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<MessageResponse> uploadProjectFiles(
+            @PathVariable("projectId") UUID projectId,
+            @RequestParam("files") MultipartFile[] files) {  // ✅ matches FormData field name
+
+        if (files == null || files.length == 0) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("No files uploaded"));
+        }
+
+        try {
+            for (MultipartFile file : files) {
+                String fileUrl = fileStorageService.store(file, "ProjectFile");
+                projectService.saveProjectFile(projectId, fileUrl);
+            }
+
+            return ResponseEntity.ok(new MessageResponse("Files uploaded successfully"));
+        } catch (Exception e) {
+            log.error("Failed to store files for project {}: {}", projectId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new MessageResponse("File upload failed"));
+        }
+    }
+
+
 
 
 

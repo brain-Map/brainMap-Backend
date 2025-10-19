@@ -5,6 +5,7 @@ import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
 import com.app.brainmap.domain.dto.EventProjectDto;
 import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
 import com.app.brainmap.domain.entities.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +35,7 @@ public interface ProjectService {
     EventProject createEventProject(EventProject eventProject);
 
     void deleteEventProject(UUID eventId);
+    void saveProjectFile(UUID projectId, String fileUrl);
 
 
 }
