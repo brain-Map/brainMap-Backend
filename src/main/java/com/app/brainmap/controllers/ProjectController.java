@@ -1,5 +1,6 @@
 package com.app.brainmap.controllers;
 
+import com.app.brainmap.domain.ProjectPositionType;
 import com.app.brainmap.domain.dto.*;
 import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
 import com.app.brainmap.domain.dto.MessageResponse;
@@ -48,6 +49,14 @@ public class ProjectController {
     @GetMapping("/collaborator")
     public List<AllProjectUserDto> getAcceptedProjects(@RequestParam UUID userId) {
         return projectService.getAcceptedProjects(userId)
+                .stream()
+                .map(collaborateProjectMapper::toDto)
+                .toList();
+    }
+
+    @GetMapping("/mentors-projects/{userId}")
+    public List<AllProjectUserDto> getMentorProjects(@PathVariable("userId") UUID userId) {
+        return projectService.getAcceptedProjectsByUserAndRole(userId, ProjectPositionType.MENTOR)
                 .stream()
                 .map(collaborateProjectMapper::toDto)
                 .toList();
@@ -119,6 +128,8 @@ public class ProjectController {
     @DeleteMapping("/kanban-board/{project_id}")
     public ResponseEntity<MessageResponse> deleteKanbanBoard(@PathVariable("project_id") UUID projectId,
                                                              @RequestBody KanbanBoardColumnDto kanbanBoardColumnDto) {
+
+        log.debug("Request to delete kanban column {} for project {}", kanbanBoardColumnDto.columnId(), projectId);
 
         UUID columnId = kanbanBoardColumnDto.columnId();
 
