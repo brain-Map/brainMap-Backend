@@ -103,15 +103,15 @@ public class TransactionServiceImpl implements TransactionService {
                 receiver.getFirstName() + " " + receiver.getLastName(),
                 paymentSession != null ? paymentSession.getPaymentId() : "N/A");
 
-        // Automatically create system wallet entry for the domain expert (receiver)
-        log.info("🔗 Triggering system wallet entry creation for transaction: {}", transaction.getTransactionId());
+        // Automatically add amount to domain expert's system wallet
+        log.info("🔗 Triggering system wallet update for domain expert: {}", receiver.getId());
         try {
-            systemWalletService.createWalletEntry(transaction);
-            log.info("✅ System wallet entry created successfully for domain expert: {}", receiver.getId());
+            systemWalletService.addToWallet(transaction);
+            log.info("✅ System wallet updated successfully for domain expert: {}", receiver.getId());
         } catch (Exception e) {
-            log.error("❌ Failed to create system wallet entry for transaction: {}", transaction.getTransactionId(), e);
+            log.error("❌ Failed to update system wallet for transaction: {}", transaction.getTransactionId(), e);
             // Note: We don't throw the exception here to avoid rolling back the transaction
-            // The wallet entry can be created later through a retry mechanism or admin action
+            // The wallet can be updated later through a retry mechanism or admin action
         }
 
         return mapToResponse(transaction);

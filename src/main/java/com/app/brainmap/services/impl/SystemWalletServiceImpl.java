@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,13 +28,13 @@ public class SystemWalletServiceImpl implements SystemWalletService {
     private final SystemWalletRepository systemWalletRepository;
     
     @Override
-    public SystemWalletResponse createWalletEntry(Transaction transaction) {
+    public SystemWalletResponse addToWallet(Transaction transaction) {
         log.info("════════════════════════════════════════════════════════════════");
-        log.info("💼 [WALLET] CREATING SYSTEM WALLET ENTRY");
+        log.info("💼 [WALLET] ADDING AMOUNT TO SYSTEM WALLET");
         log.info("════════════════════════════════════════════════════════════════");
         log.info("📊 Transaction Details:");
         log.info("   • Transaction ID: {}", transaction.getTransactionId());
-        log.info("   • Amount: {}", transaction.getAmount());
+        log.info("   • Amount to Add: {}", transaction.getAmount());
         log.info("   • Sender (Member): {} ({})", 
                 transaction.getSender().getFirstName() + " " + transaction.getSender().getLastName(),
                 transaction.getSender().getId());
@@ -42,80 +43,147 @@ public class SystemWalletServiceImpl implements SystemWalletService {
                 transaction.getReceiver().getId());
         log.info("   • Status: {}", transaction.getStatus());
         
-        // Create wallet entry - amount goes to system wallet for the domain expert (receiver)
-        SystemWallet walletEntry = SystemWallet.builder()
-                .amount(transaction.getAmount())
-                .belongsTo(transaction.getReceiver()) // Domain expert who will receive this
-                .transaction(transaction)
-                .status("PENDING") // Initial status is PENDING
-                .createdAt(LocalDateTime.now())
-                .build();
+        User domainExpert = transaction.getReceiver();
+        UUID domainExpertId = domainExpert.getId();
+        Integer amountToAdd = transaction.getAmount();
+        LocalDateTime now = LocalDateTime.now();
         
         log.info("────────────────────────────────────────────────────────────────");
-        log.info("💾 [WALLET] SAVING TO DATABASE");
-        log.info("   SQL: INSERT INTO system_wallet");
-        log.info("        (wallet_id, amount, belongs_to, transaction_id, status, created_at)");
-        log.info("        VALUES (UUID, {}, '{}', '{}', 'PENDING', NOW())",
-                walletEntry.getAmount(),
-                walletEntry.getBelongsTo().getId(),
-                walletEntry.getTransaction().getTransactionId());
+        log.info("🔍 [WALLET] CHECKING IF WALLET EXISTS");
+        log.info("   SQL: SELECT * FROM system_wallet WHERE belongs_to = '{}'", domainExpertId);
         
-        walletEntry = systemWalletRepository.save(walletEntry);
+        Optional<SystemWallet> existingWallet = systemWalletRepository.findByBelongsToId(domainExpertId);
         
-        log.info("✅ [WALLET] SYSTEM WALLET ENTRY CREATED SUCCESSFULLY!");
-        log.info("   📊 Wallet Entry Details:");
-        log.info("      • Wallet ID: {}", walletEntry.getWalletId());
-        log.info("      • Amount: {}", walletEntry.getAmount());
-        log.info("      • Belongs To (Domain Expert): {}", walletEntry.getBelongsTo().getId());
-        log.info("      • Transaction ID: {}", walletEntry.getTransaction().getTransactionId());
-        log.info("      • Status: {}", walletEntry.getStatus());
-        log.info("      • Created At: {}", walletEntry.getCreatedAt());
+        SystemWallet wallet;
+        
+        if (existingWallet.isPresent()) {
+            // Wallet exists - UPDATE existing balance
+            wallet = existingWallet.get();
+            Integer oldAmount = wallet.getAmount();
+            Integer newAmount = oldAmount + amountToAdd;
+            
+            log.info("✅ [WALLET] WALLET FOUND - UPDATING EXISTING BALANCE");
+            log.info("   📊 Current Wallet:");
+            log.info("      • Wallet ID: {}", wallet.getWalletId());
+            log.info("      • Current Balance: {}", oldAmount);
+            log.info("      • Amount to Add: {}", amountToAdd);
+            log.info("      • New Balance: {}", newAmount);
+            log.info("      • Last Transaction: {}", wallet.getLastTransactionAt());
+            
+            log.info("────────────────────────────────────────────────────────────────");
+            log.info("💾 [WALLET] UPDATING DATABASE");
+            log.info("   SQL: UPDATE system_wallet");
+            log.info("        SET amount = {} (was {}),", newAmount, oldAmount);
+            log.info("            last_transaction_at = '{}',", now);
+            log.info("            updated_at = '{}'", now);
+            log.info("        WHERE belongs_to = '{}';", domainExpertId);
+            
+            wallet.setAmount(newAmount);
+            wallet.setLastTransactionAt(now);
+            wallet.setUpdatedAt(now);
+            wallet = systemWalletRepository.save(wallet);
+            
+            log.info("✅ [WALLET] BALANCE UPDATED SUCCESSFULLY!");
+            log.info("   📊 Updated Wallet:");
+            log.info("      • Wallet ID: {}", wallet.getWalletId());
+            log.info("      • Balance: {} → {}", oldAmount, newAmount);
+            log.info("      • Increment: +{}", amountToAdd);
+            
+        } else {
+            // Wallet doesn't exist - CREATE new wallet
+            log.info("ℹ️ [WALLET] NO WALLET FOUND - CREATING NEW WALLET");
+            log.info("   📊 New Wallet Details:");
+            log.info("      • Domain Expert: {} ({})", 
+                    domainExpert.getFirstName() + " " + domainExpert.getLastName(),
+                    domainExpertId);
+            log.info("      • Initial Balance: {}", amountToAdd);
+            log.info("      • Status: ACTIVE");
+            
+            log.info("────────────────────────────────────────────────────────────────");
+            log.info("💾 [WALLET] INSERTING INTO DATABASE");
+            log.info("   SQL: INSERT INTO system_wallet");
+            log.info("        (wallet_id, amount, belongs_to, status, created_at, updated_at, last_transaction_at)");
+            log.info("        VALUES (UUID, {}, '{}', 'ACTIVE', NOW(), NOW(), NOW())",
+                    amountToAdd, domainExpertId);
+            
+            wallet = SystemWallet.builder()
+                    .amount(amountToAdd)
+                    .belongsTo(domainExpert)
+                    .status("ACTIVE")
+                    .createdAt(now)
+                    .updatedAt(now)
+                    .lastTransactionAt(now)
+                    .build();
+            
+            wallet = systemWalletRepository.save(wallet);
+            
+            log.info("✅ [WALLET] NEW WALLET CREATED SUCCESSFULLY!");
+            log.info("   📊 Wallet Details:");
+            log.info("      • Wallet ID: {}", wallet.getWalletId());
+            log.info("      • Initial Balance: {}", wallet.getAmount());
+            log.info("      • Domain Expert: {}", domainExpertId);
+            log.info("      • Status: {}", wallet.getStatus());
+        }
+        
+        log.info("════════════════════════════════════════════════════════════════");
+        log.info("✅ WALLET OPERATION COMPLETED SUCCESSFULLY!");
+        log.info("   Summary:");
+        log.info("   • Domain Expert: {} ({})", 
+                domainExpert.getFirstName() + " " + domainExpert.getLastName(),
+                domainExpertId);
+        log.info("   • Current Balance: {}", wallet.getAmount());
+        log.info("   • Last Updated: {}", wallet.getUpdatedAt());
         log.info("════════════════════════════════════════════════════════════════");
         
-        return mapToResponse(walletEntry);
+        return mapToResponse(wallet);
     }
     
     @Override
     public WalletBalanceResponse getWalletBalance(UUID domainExpertId) {
         log.info("💰 Fetching wallet balance for domain expert: {}", domainExpertId);
         
-        Integer totalBalance = systemWalletRepository.getTotalBalance(domainExpertId);
+        SystemWallet wallet = systemWalletRepository.findByBelongsToId(domainExpertId)
+                .orElseThrow(() -> {
+                    log.error("❌ Wallet not found for domain expert: {}", domainExpertId);
+                    return new EntityNotFoundException("Wallet not found for domain expert: " + domainExpertId);
+                });
         
-        log.info("✅ Total balance for domain expert {}: {}", domainExpertId, totalBalance);
+        User domainExpert = wallet.getBelongsTo();
         
-        // You can add more calculations here (withdrawn amount, transaction count, etc.)
+        log.info("✅ Wallet balance for domain expert {}: {}", domainExpertId, wallet.getAmount());
+        
         return WalletBalanceResponse.builder()
                 .domainExpertId(domainExpertId)
-                .totalBalance(totalBalance)
-                .pendingAmount(totalBalance)
+                .domainExpertName(domainExpert.getFirstName() + " " + domainExpert.getLastName())
+                .currentBalance(wallet.getAmount())
+                .status(wallet.getStatus())
+                .lastTransactionAt(wallet.getLastTransactionAt())
+                .createdAt(wallet.getCreatedAt())
                 .build();
     }
     
     @Override
-    public Page<SystemWalletResponse> getWalletEntries(UUID domainExpertId, Pageable pageable) {
-        log.info("📋 Fetching wallet entries for domain expert: {}", domainExpertId);
+    public SystemWalletResponse getWallet(UUID domainExpertId) {
+        log.info("� Fetching wallet for domain expert: {}", domainExpertId);
         
-        Page<SystemWallet> walletEntries = systemWalletRepository
-                .findByBelongsToIdOrderByCreatedAtDesc(domainExpertId, pageable);
+        SystemWallet wallet = systemWalletRepository.findByBelongsToId(domainExpertId)
+                .orElseThrow(() -> {
+                    log.error("❌ Wallet not found for domain expert: {}", domainExpertId);
+                    return new EntityNotFoundException("Wallet not found for domain expert: " + domainExpertId);
+                });
         
-        log.info("✅ Found {} wallet entries for domain expert: {}", 
-                walletEntries.getTotalElements(), domainExpertId);
-        
-        return walletEntries.map(this::mapToResponse);
+        log.info("✅ Wallet found for domain expert: {}", domainExpertId);
+        return mapToResponse(wallet);
     }
     
     @Override
-    public SystemWalletResponse getWalletEntryByTransaction(UUID transactionId) {
-        log.info("🔍 Fetching wallet entry for transaction: {}", transactionId);
+    public Page<SystemWalletResponse> getAllWallets(Pageable pageable) {
+        log.info("� Fetching all wallets, page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
         
-        SystemWallet walletEntry = systemWalletRepository.findByTransactionTransactionId(transactionId)
-                .orElseThrow(() -> {
-                    log.error("❌ Wallet entry not found for transaction: {}", transactionId);
-                    return new EntityNotFoundException("Wallet entry not found for transaction: " + transactionId);
-                });
+        Page<SystemWallet> wallets = systemWalletRepository.findAllByOrderByUpdatedAtDesc(pageable);
         
-        log.info("✅ Wallet entry found for transaction: {}", transactionId);
-        return mapToResponse(walletEntry);
+        log.info("✅ Found {} total wallets", wallets.getTotalElements());
+        return wallets.map(this::mapToResponse);
     }
     
     /**
@@ -129,11 +197,10 @@ public class SystemWalletServiceImpl implements SystemWalletService {
                 .amount(wallet.getAmount())
                 .belongsTo(domainExpert.getId())
                 .domainExpertName(domainExpert.getFirstName() + " " + domainExpert.getLastName())
-                .transactionId(wallet.getTransaction().getTransactionId())
                 .status(wallet.getStatus())
                 .createdAt(wallet.getCreatedAt())
                 .updatedAt(wallet.getUpdatedAt())
-                .withdrawnAt(wallet.getWithdrawnAt())
+                .lastTransactionAt(wallet.getLastTransactionAt())
                 .build();
     }
 }

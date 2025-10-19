@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -15,8 +16,8 @@ public class WalletBalanceResponse {
     
     private UUID domainExpertId;
     private String domainExpertName;
-    private Integer totalBalance;
-    private Integer pendingAmount;
-    private Integer withdrawnAmount;
-    private Long transactionCount;
+    private Integer currentBalance; // Current accumulated balance
+    private String status;
+    private LocalDateTime lastTransactionAt;
+    private LocalDateTime createdAt;
 }

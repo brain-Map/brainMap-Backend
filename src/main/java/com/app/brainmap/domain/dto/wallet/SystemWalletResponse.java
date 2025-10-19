@@ -15,12 +15,11 @@ import java.util.UUID;
 public class SystemWalletResponse {
     
     private UUID walletId;
-    private Integer amount;
+    private Integer amount; // Current accumulated balance
     private UUID belongsTo; // Domain expert ID
     private String domainExpertName;
-    private UUID transactionId;
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private LocalDateTime withdrawnAt;
+    private LocalDateTime lastTransactionAt; // When last amount was added
 }

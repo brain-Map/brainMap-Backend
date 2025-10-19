@@ -4,11 +4,12 @@ import com.app.brainmap.domain.entities.SystemWallet;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,35 +17,32 @@ import java.util.UUID;
 public interface SystemWalletRepository extends JpaRepository<SystemWallet, UUID> {
     
     /**
-     * Find all wallet entries for a specific domain expert
+     * Find wallet for a specific domain expert
+     * Each domain expert has only ONE wallet
      */
-    Page<SystemWallet> findByBelongsToIdOrderByCreatedAtDesc(UUID domainExpertId, Pageable pageable);
+    Optional<SystemWallet> findByBelongsToId(UUID domainExpertId);
     
     /**
-     * Find wallet entry by transaction ID
+     * Get all wallets with pagination
      */
-    Optional<SystemWallet> findByTransactionTransactionId(UUID transactionId);
+    Page<SystemWallet> findAllByOrderByUpdatedAtDesc(Pageable pageable);
     
     /**
-     * Get total balance for a domain expert (sum of all pending amounts)
+     * Get wallets by status
      */
-    @Query("SELECT COALESCE(SUM(sw.amount), 0) FROM SystemWallet sw WHERE sw.belongsTo.id = :domainExpertId AND sw.status = 'PENDING'")
-    Integer getTotalBalance(@Param("domainExpertId") UUID domainExpertId);
+    Page<SystemWallet> findByStatusOrderByUpdatedAtDesc(String status, Pageable pageable);
     
     /**
-     * Get all pending wallet entries for a domain expert
+     * Increment wallet amount for a domain expert
      */
-    @Query("SELECT sw FROM SystemWallet sw WHERE sw.belongsTo.id = :domainExpertId AND sw.status = 'PENDING' ORDER BY sw.createdAt DESC")
-    List<SystemWallet> getPendingWalletEntries(@Param("domainExpertId") UUID domainExpertId);
+    @Modifying
+    @Query("UPDATE SystemWallet sw SET sw.amount = sw.amount + :amountToAdd, sw.lastTransactionAt = :transactionTime, sw.updatedAt = :transactionTime WHERE sw.belongsTo.id = :domainExpertId")
+    int incrementWalletAmount(@Param("domainExpertId") UUID domainExpertId, 
+                              @Param("amountToAdd") Integer amountToAdd,
+                              @Param("transactionTime") LocalDateTime transactionTime);
     
     /**
-     * Get all withdrawn wallet entries for a domain expert
+     * Check if wallet exists for domain expert
      */
-    @Query("SELECT sw FROM SystemWallet sw WHERE sw.belongsTo.id = :domainExpertId AND sw.status = 'WITHDRAWN' ORDER BY sw.withdrawnAt DESC")
-    Page<SystemWallet> getWithdrawnWalletEntries(@Param("domainExpertId") UUID domainExpertId, Pageable pageable);
-    
-    /**
-     * Get wallet entries by status
-     */
-    Page<SystemWallet> findByStatusOrderByCreatedAtDesc(String status, Pageable pageable);
+    boolean existsByBelongsToId(UUID domainExpertId);
 }

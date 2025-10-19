@@ -23,15 +23,11 @@ public class SystemWallet {
     private UUID walletId;
 
     @Column(name = "amount", nullable = false)
-    private Integer amount;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "belongs_to", nullable = false)
-    private User belongsTo; // Domain expert who will receive this amount
+    private Integer amount; // Accumulated balance from all transactions
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "transaction_id", nullable = false, unique = true)
-    private Transaction transaction; // Link to the transaction that created this wallet entry
+    @JoinColumn(name = "belongs_to", nullable = false, unique = true)
+    private User belongsTo; // Domain expert who owns this wallet (ONE wallet per expert)
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -42,8 +38,8 @@ public class SystemWallet {
     private LocalDateTime updatedAt;
 
     @Column(name = "status", nullable = false)
-    private String status; // PENDING, COMPLETED, WITHDRAWN, etc.
+    private String status; // ACTIVE, FROZEN, etc.
 
-    @Column(name = "withdrawn_at")
-    private LocalDateTime withdrawnAt;
+    @Column(name = "last_transaction_at")
+    private LocalDateTime lastTransactionAt; // When the last amount was added
 }

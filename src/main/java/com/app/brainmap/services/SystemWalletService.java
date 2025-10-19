@@ -11,12 +11,13 @@ import java.util.UUID;
 public interface SystemWalletService {
     
     /**
-     * Create a wallet entry when a transaction is created
+     * Add amount to domain expert's wallet when a transaction is created
      * This method is called automatically when a transaction is inserted
+     * If wallet doesn't exist, it creates one. If it exists, it adds to existing balance.
      * @param transaction The transaction that was created
-     * @return Created wallet entry response
+     * @return Updated wallet response
      */
-    SystemWalletResponse createWalletEntry(Transaction transaction);
+    SystemWalletResponse addToWallet(Transaction transaction);
     
     /**
      * Get wallet balance for a domain expert
@@ -26,17 +27,16 @@ public interface SystemWalletService {
     WalletBalanceResponse getWalletBalance(UUID domainExpertId);
     
     /**
-     * Get all wallet entries for a domain expert
+     * Get wallet for a domain expert
      * @param domainExpertId Domain expert user ID
-     * @param pageable Pagination info
-     * @return Page of wallet entries
+     * @return Wallet details
      */
-    Page<SystemWalletResponse> getWalletEntries(UUID domainExpertId, Pageable pageable);
+    SystemWalletResponse getWallet(UUID domainExpertId);
     
     /**
-     * Get wallet entry by transaction ID
-     * @param transactionId Transaction ID
-     * @return Wallet entry
+     * Get all wallets with pagination
+     * @param pageable Pagination info
+     * @return Page of wallets
      */
-    SystemWalletResponse getWalletEntryByTransaction(UUID transactionId);
+    Page<SystemWalletResponse> getAllWallets(Pageable pageable);
 }
