@@ -76,6 +76,14 @@ public class MessageController {
             try {
                 messageService.saveFromDto(messageDto);
                 logger.info("Saved group message from {} to group {}", messageDto.getSenderId(), messageDto.getGroupId());
+                // Broadcast the group message to a topic so all subscribers to the group receive it
+                if (messageDto.getGroupId() != null) {
+                    String destination = "/group/" + messageDto.getGroupId().toString() + "/messages";
+                    simpMessagingTemplate.convertAndSend(destination, messageDto);
+                    logger.info("Broadcasted group message to {}", destination);
+                } else {
+                    logger.warn("Group message missing groupId, cannot broadcast: {}", messageDto);
+                }
             } catch (Exception e) {
                 logger.error("Failed to save group message", e);
             }
