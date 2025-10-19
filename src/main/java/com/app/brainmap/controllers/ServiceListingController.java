@@ -1,6 +1,7 @@
 package com.app.brainmap.controllers;
 
 import com.app.brainmap.domain.dto.DomainExpert.*;
+import com.app.brainmap.domain.entities.DomainExpert.ServiceListing;
 import com.app.brainmap.security.JwtUserDetails;
 import com.app.brainmap.services.ServiceListingService;
 import lombok.RequiredArgsConstructor;
@@ -26,15 +27,15 @@ public class ServiceListingController {
 
 
     @PostMapping(path = "/{userId}/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> createServiceListing(
+    public ResponseEntity<?> createServiceListing(
             @PathVariable UUID userId,
             @RequestPart("service") ServiceListingRequestDto serviceListingRequestDto,
             @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
     ) {
         try {
             if (thumbnail != null) serviceListingRequestDto.setThumbnail(thumbnail);
-            serviceListingService.createServiceListing(serviceListingRequestDto, userId);
-            return ResponseEntity.ok("Created service listing");
+            ServiceListing created = serviceListingService.createServiceListing(serviceListingRequestDto, userId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(created.getServiceId());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating service listing: " + e.getMessage());
         }
@@ -119,6 +120,7 @@ public class ServiceListingController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User not authenticated");
             }
             ServiceBookingResponseDto booking = serviceListingService.createServiceBooking(requestDto, userDetails.getUserId());
+            System.out.println("Created Booking: " + booking);
             return ResponseEntity.ok(booking);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
