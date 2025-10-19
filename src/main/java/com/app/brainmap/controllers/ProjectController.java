@@ -18,6 +18,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 @RestController
 @RequestMapping(path = "/project-member/projects")
@@ -43,6 +47,20 @@ public class ProjectController {
                 .stream()
                 .map(projectMapper::toDto)
                 .toList();
+    }
+
+    // New: Admin moderation - list all projects (paginated)
+    @GetMapping(path = "/all")
+    public ResponseEntity<Page<ProjectDto>> listAllProjects(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String order
+    ) {
+        Sort.Direction direction = "ASC".equalsIgnoreCase(order) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        Page<ProjectDto> projects = projectService.getAllProjects(pageable).map(projectMapper::toDto);
+        return ResponseEntity.ok(projects);
     }
 
     @GetMapping("/collaborator")
