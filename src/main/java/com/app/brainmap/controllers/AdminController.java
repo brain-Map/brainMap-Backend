@@ -155,7 +155,7 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-@PutMapping("/userStateUpdate/{userId}/{status}")
+    @PutMapping("/userStateUpdate/{userId}/{status}")
     public ResponseEntity<Void> updateUserStatus(
             @PathVariable UUID userId,
             @PathVariable UserStatus status) {
@@ -164,5 +164,26 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+    // New: Update project status via GET (non-RESTful, added per request)
+    @PutMapping("/projects/{projectId}/status/{status}")
+    public ResponseEntity<ProjectDto> updateProjectStatusGet(
+            @PathVariable UUID projectId,
+            @PathVariable String status
+    ) {
+        log.info("[ADMIN] Updating project status: {} -> {}", projectId, status);
+        try {
+            com.app.brainmap.domain.ProjctStatus parsed = com.app.brainmap.domain.ProjctStatus.valueOf(status.toUpperCase());
+            com.app.brainmap.domain.entities.Project updated = projectService.updateProjectStatus(projectId, parsed);
+            return ResponseEntity.ok(projectMapper.toDto(updated));
+        } catch (IllegalArgumentException ex) {
+            String message = ex.getMessage() != null ? ex.getMessage() : "Invalid status";
+            if ("project not found".equalsIgnoreCase(message)) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
 }
