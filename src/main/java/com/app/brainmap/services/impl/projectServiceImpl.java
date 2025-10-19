@@ -30,8 +30,9 @@ public class projectServiceImpl implements ProjectService {
     private final BookingMapper bookingMapper;
     private final EventProjectRepository eventProjectRepository;
     private final EventProjectMapper eventProjectMapper;
+    private final ProjectFileRepository projectFileRepository;
 
-    public projectServiceImpl(ProjectRepositiory projectRepositiory, KanbanBoardRepository kanbanBoardRepository, KanbanColumnRepository kanbanColumnRepository, UserProjectRepository userProjectRepository, ServiceBookingRepository serviceBookingRepository, BookingMapper bookingMapper, EventProjectRepository eventProjectRepository, EventProjectMapper eventProjectMapper) {
+    public projectServiceImpl(ProjectRepositiory projectRepositiory, KanbanBoardRepository kanbanBoardRepository, KanbanColumnRepository kanbanColumnRepository, UserProjectRepository userProjectRepository, ServiceBookingRepository serviceBookingRepository, BookingMapper bookingMapper, EventProjectRepository eventProjectRepository, EventProjectMapper eventProjectMapper, ProjectFileRepository projectFileRepository) {
         this.projectRepositiory = projectRepositiory;
         this.kanbanBoardRepository = kanbanBoardRepository;
         this.kanbanColumnRepository = kanbanColumnRepository;
@@ -41,6 +42,7 @@ public class projectServiceImpl implements ProjectService {
         this.bookingMapper = bookingMapper;
         this.eventProjectRepository = eventProjectRepository;
         this.eventProjectMapper = eventProjectMapper;
+        this.projectFileRepository = projectFileRepository;
     }
 
     @Override
@@ -253,7 +255,14 @@ public class projectServiceImpl implements ProjectService {
 
     @Override
     public void saveProjectFile(UUID projectId, String fileUrl) {
+        Project project = projectRepositiory.findById(projectId)
+                .orElseThrow(() -> new NoSuchElementException("No project found with id " + projectId));
 
+        projectFileRepository.save(new ProjectFiles(
+                null,
+                project,
+                fileUrl
+        ));
     }
 
     @Override
