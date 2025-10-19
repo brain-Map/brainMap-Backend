@@ -29,7 +29,7 @@ public class PayHereCallback {
     private UUID id;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_session_id")
+    @JoinColumn(name = "payment_session_id", referencedColumnName = "payment_id")
     private PaymentSession paymentSession;
     
     @Column(name = "order_id", nullable = false)
