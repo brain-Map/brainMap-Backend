@@ -15,7 +15,8 @@ import java.util.UUID;
 public class SystemWalletResponse {
     
     private UUID walletId;
-    private Integer amount; // Current accumulated balance
+    private Integer amount; // Current accumulated balance (95% of transactions)
+    private Integer systemCharged; // Accumulated system charges (5% of transactions)
     private UUID belongsTo; // Domain expert ID
     private String domainExpertName;
     private String status;

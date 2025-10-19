@@ -16,7 +16,9 @@ public class WalletBalanceResponse {
     
     private UUID domainExpertId;
     private String domainExpertName;
-    private Integer currentBalance; // Current accumulated balance
+    private Integer currentBalance; // Current accumulated balance (95% of transactions)
+    private Integer systemCharged; // Total system charges (5% of transactions)
+    private Integer totalReceived; // Total amount before system charge (currentBalance + systemCharged)
     private String status;
     private LocalDateTime lastTransactionAt;
     private LocalDateTime createdAt;

@@ -23,7 +23,11 @@ public class SystemWallet {
     private UUID walletId;
 
     @Column(name = "amount", nullable = false)
-    private Integer amount; // Accumulated balance from all transactions
+    private Integer amount; // Accumulated balance from all transactions (95% of each transaction)
+
+    @Builder.Default
+    @Column(name = "system_charged", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    private Integer systemCharged = 0; // Accumulated system charges (5% of each transaction)
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "belongs_to", nullable = false, unique = true)
