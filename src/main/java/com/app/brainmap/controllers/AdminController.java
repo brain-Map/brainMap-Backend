@@ -6,13 +6,18 @@ import com.app.brainmap.domain.UserStatus;
 import com.app.brainmap.domain.dto.*;
 import com.app.brainmap.domain.dto.Admin.CreateUserByAdminDto;
 import com.app.brainmap.domain.entities.User;
+import com.app.brainmap.mappers.ProjectMapper;
 import com.app.brainmap.mappers.UserMapper;
 import com.app.brainmap.services.AdminService;
+import com.app.brainmap.services.ProjectService;
 import com.app.brainmap.services.SupabaseService;
 import com.app.brainmap.services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +35,10 @@ public class AdminController {
     private final UserService userService;
     private final UserMapper userMapper;
     private final SupabaseService supabaseService;
+
+    // New injections for project moderation listing
+    private final ProjectService projectService;
+    private final ProjectMapper projectMapper;
 
     @GetMapping("/dashboard/helthcheck")
     public ResponseEntity<String> healthCheck() {
@@ -81,6 +90,25 @@ public class AdminController {
         return ResponseEntity.ok()
                 .header("content-type", "application/json")
                 .body(users);
+    }
+
+    // New: Admin projects list for moderation
+    @GetMapping("/projects")
+    public ResponseEntity<Page<ProjectDto>> getAllProjects(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "200") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String order
+    ) {
+        Sort.Direction direction = "ASC".equalsIgnoreCase(order) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        Page<ProjectDto> projects = projectService.getAllProjects(pageable)
+                .map(projectMapper::toDto);
+
+        return ResponseEntity.ok()
+                .header("content-type", "application/json")
+                .body(projects);
     }
 
     @GetMapping("/project-count")

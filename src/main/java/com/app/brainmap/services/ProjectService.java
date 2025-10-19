@@ -4,6 +4,9 @@ import com.app.brainmap.domain.ProjectPositionType;
 import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
 import com.app.brainmap.domain.dto.EventProjectDto;
 import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
+import com.app.brainmap.domain.ProjctStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import com.app.brainmap.domain.entities.*;
 
 import java.util.List;
@@ -33,5 +36,12 @@ public interface ProjectService {
     List<EventProjectDto> getEvents(UUID projectId);
     EventProject createEventProject(EventProject eventProject);
 
+    void deleteEventProject(UUID eventId);
+
+    // New: update only project status
+    Project updateProjectStatus(UUID projectId, ProjctStatus status);
+
+    // New: admin - get all projects (paginated)
+    Page<Project> getAllProjects(Pageable pageable);
 
 }

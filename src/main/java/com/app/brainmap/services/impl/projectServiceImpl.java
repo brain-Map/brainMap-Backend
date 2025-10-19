@@ -11,6 +11,8 @@ import com.app.brainmap.mappers.BookingMapper;
 import com.app.brainmap.mappers.EventProjectMapper;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.ProjectService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -244,9 +246,29 @@ public class projectServiceImpl implements ProjectService {
     }
 
     @Override
+    public void deleteEventProject(UUID eventId) {
+        EventProject eventProject = eventProjectRepository.findById(eventId)
+                .orElseThrow(() -> new NoSuchElementException("No event found with id " + eventId));
+
+        eventProjectRepository.delete(eventProject);
+    }
+
+    @Override
     public List<UserProject> getProjectOwners(UUID projectId) {
         return userProjectRepository.findAllByProjectIdAndRole(projectId, ProjectPositionType.OWNER);
     }
 
+    @Override
+    public Project updateProjectStatus(UUID projectId, com.app.brainmap.domain.ProjctStatus status) {
+        Project project = projectRepositiory.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("project not found"));
+        project.setStatus(status);
+        return projectRepositiory.save(project);
+    }
+
+    @Override
+    public Page<Project> getAllProjects(Pageable pageable) {
+        return projectRepositiory.findAll(pageable);
+    }
 
 }

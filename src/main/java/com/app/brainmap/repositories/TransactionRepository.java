@@ -50,7 +50,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     Page<Transaction> findTransactionDetailsForUser(@Param("userId") UUID userId, Pageable pageable);
 
     /**
-     * Find all transaction details (for admin or general listing)
+     * Find all transaction details (for admin or general listing) - paginated
      */
     @Query("SELECT DISTINCT t FROM Transaction t " +
            "LEFT JOIN FETCH t.sender " +
@@ -71,4 +71,14 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
            "AND t.createdAt <= :cutoffDate " +
            "AND (t.status = 'SUCCESS' OR t.status = 'COMPLETED')")
     List<Transaction> findUnreleasedTransactionsOlderThan(@Param("cutoffDate") java.time.LocalDateTime cutoffDate);
+     * Find all transaction details (non-paginated) with eager loading
+     */
+    @Query("SELECT DISTINCT t FROM Transaction t " +
+           "LEFT JOIN FETCH t.sender " +
+           "LEFT JOIN FETCH t.receiver " +
+           "LEFT JOIN FETCH t.paymentSession ps " +
+           "LEFT JOIN FETCH ps.serviceBooking sb " +
+           "LEFT JOIN FETCH sb.service " +
+           "ORDER BY t.createdAt DESC")
+    List<Transaction> findAllTransactionDetailsList();
 }
