@@ -23,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -227,7 +228,7 @@ public class TransactionController {
         }
     }
 
-    @GetMapping("/details/all")
+    @GetMapping("/details/allByPage")
     @Operation(summary = "Get All Detailed Transactions",
                description = "Get all detailed transaction information with pagination (Admin only)")
     @ApiResponses(value = {
@@ -237,7 +238,7 @@ public class TransactionController {
     })
     public ResponseEntity<Page<TransactionDetailsDto>> getAllTransactionDetails(
             @Parameter(description = "Page number (0-indexed)") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "Page size") @RequestParam(defaultValue = "20") int size,
+            @Parameter(description = "Page size") @RequestParam(defaultValue = "1000") int size,
             Authentication authentication) {
 
         try {
@@ -254,6 +255,32 @@ public class TransactionController {
 
         } catch (Exception e) {
             log.error("❌ Error fetching all detailed transactions", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/details/all")
+    @Operation(summary = "Get All Detailed Transactions (no pagination)",
+               description = "Get all detailed transaction information without pagination (Admin only)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "All transaction details retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<List<TransactionDetailsDto>> getAllTransactionDetailsNoPagination(
+            Authentication authentication) {
+        try {
+            getCurrentUserId(authentication); // Ensure authenticated
+
+            log.info("📊 Fetching all detailed transaction info (no pagination)");
+
+            List<TransactionDetailsDto> transactionDetails = transactionService.getAllTransactionDetails();
+
+            log.info("✅ Found {} total detailed transactions (no pagination)", transactionDetails.size());
+            return ResponseEntity.ok(transactionDetails);
+
+        } catch (Exception e) {
+            log.error("❌ Error fetching all detailed transactions (no pagination)", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
