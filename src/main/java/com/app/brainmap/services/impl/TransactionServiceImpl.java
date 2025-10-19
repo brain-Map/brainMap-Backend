@@ -9,6 +9,7 @@ import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.mappers.TransactionMapper;
 import com.app.brainmap.repositories.PaymentSessionRepository;
 import com.app.brainmap.repositories.TransactionRepository;
+import com.app.brainmap.services.SystemWalletService;
 import com.app.brainmap.services.TransactionService;
 import com.app.brainmap.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -32,6 +33,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final PaymentSessionRepository paymentSessionRepository;
     private final UserService userService;
     private final TransactionMapper transactionMapper;
+    private final SystemWalletService systemWalletService;
 
     @Override
     public TransactionResponse createTransaction(TransactionRequest request, UUID authenticatedUserId) {
@@ -100,6 +102,17 @@ public class TransactionServiceImpl implements TransactionService {
                 sender.getFirstName() + " " + sender.getLastName(),
                 receiver.getFirstName() + " " + receiver.getLastName(),
                 paymentSession != null ? paymentSession.getPaymentId() : "N/A");
+
+        // Automatically create system wallet entry for the domain expert (receiver)
+        log.info("🔗 Triggering system wallet entry creation for transaction: {}", transaction.getTransactionId());
+        try {
+            systemWalletService.createWalletEntry(transaction);
+            log.info("✅ System wallet entry created successfully for domain expert: {}", receiver.getId());
+        } catch (Exception e) {
+            log.error("❌ Failed to create system wallet entry for transaction: {}", transaction.getTransactionId(), e);
+            // Note: We don't throw the exception here to avoid rolling back the transaction
+            // The wallet entry can be created later through a retry mechanism or admin action
+        }
 
         return mapToResponse(transaction);
     }

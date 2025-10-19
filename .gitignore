@@ -36,3 +36,4 @@ src/main/resources/application-development.properties
 uploads
 
 TRANSACTION_API_DOCS.md
+SYSTEM_WALLET_IMPLEMENTATION.md
