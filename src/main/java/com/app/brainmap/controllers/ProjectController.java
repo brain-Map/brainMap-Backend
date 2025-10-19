@@ -195,6 +195,12 @@ public class ProjectController {
         return ResponseEntity.ok(new MessageResponse("Event created successfully"));
     }
 
+    @DeleteMapping(path="/delete-events/{eventId}")
+    public ResponseEntity<MessageResponse> deleteProjectEvent(@PathVariable UUID eventId) {
+        projectService.deleteEventProject(eventId);
+        return ResponseEntity.ok(new MessageResponse("Event deleted successfully"));
+    }
+
 
 
 }

@@ -244,6 +244,14 @@ public class projectServiceImpl implements ProjectService {
     }
 
     @Override
+    public void deleteEventProject(UUID eventId) {
+        EventProject eventProject = eventProjectRepository.findById(eventId)
+                .orElseThrow(() -> new NoSuchElementException("No event found with id " + eventId));
+
+        eventProjectRepository.delete(eventProject);
+    }
+
+    @Override
     public List<UserProject> getProjectOwners(UUID projectId) {
         return userProjectRepository.findAllByProjectIdAndRole(projectId, ProjectPositionType.OWNER);
     }
