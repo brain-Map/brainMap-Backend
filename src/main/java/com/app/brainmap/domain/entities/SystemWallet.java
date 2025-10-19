@@ -22,8 +22,11 @@ public class SystemWallet {
     @Column(name = "wallet_id", updatable = false, nullable = false)
     private UUID walletId;
 
-    @Column(name = "amount", nullable = false)
-    private Integer amount; // Accumulated balance from all transactions (95% of each transaction)
+    @Column(name = "hold_amount", nullable = false)
+    private Integer holdAmount; // Amount from transactions within last 14 days (95% of each transaction)
+
+    @Column(name = "released_amount", nullable = false)
+    private Integer releasedAmount; // Amount released after 14 days (available for withdrawal)
 
     @Builder.Default
     @Column(name = "system_charged", nullable = false, columnDefinition = "INTEGER DEFAULT 0")

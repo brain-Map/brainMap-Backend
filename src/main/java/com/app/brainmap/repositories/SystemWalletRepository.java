@@ -33,15 +33,6 @@ public interface SystemWalletRepository extends JpaRepository<SystemWallet, UUID
     Page<SystemWallet> findByStatusOrderByUpdatedAtDesc(String status, Pageable pageable);
     
     /**
-     * Increment wallet amount for a domain expert
-     */
-    @Modifying
-    @Query("UPDATE SystemWallet sw SET sw.amount = sw.amount + :amountToAdd, sw.lastTransactionAt = :transactionTime, sw.updatedAt = :transactionTime WHERE sw.belongsTo.id = :domainExpertId")
-    int incrementWalletAmount(@Param("domainExpertId") UUID domainExpertId, 
-                              @Param("amountToAdd") Integer amountToAdd,
-                              @Param("transactionTime") LocalDateTime transactionTime);
-    
-    /**
      * Check if wallet exists for domain expert
      */
     boolean existsByBelongsToId(UUID domainExpertId);

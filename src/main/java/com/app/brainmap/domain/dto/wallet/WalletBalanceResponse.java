@@ -16,9 +16,11 @@ public class WalletBalanceResponse {
     
     private UUID domainExpertId;
     private String domainExpertName;
-    private Integer currentBalance; // Current accumulated balance (95% of transactions)
+    private Integer holdAmount; // Amount on hold (within 14 days)
+    private Integer releasedAmount; // Amount available for withdrawal (after 14 days)
     private Integer systemCharged; // Total system charges (5% of transactions)
-    private Integer totalReceived; // Total amount before system charge (currentBalance + systemCharged)
+    private Integer totalBalance; // holdAmount + releasedAmount
+    private Integer totalReceived; // totalBalance + systemCharged
     private String status;
     private LocalDateTime lastTransactionAt;
     private LocalDateTime createdAt;

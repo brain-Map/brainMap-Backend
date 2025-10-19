@@ -39,6 +39,10 @@ public class Transaction {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Builder.Default
+    @Column(name = "amount_released", columnDefinition = "BOOLEAN DEFAULT false")
+    private Boolean amountReleased = false;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id", referencedColumnName = "payment_id")
     private PaymentSession paymentSession;

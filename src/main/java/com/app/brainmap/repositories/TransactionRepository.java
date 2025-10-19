@@ -60,4 +60,15 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
            "LEFT JOIN FETCH sb.service " +
            "ORDER BY t.createdAt DESC")
     Page<Transaction> findAllTransactionDetails(Pageable pageable);
+
+    /**
+     * Find transactions that are older than 14 days and haven't been released yet
+     * Used by scheduled task to move amounts from hold to released
+     * Accepts both 'SUCCESS' and 'COMPLETED' statuses
+     */
+    @Query("SELECT t FROM Transaction t " +
+           "WHERE t.amountReleased = false " +
+           "AND t.createdAt <= :cutoffDate " +
+           "AND (t.status = 'SUCCESS' OR t.status = 'COMPLETED')")
+    List<Transaction> findUnreleasedTransactionsOlderThan(@Param("cutoffDate") java.time.LocalDateTime cutoffDate);
 }

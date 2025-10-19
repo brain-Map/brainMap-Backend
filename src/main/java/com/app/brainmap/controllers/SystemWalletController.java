@@ -50,7 +50,8 @@ public class SystemWalletController {
             
             WalletBalanceResponse balance = systemWalletService.getWalletBalance(domainExpertId);
             
-            log.info("✅ Balance retrieved: {}", balance.getCurrentBalance());
+            log.info("✅ Balance retrieved - Hold: {}, Released: {}, Total: {}", 
+                    balance.getHoldAmount(), balance.getReleasedAmount(), balance.getTotalBalance());
             return ResponseEntity.ok(balance);
             
         } catch (EntityNotFoundException e) {
