@@ -2,8 +2,10 @@ package com.app.brainmap.services.impl;
 
 import com.app.brainmap.domain.dto.transaction.TransactionRequest;
 import com.app.brainmap.domain.dto.transaction.TransactionResponse;
+import com.app.brainmap.domain.entities.PaymentSession;
 import com.app.brainmap.domain.entities.Transaction;
 import com.app.brainmap.domain.entities.User;
+import com.app.brainmap.repositories.PaymentSessionRepository;
 import com.app.brainmap.repositories.TransactionRepository;
 import com.app.brainmap.services.TransactionService;
 import com.app.brainmap.services.UserService;
@@ -26,6 +28,7 @@ public class TransactionServiceImpl implements TransactionService {
     
     private final TransactionRepository transactionRepository;
     private final UserService userService;
+    private final PaymentSessionRepository paymentSessionRepository;
     
     @Override
     public TransactionResponse createTransaction(TransactionRequest request, UUID authenticatedUserId) {
@@ -65,6 +68,18 @@ public class TransactionServiceImpl implements TransactionService {
             // throw new IllegalArgumentException("You can only create transactions as the sender");
         }
         
+        // Find payment session if paymentId is provided
+        PaymentSession paymentSession = null;
+        if (request.getPaymentId() != null && !request.getPaymentId().isEmpty()) {
+            log.info("🔗 Linking transaction to payment session: {}", request.getPaymentId());
+            paymentSession = paymentSessionRepository.findByPaymentId(request.getPaymentId())
+                    .orElseThrow(() -> {
+                        log.error("❌ Payment session not found: {}", request.getPaymentId());
+                        return new EntityNotFoundException("Payment session not found with ID: " + request.getPaymentId());
+                    });
+            log.info("✅ Payment session found and linked: {}", request.getPaymentId());
+        }
+        
         // Create transaction
         Transaction transaction = Transaction.builder()
                 .amount(request.getAmount())
@@ -72,6 +87,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .receiver(receiver)
                 .status(request.getStatus())
                 .createdAt(LocalDateTime.now())
+                .paymentSession(paymentSession)
                 .build();
         
         // Save transaction
@@ -142,6 +158,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .receiverName(transaction.getReceiver().getFirstName() + " " + transaction.getReceiver().getLastName())
                 .status(transaction.getStatus())
                 .createdAt(transaction.getCreatedAt())
+                .paymentId(transaction.getPaymentSession() != null ? transaction.getPaymentSession().getPaymentId() : null)
                 .build();
     }
 }

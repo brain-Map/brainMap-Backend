@@ -22,4 +22,5 @@ public class TransactionResponse {
     private String receiverName;
     private String status;
     private LocalDateTime createdAt;
+    private String paymentId; // Payment session ID if linked
 }

@@ -26,4 +26,7 @@ public class TransactionRequest {
     
     @NotBlank(message = "Status is required")
     private String status;
+    
+    // Optional: Link to payment session if this transaction is from a payment
+    private String paymentId;
 }
