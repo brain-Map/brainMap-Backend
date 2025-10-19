@@ -6,11 +6,9 @@ import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
 import com.app.brainmap.domain.dto.MessageResponse;
 import com.app.brainmap.domain.dto.Project.AllProjectUserDto;
 import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
+import com.app.brainmap.domain.entities.EventProject;
 import com.app.brainmap.domain.entities.Project;
-import com.app.brainmap.mappers.CollaborateProjectMapper;
-import com.app.brainmap.mappers.KanbanBoardMapper;
-import com.app.brainmap.mappers.ProjectMapper;
-import com.app.brainmap.mappers.UserProjectMapper;
+import com.app.brainmap.mappers.*;
 import com.app.brainmap.services.ProjectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +27,15 @@ public class ProjectController {
     private final KanbanBoardMapper kanbanBoardMapper;
     private final UserProjectMapper userProjectMapper;
     private final CollaborateProjectMapper collaborateProjectMapper;
+    private final EventProjectMapper eventProjectMapper;
 
-    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, KanbanBoardMapper kanbanBoardMapper, UserProjectMapper userProjectMapper, CollaborateProjectMapper collaborateProjectMapper) {
+    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, KanbanBoardMapper kanbanBoardMapper, UserProjectMapper userProjectMapper, CollaborateProjectMapper collaborateProjectMapper, EventProjectMapper eventProjectMapper) {
         this.projectService = projectService;
         this.projectMapper = projectMapper;
         this.kanbanBoardMapper = kanbanBoardMapper;
         this.userProjectMapper = userProjectMapper;
         this.collaborateProjectMapper = collaborateProjectMapper;
+        this.eventProjectMapper = eventProjectMapper;
     }
 
     @GetMapping(path = "/all/{user_id}")
@@ -179,6 +179,20 @@ public class ProjectController {
             @PathVariable UUID bookingId) {
         List<ServiceBookingResponseDto> bookings = projectService.getBookingsForDomainExpertFiltered(bookingId);
         return ResponseEntity.ok(bookings);
+    }
+
+    @GetMapping(path="/get-events/{projectId}")
+    public ResponseEntity<List<EventProjectDto>> getProjectEvents(@PathVariable UUID projectId) {
+        List<EventProjectDto> events = projectService.getEvents(projectId);
+        return ResponseEntity.ok(events);
+    }
+
+    @PostMapping(path="/create-events")
+    public ResponseEntity<MessageResponse> createProjectEvent(@RequestBody EventProjectDto eventProjectDto) {
+        EventProject eventProject = projectService.createEventProject(
+                eventProjectMapper.toEntity(eventProjectDto)
+        );
+        return ResponseEntity.ok(new MessageResponse("Event created successfully"));
     }
 
 

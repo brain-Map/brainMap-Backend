@@ -50,4 +50,15 @@ public class EventProject {
     @JoinColumn(name = "project_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
+
+    // java
+    @PrePersist
+    private void prePersist() {
+        if (createdDate == null) {
+            createdDate = LocalDate.now();
+        }
+        if (createdTime == null) {
+            createdTime = LocalTime.now();
+        }
+    }
 }
