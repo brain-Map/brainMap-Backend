@@ -34,4 +34,30 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
      * Find transactions by status
      */
     List<Transaction> findByStatus(String status);
+
+    /**
+     * Find all transaction details with eager loading of related entities
+     * This query joins all necessary entities for TransactionDetailsDto
+     */
+    @Query("SELECT DISTINCT t FROM Transaction t " +
+           "LEFT JOIN FETCH t.sender " +
+           "LEFT JOIN FETCH t.receiver " +
+           "LEFT JOIN FETCH t.paymentSession ps " +
+           "LEFT JOIN FETCH ps.serviceBooking sb " +
+           "LEFT JOIN FETCH sb.service " +
+           "WHERE t.sender.id = :userId OR t.receiver.id = :userId " +
+           "ORDER BY t.createdAt DESC")
+    Page<Transaction> findTransactionDetailsForUser(@Param("userId") UUID userId, Pageable pageable);
+
+    /**
+     * Find all transaction details (for admin or general listing)
+     */
+    @Query("SELECT DISTINCT t FROM Transaction t " +
+           "LEFT JOIN FETCH t.sender " +
+           "LEFT JOIN FETCH t.receiver " +
+           "LEFT JOIN FETCH t.paymentSession ps " +
+           "LEFT JOIN FETCH ps.serviceBooking sb " +
+           "LEFT JOIN FETCH sb.service " +
+           "ORDER BY t.createdAt DESC")
+    Page<Transaction> findAllTransactionDetails(Pageable pageable);
 }

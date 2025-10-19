@@ -26,4 +26,7 @@ public class TransactionRequest {
     
     @NotBlank(message = "Status is required")
     private String status;
+
+    @NotBlank(message = "Payment type is required")
+    private String paymentId;
 }

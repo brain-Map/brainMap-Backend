@@ -40,6 +40,6 @@ public class Transaction {
     private LocalDateTime createdAt;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_session_id", referencedColumnName = "id")
+    @JoinColumn(name = "payment_id", referencedColumnName = "payment_id")
     private PaymentSession paymentSession;
 }
