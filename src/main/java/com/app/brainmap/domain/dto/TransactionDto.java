@@ -20,5 +20,5 @@ public class TransactionDto {
     private String status;
     private LocalDateTime createdAt;
     // Related payment session (optional)
-    private Long paymentSessionId;
+    private UUID paymentSessionId;
 }

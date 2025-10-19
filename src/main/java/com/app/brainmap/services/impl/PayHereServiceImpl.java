@@ -33,7 +33,6 @@ import java.util.UUID;
 public class PayHereServiceImpl implements PayHereService {
     
     private final PaymentSessionRepository paymentSessionRepository;
-    private final PaymentStatusHistoryRepository paymentStatusHistoryRepository;
     private final PayHereCallbackRepository payHereCallbackRepository;
     private final UserService userService;
     private final PayHereConfig payHereConfig;
@@ -104,11 +103,7 @@ public class PayHereServiceImpl implements PayHereService {
             paymentSession.setPayHereHash(hash);
             
             // Save payment session
-            paymentSession = paymentSessionRepository.save(paymentSession);
-            
-            // Create status history
-            createStatusHistory(paymentSession, null, PaymentStatus.PENDING.name(), 
-                              "SYSTEM", "Payment session created", null);
+            paymentSessionRepository.save(paymentSession);
             
             // Generate redirect URL to our auto-submit form endpoint
             String redirectUrl = appConfig.getBackendUrl() + "/api/payments/payhere/redirect/" + paymentId;
@@ -213,10 +208,6 @@ public class PayHereServiceImpl implements PayHereService {
         paymentSession.setStatus(PaymentStatus.CANCELLED);
         paymentSession.setUpdatedAt(LocalDateTime.now());
         paymentSessionRepository.save(paymentSession);
-        
-        // Create status history
-        createStatusHistory(paymentSession, oldStatus.name(), PaymentStatus.CANCELLED.name(), 
-                          "USER", "Payment cancelled by user", null);
         
         log.info("Payment cancelled: {}", paymentId);
     }
@@ -384,11 +375,6 @@ public class PayHereServiceImpl implements PayHereService {
         
         paymentSessionRepository.save(paymentSession);
         
-        // Create status history
-        Map<String, Object> payHereData = new HashMap<>(callbackData);
-        createStatusHistory(paymentSession, oldStatus.name(), newStatus.name(), 
-                          "PAYHERE", PayHereHashUtil.getStatusDescription(statusCode), payHereData);
-        
         log.info("Payment status updated: {} -> {} for payment: {}", 
                 oldStatus, newStatus, paymentSession.getPaymentId());
     }
@@ -419,21 +405,6 @@ public class PayHereServiceImpl implements PayHereService {
         callback.setCurrency(callbackData.get("payhere_currency"));
         
         return payHereCallbackRepository.save(callback);
-    }
-    
-    private void createStatusHistory(PaymentSession paymentSession, String previousStatus, 
-                                   String newStatus, String changedBy, String reason, 
-                                   Map<String, Object> payHereData) {
-        PaymentStatusHistory history = PaymentStatusHistory.builder()
-                .paymentSession(paymentSession)
-                .previousStatus(previousStatus)
-                .newStatus(newStatus)
-                .changedBy(changedBy)
-                .changeReason(reason)
-                .payHereData(payHereData)
-                .build();
-        
-        paymentStatusHistoryRepository.save(history);
     }
     
     private PaymentStatusResponse buildPaymentStatusResponse(PaymentSession paymentSession) {

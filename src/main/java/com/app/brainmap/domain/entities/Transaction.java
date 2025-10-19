@@ -39,7 +39,7 @@ public class Transaction {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_session_id", referencedColumnName = "id")
     private PaymentSession paymentSession;
 }
