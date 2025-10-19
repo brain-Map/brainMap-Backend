@@ -211,5 +211,12 @@ public class ProjectServiceImpl implements ProjectService {
         return userProjectRepository.findAllByProjectIdAndRole(projectId, ProjectPositionType.OWNER);
     }
 
+    @Override
+    public Project updateProjectStatus(UUID projectId, com.app.brainmap.domain.ProjctStatus status) {
+        Project project = projectRepositiory.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("project not found"));
+        project.setStatus(status);
+        return projectRepositiory.save(project);
+    }
 
 }

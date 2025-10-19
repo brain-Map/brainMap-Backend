@@ -161,6 +161,27 @@ public class ProjectController {
         return ResponseEntity.ok(bookings);
     }
 
+    @PatchMapping(path = "/{project_id}/status")
+    public ResponseEntity<ProjectDto> updateProjectStatus(
+            @PathVariable("project_id") UUID projectId,
+            @RequestParam("status") String statusStr
+    ) {
+        try {
+            com.app.brainmap.domain.ProjctStatus status = com.app.brainmap.domain.ProjctStatus.valueOf(statusStr.toUpperCase());
+            Project updated = projectService.updateProjectStatus(projectId, status);
+            return ResponseEntity.ok(projectMapper.toDto(updated));
+        } catch (IllegalArgumentException ex) {
+            // Could be invalid enum value or project not found
+            String message = ex.getMessage() != null ? ex.getMessage() : "Invalid status";
+            if ("project not found".equalsIgnoreCase(message)) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 
 
 }

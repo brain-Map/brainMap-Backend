@@ -7,6 +7,7 @@ import com.app.brainmap.domain.entities.KanbanBoard;
 import com.app.brainmap.domain.entities.KanbanColumn;
 import com.app.brainmap.domain.entities.Project;
 import com.app.brainmap.domain.entities.UserProject;
+import com.app.brainmap.domain.ProjctStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,5 +32,7 @@ public interface ProjectService {
     List<BookingDetailsDto> listHiredExperts(UUID userId);
     List<ServiceBookingResponseDto> getBookingsForDomainExpertFiltered(UUID bookingId);
 
+    // New: update only project status
+    Project updateProjectStatus(UUID projectId, ProjctStatus status);
 
 }
