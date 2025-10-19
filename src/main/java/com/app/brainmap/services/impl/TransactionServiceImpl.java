@@ -1,9 +1,11 @@
 package com.app.brainmap.services.impl;
 
+import com.app.brainmap.domain.dto.transaction.TransactionDetailsDto;
 import com.app.brainmap.domain.dto.transaction.TransactionRequest;
 import com.app.brainmap.domain.dto.transaction.TransactionResponse;
 import com.app.brainmap.domain.entities.Transaction;
 import com.app.brainmap.domain.entities.User;
+import com.app.brainmap.mappers.TransactionMapper;
 import com.app.brainmap.repositories.TransactionRepository;
 import com.app.brainmap.services.TransactionService;
 import com.app.brainmap.services.UserService;
@@ -26,7 +28,8 @@ public class TransactionServiceImpl implements TransactionService {
     
     private final TransactionRepository transactionRepository;
     private final UserService userService;
-    
+    private final TransactionMapper transactionMapper;
+
     @Override
     public TransactionResponse createTransaction(TransactionRequest request, UUID authenticatedUserId) {
         log.info("💰 Creating transaction - Amount: {}, Sender: {}, Receiver: {}, Status: {}", 
@@ -129,6 +132,26 @@ public class TransactionServiceImpl implements TransactionService {
         return transactions.map(this::mapToResponse);
     }
     
+    @Override
+    public Page<TransactionDetailsDto> getTransactionDetails(UUID userId, Pageable pageable) {
+        log.info("📊 Fetching detailed transactions for user: {}", userId);
+
+        Page<Transaction> transactions = transactionRepository.findTransactionDetailsForUser(userId, pageable);
+
+        log.info("✅ Found {} detailed transactions for user: {}", transactions.getTotalElements(), userId);
+        return transactions.map(transactionMapper::toTransactionDetailsDto);
+    }
+
+    @Override
+    public Page<TransactionDetailsDto> getAllTransactionDetails(Pageable pageable) {
+        log.info("📊 Fetching all detailed transactions");
+
+        Page<Transaction> transactions = transactionRepository.findAllTransactionDetails(pageable);
+
+        log.info("✅ Found {} total detailed transactions", transactions.getTotalElements());
+        return transactions.map(transactionMapper::toTransactionDetailsDto);
+    }
+
     /**
      * Map Transaction entity to TransactionResponse DTO
      */
