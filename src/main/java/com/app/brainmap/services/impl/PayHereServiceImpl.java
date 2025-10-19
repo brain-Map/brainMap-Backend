@@ -368,7 +368,6 @@ public class PayHereServiceImpl implements PayHereService {
         // Map PayHere status codes to our status enum
         if (PayHereHashUtil.isSuccessStatus(statusCode)) {
             newStatus = PaymentStatus.SUCCESS;
-            paymentSession.setPaymentDate(LocalDateTime.now());
         } else if (PayHereHashUtil.isFailedStatus(statusCode)) {
             newStatus = PaymentStatus.FAILED;
         } else if (PayHereHashUtil.isPendingStatus(statusCode)) {
@@ -380,8 +379,6 @@ public class PayHereServiceImpl implements PayHereService {
         
         // Update payment session
         paymentSession.setStatus(newStatus);
-        paymentSession.setTransactionId(callbackData.get("payment_id"));
-        paymentSession.setPayHereOrderId(callbackData.get("payhere_order_id"));
         paymentSession.setPaymentMethod(callbackData.get("method"));
         paymentSession.setUpdatedAt(LocalDateTime.now());
         
@@ -446,9 +443,7 @@ public class PayHereServiceImpl implements PayHereService {
                 .status(paymentSession.getStatus())
                 .amount(paymentSession.getAmount())
                 .currency(paymentSession.getCurrency())
-                .transactionId(paymentSession.getTransactionId())
                 .paymentMethod(paymentSession.getPaymentMethod())
-                .paymentDate(paymentSession.getPaymentDate())
                 .customerName(paymentSession.getCustomerName())
                 .customerEmail(paymentSession.getCustomerEmail())
                 .message(getStatusMessage(paymentSession.getStatus()))
@@ -463,10 +458,8 @@ public class PayHereServiceImpl implements PayHereService {
                 .amount(paymentSession.getAmount())
                 .currency(paymentSession.getCurrency())
                 .itemDescription(paymentSession.getItemDescription())
-                .transactionId(paymentSession.getTransactionId())
                 .paymentMethod(paymentSession.getPaymentMethod())
                 .createdAt(paymentSession.getCreatedAt())
-                .paymentDate(paymentSession.getPaymentDate())
                 .build();
     }
     

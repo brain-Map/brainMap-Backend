@@ -1,6 +1,7 @@
 package com.app.brainmap.domain.entities;
 
 import com.app.brainmap.domain.PaymentStatus;
+import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -88,12 +89,6 @@ public class PaymentSession {
     @Column(name = "payment_method")
     private String paymentMethod;
     
-    @Column(name = "transaction_id")
-    private String transactionId;
-    
-    @Column(name = "payhere_order_id")
-    private String payHereOrderId;
-    
     // Timestamps
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -102,12 +97,8 @@ public class PaymentSession {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-    
-    @Column(name = "payment_date")
-    private LocalDateTime paymentDate;
-    
-    // Metadata as JSON
-    @Type(JsonType.class)
-    @Column(name = "metadata", columnDefinition = "jsonb")
-    private Map<String, Object> metadata;
+
+    @OneToOne
+    @JoinColumn(name = "booking_id")
+    private ServiceBooking serviceBooking;
 }

@@ -23,5 +23,4 @@ public class PaymentHistoryResponse {
     private String transactionId;
     private String paymentMethod;
     private LocalDateTime createdAt;
-    private LocalDateTime paymentDate;
 }

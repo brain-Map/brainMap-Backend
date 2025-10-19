@@ -21,7 +21,6 @@ public class PaymentStatusResponse {
     private String currency;
     private String transactionId;
     private String paymentMethod;
-    private LocalDateTime paymentDate;
     private String message;
     private String customerName;
     private String customerEmail;
