@@ -33,5 +33,7 @@ public interface ProjectService {
     List<EventProjectDto> getEvents(UUID projectId);
     EventProject createEventProject(EventProject eventProject);
 
+    void deleteEventProject(UUID eventId);
+
 
 }
