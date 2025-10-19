@@ -1,5 +1,6 @@
 package com.app.brainmap.services;
 
+import com.app.brainmap.domain.dto.transaction.TransactionDetailsDto;
 import com.app.brainmap.domain.dto.transaction.TransactionRequest;
 import com.app.brainmap.domain.dto.transaction.TransactionResponse;
 import org.springframework.data.domain.Page;
@@ -47,4 +48,20 @@ public interface TransactionService {
      * @return Page of transactions
      */
     Page<TransactionResponse> getReceivedTransactions(UUID receiverId, Pageable pageable);
+
+    /**
+     * Get detailed transaction information for a user with pagination
+     * Includes sender/receiver details, payment info, and service listing title
+     * @param userId User ID
+     * @param pageable Pagination info
+     * @return Page of transaction details
+     */
+    Page<TransactionDetailsDto> getTransactionDetails(UUID userId, Pageable pageable);
+
+    /**
+     * Get all transaction details with pagination (for admin)
+     * @param pageable Pagination info
+     * @return Page of transaction details
+     */
+    Page<TransactionDetailsDto> getAllTransactionDetails(Pageable pageable);
 }

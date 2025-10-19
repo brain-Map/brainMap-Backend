@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface PayHereCallbackRepository extends JpaRepository<PayHereCallback, Long> {
-    
+
     List<PayHereCallback> findByOrderIdOrderByCreatedAtDesc(String orderId);
     
     Optional<PayHereCallback> findByPaymentId(String paymentId);

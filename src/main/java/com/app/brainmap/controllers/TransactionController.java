@@ -1,5 +1,6 @@
 package com.app.brainmap.controllers;
 
+import com.app.brainmap.domain.dto.transaction.TransactionDetailsDto;
 import com.app.brainmap.domain.dto.transaction.TransactionRequest;
 import com.app.brainmap.domain.dto.transaction.TransactionResponse;
 import com.app.brainmap.security.JwtUserDetails;
@@ -193,7 +194,70 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+
+    @GetMapping("/details/user/{userId}")
+    @Operation(summary = "Get Detailed Transaction Information",
+               description = "Get detailed transaction information for a user including sender/receiver details, payment info, and service listing title")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Transaction details retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<Page<TransactionDetailsDto>> getTransactionDetails(
+            @Parameter(description = "User ID") @PathVariable UUID userId,
+            @Parameter(description = "Page number (0-indexed)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size") @RequestParam(defaultValue = "20") int size,
+            Authentication authentication) {
+
+        try {
+            getCurrentUserId(authentication); // Ensure authenticated
+
+            Pageable pageable = PageRequest.of(page, size);
+
+            log.info("📊 Fetching detailed transaction info for user: {}, page: {}, size: {}", userId, page, size);
+
+            Page<TransactionDetailsDto> transactionDetails = transactionService.getTransactionDetails(userId, pageable);
+
+            log.info("✅ Found {} detailed transactions for user: {}", transactionDetails.getTotalElements(), userId);
+            return ResponseEntity.ok(transactionDetails);
+
+        } catch (Exception e) {
+            log.error("❌ Error fetching detailed transactions for user: {}", userId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/details/all")
+    @Operation(summary = "Get All Detailed Transactions",
+               description = "Get all detailed transaction information with pagination (Admin only)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "All transaction details retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<Page<TransactionDetailsDto>> getAllTransactionDetails(
+            @Parameter(description = "Page number (0-indexed)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size") @RequestParam(defaultValue = "20") int size,
+            Authentication authentication) {
+
+        try {
+            getCurrentUserId(authentication); // Ensure authenticated
+
+            Pageable pageable = PageRequest.of(page, size);
+
+            log.info("📊 Fetching all detailed transaction info, page: {}, size: {}", page, size);
+
+            Page<TransactionDetailsDto> transactionDetails = transactionService.getAllTransactionDetails(pageable);
+
+            log.info("✅ Found {} total detailed transactions", transactionDetails.getTotalElements());
+            return ResponseEntity.ok(transactionDetails);
+
+        } catch (Exception e) {
+            log.error("❌ Error fetching all detailed transactions", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     // Utility method
     private UUID getCurrentUserId(Authentication authentication) {
         if (authentication == null || !(authentication.getPrincipal() instanceof JwtUserDetails)) {
