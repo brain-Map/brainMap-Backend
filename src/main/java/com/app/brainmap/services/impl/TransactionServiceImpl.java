@@ -3,9 +3,11 @@ package com.app.brainmap.services.impl;
 import com.app.brainmap.domain.dto.transaction.TransactionDetailsDto;
 import com.app.brainmap.domain.dto.transaction.TransactionRequest;
 import com.app.brainmap.domain.dto.transaction.TransactionResponse;
+import com.app.brainmap.domain.entities.PaymentSession;
 import com.app.brainmap.domain.entities.Transaction;
 import com.app.brainmap.domain.entities.User;
 import com.app.brainmap.mappers.TransactionMapper;
+import com.app.brainmap.repositories.PaymentSessionRepository;
 import com.app.brainmap.repositories.TransactionRepository;
 import com.app.brainmap.services.TransactionService;
 import com.app.brainmap.services.UserService;
@@ -27,20 +29,32 @@ import java.util.UUID;
 public class TransactionServiceImpl implements TransactionService {
     
     private final TransactionRepository transactionRepository;
+    private final PaymentSessionRepository paymentSessionRepository;
     private final UserService userService;
     private final TransactionMapper transactionMapper;
 
     @Override
     public TransactionResponse createTransaction(TransactionRequest request, UUID authenticatedUserId) {
-        log.info("💰 Creating transaction - Amount: {}, Sender: {}, Receiver: {}, Status: {}", 
-                request.getAmount(), request.getSenderId(), request.getReceiverId(), request.getStatus());
-        
+        log.info("💰 Creating transaction - Amount: {}, Sender: {}, Receiver: {}, Status: {}, PaymentId: {}",
+                request.getAmount(), request.getSenderId(), request.getReceiverId(), request.getStatus(), request.getPaymentId());
+
         // Validate that sender and receiver are different
         if (request.getSenderId().equals(request.getReceiverId())) {
             log.error("❌ Sender and receiver cannot be the same user: {}", request.getSenderId());
             throw new IllegalArgumentException("Sender and receiver cannot be the same user");
         }
         
+        // Fetch PaymentSession by paymentId
+        PaymentSession paymentSession = null;
+        if (request.getPaymentId() != null && !request.getPaymentId().isBlank()) {
+            paymentSession = paymentSessionRepository.findByPaymentId(request.getPaymentId())
+                    .orElseThrow(() -> {
+                        log.error("❌ PaymentSession not found: {}", request.getPaymentId());
+                        return new EntityNotFoundException("PaymentSession not found with ID: " + request.getPaymentId());
+                    });
+            log.info("✅ PaymentSession found: {} with amount: {}", paymentSession.getPaymentId(), paymentSession.getAmount());
+        }
+
         // Validate sender exists
         User sender;
         try {
@@ -67,24 +81,26 @@ public class TransactionServiceImpl implements TransactionService {
             // You can uncomment this to enforce sender must be authenticated user
             // throw new IllegalArgumentException("You can only create transactions as the sender");
         }
-        
-        // Create transaction
+
+        // Create transaction with PaymentSession
         Transaction transaction = Transaction.builder()
                 .amount(request.getAmount())
                 .sender(sender)
                 .receiver(receiver)
                 .status(request.getStatus())
                 .createdAt(LocalDateTime.now())
+                .paymentSession(paymentSession)  // Set the PaymentSession
                 .build();
         
         // Save transaction
         transaction = transactionRepository.save(transaction);
         
-        log.info("✅ Transaction created successfully - ID: {}, Amount: {}, From: {} To: {}", 
-                transaction.getTransactionId(), transaction.getAmount(), 
+        log.info("✅ Transaction created successfully - ID: {}, Amount: {}, From: {} To: {}, PaymentSession: {}",
+                transaction.getTransactionId(), transaction.getAmount(),
                 sender.getFirstName() + " " + sender.getLastName(),
-                receiver.getFirstName() + " " + receiver.getLastName());
-        
+                receiver.getFirstName() + " " + receiver.getLastName(),
+                paymentSession != null ? paymentSession.getPaymentId() : "N/A");
+
         return mapToResponse(transaction);
     }
     
