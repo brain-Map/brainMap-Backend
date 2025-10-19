@@ -32,6 +32,7 @@ import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -134,4 +135,13 @@ public class AdminServiceImpl implements AdminService {
     public List<UserProjectCountDto> getUsersWithProjectCount() {
         return userRepository.findUsersWithProjectCount();
     }
+
+    @Override
+    public void updateUserStatus(UUID userId, UserStatus status) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+        user.setStatus(status);
+        userRepository.save(user);
+    }
+
 }

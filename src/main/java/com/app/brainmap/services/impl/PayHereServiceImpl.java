@@ -33,7 +33,6 @@ import java.util.UUID;
 public class PayHereServiceImpl implements PayHereService {
     
     private final PaymentSessionRepository paymentSessionRepository;
-    private final PaymentStatusHistoryRepository paymentStatusHistoryRepository;
     private final PayHereCallbackRepository payHereCallbackRepository;
     private final UserService userService;
     private final PayHereConfig payHereConfig;
@@ -104,11 +103,7 @@ public class PayHereServiceImpl implements PayHereService {
             paymentSession.setPayHereHash(hash);
             
             // Save payment session
-            paymentSession = paymentSessionRepository.save(paymentSession);
-            
-            // Create status history
-            createStatusHistory(paymentSession, null, PaymentStatus.PENDING.name(), 
-                              "SYSTEM", "Payment session created", null);
+            paymentSessionRepository.save(paymentSession);
             
             // Generate redirect URL to our auto-submit form endpoint
             String redirectUrl = appConfig.getBackendUrl() + "/api/payments/payhere/redirect/" + paymentId;
@@ -213,10 +208,6 @@ public class PayHereServiceImpl implements PayHereService {
         paymentSession.setStatus(PaymentStatus.CANCELLED);
         paymentSession.setUpdatedAt(LocalDateTime.now());
         paymentSessionRepository.save(paymentSession);
-        
-        // Create status history
-        createStatusHistory(paymentSession, oldStatus.name(), PaymentStatus.CANCELLED.name(), 
-                          "USER", "Payment cancelled by user", null);
         
         log.info("Payment cancelled: {}", paymentId);
     }
@@ -368,7 +359,6 @@ public class PayHereServiceImpl implements PayHereService {
         // Map PayHere status codes to our status enum
         if (PayHereHashUtil.isSuccessStatus(statusCode)) {
             newStatus = PaymentStatus.SUCCESS;
-            paymentSession.setPaymentDate(LocalDateTime.now());
         } else if (PayHereHashUtil.isFailedStatus(statusCode)) {
             newStatus = PaymentStatus.FAILED;
         } else if (PayHereHashUtil.isPendingStatus(statusCode)) {
@@ -380,17 +370,10 @@ public class PayHereServiceImpl implements PayHereService {
         
         // Update payment session
         paymentSession.setStatus(newStatus);
-        paymentSession.setTransactionId(callbackData.get("payment_id"));
-        paymentSession.setPayHereOrderId(callbackData.get("payhere_order_id"));
         paymentSession.setPaymentMethod(callbackData.get("method"));
         paymentSession.setUpdatedAt(LocalDateTime.now());
         
         paymentSessionRepository.save(paymentSession);
-        
-        // Create status history
-        Map<String, Object> payHereData = new HashMap<>(callbackData);
-        createStatusHistory(paymentSession, oldStatus.name(), newStatus.name(), 
-                          "PAYHERE", PayHereHashUtil.getStatusDescription(statusCode), payHereData);
         
         log.info("Payment status updated: {} -> {} for payment: {}", 
                 oldStatus, newStatus, paymentSession.getPaymentId());
@@ -424,21 +407,6 @@ public class PayHereServiceImpl implements PayHereService {
         return payHereCallbackRepository.save(callback);
     }
     
-    private void createStatusHistory(PaymentSession paymentSession, String previousStatus, 
-                                   String newStatus, String changedBy, String reason, 
-                                   Map<String, Object> payHereData) {
-        PaymentStatusHistory history = PaymentStatusHistory.builder()
-                .paymentSession(paymentSession)
-                .previousStatus(previousStatus)
-                .newStatus(newStatus)
-                .changedBy(changedBy)
-                .changeReason(reason)
-                .payHereData(payHereData)
-                .build();
-        
-        paymentStatusHistoryRepository.save(history);
-    }
-    
     private PaymentStatusResponse buildPaymentStatusResponse(PaymentSession paymentSession) {
         return PaymentStatusResponse.builder()
                 .paymentId(paymentSession.getPaymentId())
@@ -446,9 +414,7 @@ public class PayHereServiceImpl implements PayHereService {
                 .status(paymentSession.getStatus())
                 .amount(paymentSession.getAmount())
                 .currency(paymentSession.getCurrency())
-                .transactionId(paymentSession.getTransactionId())
                 .paymentMethod(paymentSession.getPaymentMethod())
-                .paymentDate(paymentSession.getPaymentDate())
                 .customerName(paymentSession.getCustomerName())
                 .customerEmail(paymentSession.getCustomerEmail())
                 .message(getStatusMessage(paymentSession.getStatus()))
@@ -463,10 +429,8 @@ public class PayHereServiceImpl implements PayHereService {
                 .amount(paymentSession.getAmount())
                 .currency(paymentSession.getCurrency())
                 .itemDescription(paymentSession.getItemDescription())
-                .transactionId(paymentSession.getTransactionId())
                 .paymentMethod(paymentSession.getPaymentMethod())
                 .createdAt(paymentSession.getCreatedAt())
-                .paymentDate(paymentSession.getPaymentDate())
                 .build();
     }
     

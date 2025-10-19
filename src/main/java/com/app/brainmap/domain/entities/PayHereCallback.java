@@ -9,6 +9,7 @@ import org.hibernate.annotations.Type;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 @Entity
 @Table(name = "payhere_callbacks", indexes = {
@@ -24,8 +25,8 @@ import java.util.Map;
 public class PayHereCallback {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_session_id")

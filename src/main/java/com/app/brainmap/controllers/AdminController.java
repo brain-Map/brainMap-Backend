@@ -100,7 +100,7 @@ public class AdminController {
     }
 
     @PostMapping("/createUser")
-    public ResponseEntity<SupabaseUserResponse> createModerator(@RequestBody @Valid CreateUserByAdminDto request){
+    public ResponseEntity<SupabaseUserResponse> createUser(@RequestBody @Valid CreateUserByAdminDto request){
         log.info("Creating new Moderator: {}", request);
         SupabaseUserResponse createdUser = supabaseService.createUser(request);
 
@@ -124,6 +124,15 @@ public class AdminController {
         userService.deleteUser(userId);
         log.info("Deleting user: {}", userId);
 
+        return ResponseEntity.noContent().build();
+    }
+
+@PutMapping("/userStateUpdate/{userId}/{status}")
+    public ResponseEntity<Void> updateUserStatus(
+            @PathVariable UUID userId,
+            @PathVariable UserStatus status) {
+        log.info("Updating user status: {} -> {}", userId, status);
+        adminService.updateUserStatus(userId, status);
         return ResponseEntity.noContent().build();
     }
 
