@@ -3,10 +3,12 @@ package com.app.brainmap.services.impl;
 import com.app.brainmap.domain.ProjectCollaboratorAccept;
 import com.app.brainmap.domain.ProjectPositionType;
 import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
+import com.app.brainmap.domain.dto.EventProjectDto;
 import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
 import com.app.brainmap.domain.entities.*;
 import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
 import com.app.brainmap.mappers.BookingMapper;
+import com.app.brainmap.mappers.EventProjectMapper;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.ProjectService;
 import org.springframework.data.domain.Page;
@@ -15,11 +17,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class ProjectServiceImpl implements ProjectService {
+public class projectServiceImpl implements ProjectService {
 
     private final ProjectRepositiory projectRepositiory;
     private final KanbanBoardRepository kanbanBoardRepository;
@@ -27,8 +30,10 @@ public class ProjectServiceImpl implements ProjectService {
     private final UserProjectRepository userProjectRepository;
     private final ServiceBookingRepository serviceBookingRepository;
     private final BookingMapper bookingMapper;
+    private final EventProjectRepository eventProjectRepository;
+    private final EventProjectMapper eventProjectMapper;
 
-    public ProjectServiceImpl(ProjectRepositiory projectRepositiory, KanbanBoardRepository kanbanBoardRepository, KanbanColumnRepository kanbanColumnRepository, UserProjectRepository userProjectRepository, ServiceBookingRepository serviceBookingRepository, BookingMapper bookingMapper) {
+    public projectServiceImpl(ProjectRepositiory projectRepositiory, KanbanBoardRepository kanbanBoardRepository, KanbanColumnRepository kanbanColumnRepository, UserProjectRepository userProjectRepository, ServiceBookingRepository serviceBookingRepository, BookingMapper bookingMapper, EventProjectRepository eventProjectRepository, EventProjectMapper eventProjectMapper) {
         this.projectRepositiory = projectRepositiory;
         this.kanbanBoardRepository = kanbanBoardRepository;
         this.kanbanColumnRepository = kanbanColumnRepository;
@@ -36,6 +41,8 @@ public class ProjectServiceImpl implements ProjectService {
 
         this.serviceBookingRepository = serviceBookingRepository;
         this.bookingMapper = bookingMapper;
+        this.eventProjectRepository = eventProjectRepository;
+        this.eventProjectMapper = eventProjectMapper;
     }
 
     @Override
@@ -48,6 +55,10 @@ public class ProjectServiceImpl implements ProjectService {
         return userProjectRepository.findAcceptedProjectsByUser(userId);
     }
 
+    @Override
+    public List<UserProject> getAcceptedProjectsByUserAndRole(UUID userId, ProjectPositionType role) {
+        return userProjectRepository.findAcceptedProjectsByUserAndRole(userId, role);
+    }
 
     @Override
     public Project createProject(Project project) {
@@ -55,9 +66,9 @@ public class ProjectServiceImpl implements ProjectService {
             throw new IllegalArgumentException("Project Id must be null");
         }
 
-//        if(null == project.getTitle() || project.getTitle().isBlank()){
-//            throw new IllegalArgumentException("Project title must not be null or empty");
-//        }
+        if(null == project.getTitle() || project.getTitle().isBlank()){
+            throw new IllegalArgumentException("Project title must not be null or empty");
+        }
 
         LocalDateTime now = LocalDateTime.now();
         Project savedProject= projectRepositiory.save(new Project(
@@ -153,6 +164,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public void removeCollaborator(UUID projectId, UUID userId) {
+        UserProject userProject = userProjectRepository.findByUserIdAndProjectId(userId, projectId)
+                .orElseThrow(() -> new NoSuchElementException("No collaboration found for user " + userId + " and project " + projectId));
+
+        userProjectRepository.delete(userProject);
+    }
+
+    @Override
     public Optional<KanbanBoard> getKanbanBoardDetails(UUID projectId) {
         return kanbanBoardRepository.findByProjectId(projectId);
     }
@@ -206,6 +225,32 @@ public class ProjectServiceImpl implements ProjectService {
     public List<ServiceBookingResponseDto> getBookingsForDomainExpertFiltered(UUID bookingId) {
         Optional<ServiceBooking> bookings = serviceBookingRepository.findById(bookingId);
         return bookings.stream().map(bookingMapper::toBookingResponseDto).toList();
+    }
+
+    @Override
+    public List<EventProjectDto> getEvents(UUID projectId) {
+        List<EventProject> eventProject = eventProjectRepository.findAllByProject_Id(projectId);
+
+        if (eventProject == null || eventProject.isEmpty()) {
+            throw new NoSuchElementException("No events Found for project " + projectId);
+        }
+
+        return eventProject.stream()
+                .map(eventProjectMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    public EventProject createEventProject(EventProject eventProject) {
+        return eventProjectRepository.save(eventProject);
+    }
+
+    @Override
+    public void deleteEventProject(UUID eventId) {
+        EventProject eventProject = eventProjectRepository.findById(eventId)
+                .orElseThrow(() -> new NoSuchElementException("No event found with id " + eventId));
+
+        eventProjectRepository.delete(eventProject);
     }
 
     @Override

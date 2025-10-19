@@ -42,16 +42,6 @@ public class MessageController {
 
     @MessageMapping("/private-message")
     public MessageDto receivePrivateMessage(@Payload MessageDto messageDto, Principal principal) {
-        System.out.println("Received private message: " + messageDto);
-
-//        UUID actualSenderId = getUserIdFromPrincipal(principal);
-//        if (actualSenderId == null) {
-//            throw new RuntimeException("Unauthorized: No authentication");
-//        }
-//        if (!actualSenderId.equals(messageDto.getSenderId())) {
-//            throw new RuntimeException("Invalid sender");
-//        }
-
         // Handle JOIN messages separately
         if ("JOIN".equals(messageDto.getStatus())) {
             System.out.println("User joined: " + messageDto.getSenderId());
@@ -76,6 +66,14 @@ public class MessageController {
             try {
                 messageService.saveFromDto(messageDto);
                 logger.info("Saved group message from {} to group {}", messageDto.getSenderId(), messageDto.getGroupId());
+                // Broadcast the group message to a topic so all subscribers to the group receive it
+                if (messageDto.getGroupId() != null) {
+                    String destination = "/group/" + messageDto.getGroupId().toString() + "/messages";
+                    simpMessagingTemplate.convertAndSend(destination, messageDto);
+                    logger.info("Broadcasted group message to {}", destination);
+                } else {
+                    logger.warn("Group message missing groupId, cannot broadcast: {}", messageDto);
+                }
             } catch (Exception e) {
                 logger.error("Failed to save group message", e);
             }

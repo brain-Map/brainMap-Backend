@@ -1,15 +1,14 @@
 package com.app.brainmap.controllers;
 
+import com.app.brainmap.domain.ProjectPositionType;
 import com.app.brainmap.domain.dto.*;
 import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
 import com.app.brainmap.domain.dto.MessageResponse;
 import com.app.brainmap.domain.dto.Project.AllProjectUserDto;
 import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
+import com.app.brainmap.domain.entities.EventProject;
 import com.app.brainmap.domain.entities.Project;
-import com.app.brainmap.mappers.CollaborateProjectMapper;
-import com.app.brainmap.mappers.KanbanBoardMapper;
-import com.app.brainmap.mappers.ProjectMapper;
-import com.app.brainmap.mappers.UserProjectMapper;
+import com.app.brainmap.mappers.*;
 import com.app.brainmap.services.ProjectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -32,13 +31,15 @@ public class ProjectController {
     private final KanbanBoardMapper kanbanBoardMapper;
     private final UserProjectMapper userProjectMapper;
     private final CollaborateProjectMapper collaborateProjectMapper;
+    private final EventProjectMapper eventProjectMapper;
 
-    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, KanbanBoardMapper kanbanBoardMapper, UserProjectMapper userProjectMapper, CollaborateProjectMapper collaborateProjectMapper) {
+    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, KanbanBoardMapper kanbanBoardMapper, UserProjectMapper userProjectMapper, CollaborateProjectMapper collaborateProjectMapper, EventProjectMapper eventProjectMapper) {
         this.projectService = projectService;
         this.projectMapper = projectMapper;
         this.kanbanBoardMapper = kanbanBoardMapper;
         this.userProjectMapper = userProjectMapper;
         this.collaborateProjectMapper = collaborateProjectMapper;
+        this.eventProjectMapper = eventProjectMapper;
     }
 
     @GetMapping(path = "/all/{user_id}")
@@ -66,6 +67,14 @@ public class ProjectController {
     @GetMapping("/collaborator")
     public List<AllProjectUserDto> getAcceptedProjects(@RequestParam UUID userId) {
         return projectService.getAcceptedProjects(userId)
+                .stream()
+                .map(collaborateProjectMapper::toDto)
+                .toList();
+    }
+
+    @GetMapping("/mentors-projects/{userId}")
+    public List<AllProjectUserDto> getMentorProjects(@PathVariable("userId") UUID userId) {
+        return projectService.getAcceptedProjectsByUserAndRole(userId, ProjectPositionType.MENTOR)
                 .stream()
                 .map(collaborateProjectMapper::toDto)
                 .toList();
@@ -138,6 +147,8 @@ public class ProjectController {
     public ResponseEntity<MessageResponse> deleteKanbanBoard(@PathVariable("project_id") UUID projectId,
                                                              @RequestBody KanbanBoardColumnDto kanbanBoardColumnDto) {
 
+        log.debug("Request to delete kanban column {} for project {}", kanbanBoardColumnDto.columnId(), projectId);
+
         UUID columnId = kanbanBoardColumnDto.columnId();
 
         boolean isDeleted = projectService.deleteKanbanBoardColumn(columnId);
@@ -154,6 +165,15 @@ public class ProjectController {
                 .stream()
                 .map(userProjectMapper::toDto)
                 .toList();
+    }
+
+    @DeleteMapping(path="/collaborators/{project_id}/{user_id}")
+    public ResponseEntity<MessageResponse> removeCollaborator(
+            @PathVariable("project_id") UUID projectId,
+            @PathVariable("user_id") UUID userId
+    ){
+        projectService.removeCollaborator(projectId, userId);
+        return ResponseEntity.ok(new MessageResponse("Collaborator removed successfully"));
     }
 
 
@@ -199,7 +219,23 @@ public class ProjectController {
             return ResponseEntity.internalServerError().build();
         }
     }
+    @GetMapping(path="/get-events/{projectId}")
+    public ResponseEntity<List<EventProjectDto>> getProjectEvents(@PathVariable UUID projectId) {
+        List<EventProjectDto> events = projectService.getEvents(projectId);
+        return ResponseEntity.ok(events);
+    }
 
+    @PostMapping(path="/create-events")
+    public ResponseEntity<MessageResponse> createProjectEvent(@RequestBody EventProjectDto eventProjectDto) {
+        EventProject eventProject = projectService.createEventProject(
+                eventProjectMapper.toEntity(eventProjectDto)
+        );
+        return ResponseEntity.ok(new MessageResponse("Event created successfully"));
+    }
 
-
+    @DeleteMapping(path="/delete-events/{eventId}")
+    public ResponseEntity<MessageResponse> deleteProjectEvent(@PathVariable UUID eventId) {
+        projectService.deleteEventProject(eventId);
+        return ResponseEntity.ok(new MessageResponse("Event deleted successfully"));
+    }
 }
