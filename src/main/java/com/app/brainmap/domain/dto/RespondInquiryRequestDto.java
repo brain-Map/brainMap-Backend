@@ -19,4 +19,3 @@ public class RespondInquiryRequestDto {
     @NotBlank
     private String responseContent;
 }
-

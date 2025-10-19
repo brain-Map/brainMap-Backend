@@ -38,6 +38,7 @@ public class SupabaseServiceImpl implements SupabaseService {
         metadata.put("role", request.getUserRole());
         metadata.put("username", request.getUsername());
         body.put("user_metadata", metadata);
+        body.put("email_confirm", true);
 
         WebClient webClient = webClientBuilder.build();
 

@@ -27,4 +27,3 @@ public class CreateInquiryRequestDto {
     @NotBlank
     private String inquiryContent;
 }
-
