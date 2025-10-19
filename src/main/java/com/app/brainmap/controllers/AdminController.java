@@ -186,4 +186,18 @@ public class AdminController {
         }
     }
 
+    // Admin: Delete a project by ID
+    @DeleteMapping("/projects/{projectId}")
+    public ResponseEntity<Void> deleteProjectByAdmin(@PathVariable UUID projectId) {
+        log.info("[ADMIN] Deleting project: {}", projectId);
+        try {
+            projectService.deleteProject(projectId);
+            return ResponseEntity.noContent().build();
+        } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 }
