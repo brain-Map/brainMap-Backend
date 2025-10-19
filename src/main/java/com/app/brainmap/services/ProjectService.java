@@ -5,6 +5,9 @@ import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
 import com.app.brainmap.domain.dto.EventProjectDto;
 import com.app.brainmap.domain.dto.ProjectFileDto;
 import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
+import com.app.brainmap.domain.ProjctStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import com.app.brainmap.domain.entities.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,5 +43,10 @@ public interface ProjectService {
 
     List<ProjectFileDto> getProjectFile(UUID projectId);
 
+    // New: update only project status
+    Project updateProjectStatus(UUID projectId, ProjctStatus status);
+
+    // New: admin - get all projects (paginated)
+    Page<Project> getAllProjects(Pageable pageable);
 
 }

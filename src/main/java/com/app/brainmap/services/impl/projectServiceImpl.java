@@ -13,6 +13,8 @@ import com.app.brainmap.mappers.EventProjectMapper;
 import com.app.brainmap.mappers.ProjectFilesMapper;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.ProjectService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -287,5 +289,17 @@ public class projectServiceImpl implements ProjectService {
         return userProjectRepository.findAllByProjectIdAndRole(projectId, ProjectPositionType.OWNER);
     }
 
+    @Override
+    public Project updateProjectStatus(UUID projectId, com.app.brainmap.domain.ProjctStatus status) {
+        Project project = projectRepositiory.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("project not found"));
+        project.setStatus(status);
+        return projectRepositiory.save(project);
+    }
+
+    @Override
+    public Page<Project> getAllProjects(Pageable pageable) {
+        return projectRepositiory.findAll(pageable);
+    }
 
 }
