@@ -3,6 +3,7 @@ package com.app.brainmap.services;
 import com.app.brainmap.domain.ProjectPositionType;
 import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
 import com.app.brainmap.domain.dto.EventProjectDto;
+import com.app.brainmap.domain.dto.ProjectFileDto;
 import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
 import com.app.brainmap.domain.entities.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +37,8 @@ public interface ProjectService {
 
     void deleteEventProject(UUID eventId);
     void saveProjectFile(UUID projectId, String fileUrl);
+
+    List<ProjectFileDto> getProjectFile(UUID projectId);
 
 
 }
