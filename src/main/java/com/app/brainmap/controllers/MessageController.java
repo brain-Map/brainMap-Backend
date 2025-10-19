@@ -42,16 +42,6 @@ public class MessageController {
 
     @MessageMapping("/private-message")
     public MessageDto receivePrivateMessage(@Payload MessageDto messageDto, Principal principal) {
-        System.out.println("Received private message: " + messageDto);
-
-//        UUID actualSenderId = getUserIdFromPrincipal(principal);
-//        if (actualSenderId == null) {
-//            throw new RuntimeException("Unauthorized: No authentication");
-//        }
-//        if (!actualSenderId.equals(messageDto.getSenderId())) {
-//            throw new RuntimeException("Invalid sender");
-//        }
-
         // Handle JOIN messages separately
         if ("JOIN".equals(messageDto.getStatus())) {
             System.out.println("User joined: " + messageDto.getSenderId());
