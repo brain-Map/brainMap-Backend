@@ -8,6 +8,8 @@ import com.app.brainmap.domain.entities.KanbanColumn;
 import com.app.brainmap.domain.entities.Project;
 import com.app.brainmap.domain.entities.UserProject;
 import com.app.brainmap.domain.ProjctStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,5 +36,8 @@ public interface ProjectService {
 
     // New: update only project status
     Project updateProjectStatus(UUID projectId, ProjctStatus status);
+
+    // New: admin - get all projects (paginated)
+    Page<Project> getAllProjects(Pageable pageable);
 
 }

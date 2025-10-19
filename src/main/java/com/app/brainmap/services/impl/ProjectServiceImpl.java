@@ -9,6 +9,8 @@ import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
 import com.app.brainmap.mappers.BookingMapper;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.ProjectService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -217,6 +219,11 @@ public class ProjectServiceImpl implements ProjectService {
                 .orElseThrow(() -> new IllegalArgumentException("project not found"));
         project.setStatus(status);
         return projectRepositiory.save(project);
+    }
+
+    @Override
+    public Page<Project> getAllProjects(Pageable pageable) {
+        return projectRepositiory.findAll(pageable);
     }
 
 }
