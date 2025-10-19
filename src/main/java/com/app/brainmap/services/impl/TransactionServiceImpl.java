@@ -20,7 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -166,6 +168,16 @@ public class TransactionServiceImpl implements TransactionService {
 
         log.info("✅ Found {} total detailed transactions", transactions.getTotalElements());
         return transactions.map(transactionMapper::toTransactionDetailsDto);
+    }
+
+    @Override
+    public List<TransactionDetailsDto> getAllTransactionDetails() {
+        log.info("📊 Fetching all detailed transactions (non-paginated)");
+        List<Transaction> transactions = transactionRepository.findAllTransactionDetailsList();
+        log.info("✅ Found {} total detailed transactions (non-paginated)", transactions.size());
+        return transactions.stream()
+                .map(transactionMapper::toTransactionDetailsDto)
+                .collect(Collectors.toList());
     }
 
     /**

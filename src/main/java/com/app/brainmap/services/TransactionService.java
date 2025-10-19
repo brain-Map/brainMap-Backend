@@ -6,6 +6,7 @@ import com.app.brainmap.domain.dto.transaction.TransactionResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface TransactionService {
@@ -64,4 +65,9 @@ public interface TransactionService {
      * @return Page of transaction details
      */
     Page<TransactionDetailsDto> getAllTransactionDetails(Pageable pageable);
+
+    /**
+     * Get all transaction details without pagination
+     */
+    List<TransactionDetailsDto> getAllTransactionDetails();
 }
