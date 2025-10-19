@@ -2,11 +2,9 @@ package com.app.brainmap.services;
 
 import com.app.brainmap.domain.ProjectPositionType;
 import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
+import com.app.brainmap.domain.dto.EventProjectDto;
 import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
-import com.app.brainmap.domain.entities.KanbanBoard;
-import com.app.brainmap.domain.entities.KanbanColumn;
-import com.app.brainmap.domain.entities.Project;
-import com.app.brainmap.domain.entities.UserProject;
+import com.app.brainmap.domain.entities.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +30,8 @@ public interface ProjectService {
 
     List<BookingDetailsDto> listHiredExperts(UUID userId);
     List<ServiceBookingResponseDto> getBookingsForDomainExpertFiltered(UUID bookingId);
+    List<EventProjectDto> getEvents(UUID projectId);
+    EventProject createEventProject(EventProject eventProject);
 
 
 }
