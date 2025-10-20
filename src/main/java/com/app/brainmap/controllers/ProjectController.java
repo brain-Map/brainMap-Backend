@@ -278,6 +278,20 @@ public class ProjectController {
         return ResponseEntity.ok(projectFile);
     }
 
+    @DeleteMapping(path="/{serviceId}/cancel")
+    public ResponseEntity<MessageResponse> cancelServiceBooking(@PathVariable("serviceId") UUID serviceId){
+        projectService.cancelServiceBooking(serviceId);
+        return ResponseEntity.ok(new MessageResponse("Service booking cancelled successfully"));
+    }
+
+    @PutMapping(path="/payment/{serviceId}")
+    public ResponseEntity<MessageResponse> updatePaymentStatus(@PathVariable("serviceId") UUID serviceId,
+                                                                @RequestParam("status") String status) {
+        projectService.updateBookingServiceStatus(serviceId, status);
+
+        return ResponseEntity.ok(new MessageResponse("Service booking Payment successfully"));
+    }
+
 
 
 

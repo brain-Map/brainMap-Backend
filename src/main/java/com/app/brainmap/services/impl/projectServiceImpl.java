@@ -302,4 +302,16 @@ public class projectServiceImpl implements ProjectService {
         return projectRepositiory.findAll(pageable);
     }
 
+    @Override
+    public void cancelServiceBooking(UUID serviceId) {
+        ServiceBooking serviceBooking = serviceBookingRepository.findById(serviceId)
+                .orElseThrow(() -> new NoSuchElementException("No service booking found with id " + serviceId));
+        serviceBookingRepository.delete(serviceBooking);
+    }
+
+    @Override
+    public void updateBookingServiceStatus(UUID serviceId, String status) {
+
+    }
+
 }
