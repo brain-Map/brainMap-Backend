@@ -32,6 +32,10 @@ public class SystemWallet {
     @Column(name = "system_charged", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
     private Integer systemCharged = 0; // Accumulated system charges (5% of each transaction)
 
+    @Builder.Default
+    @Column(name = "withdrawn_amount", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    private Integer withdrawnAmount = 0; // Total amount withdrawn by the domain expert
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "belongs_to", nullable = false, unique = true)
     private User belongsTo; // Domain expert who owns this wallet (ONE wallet per expert)

@@ -1,6 +1,7 @@
 package com.app.brainmap.domain.entities;
 
 import jakarta.persistence.*;
+import com.app.brainmap.domain.PaymentType;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -35,6 +36,11 @@ public class Transaction {
 
     @Column(name = "status", nullable = false)
     private String status;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_type", columnDefinition = "VARCHAR(50) DEFAULT 'PAYMENT'")
+    private PaymentType paymentType = PaymentType.PAYMENT;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
