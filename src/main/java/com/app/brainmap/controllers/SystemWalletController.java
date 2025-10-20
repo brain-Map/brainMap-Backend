@@ -2,6 +2,7 @@ package com.app.brainmap.controllers;
 
 import com.app.brainmap.domain.dto.wallet.SystemWalletResponse;
 import com.app.brainmap.domain.dto.wallet.WalletBalanceResponse;
+import com.app.brainmap.domain.dto.wallet.SystemWalletTotalsResponse;
 import com.app.brainmap.security.JwtUserDetails;
 import com.app.brainmap.services.SystemWalletService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/wallet")
+@RequestMapping("/api/v1/wallet")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "System Wallet Management", description = "APIs for managing domain expert wallet balances")
@@ -106,14 +107,33 @@ public class SystemWalletController {
             getCurrentUserId(authentication); // Ensure authenticated
             
             Pageable pageable = PageRequest.of(page, size);
-            log.info("� Fetching all wallets, page: {}, size: {}", page, size);
+            log.info("Fetching all wallets, page: {}, size: {}", page, size);
             
             Page<SystemWalletResponse> wallets = systemWalletService.getAllWallets(pageable);
-            log.info("✅ Found {} total wallets", wallets.getTotalElements());
+            log.info("Found {} total wallets", wallets.getTotalElements());
             return ResponseEntity.ok(wallets);
             
         } catch (Exception e) {
             log.error("❌ Error fetching all wallets", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/totals")
+    @Operation(summary = "Get Wallet Totals", description = "Get sum totals for hold, released, and system charged amounts")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Totals retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<SystemWalletTotalsResponse> getWalletTotals(Authentication authentication) {
+        try {
+            getCurrentUserId(authentication); // Ensure authenticated
+            log.info("Fetching wallet totals");
+            SystemWalletTotalsResponse totals = systemWalletService.getTotals();
+            return ResponseEntity.ok(totals);
+        } catch (Exception e) {
+            log.error("❌ Error fetching wallet totals", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

@@ -2,6 +2,7 @@ package com.app.brainmap.services.impl;
 
 import com.app.brainmap.domain.dto.wallet.SystemWalletResponse;
 import com.app.brainmap.domain.dto.wallet.WalletBalanceResponse;
+import com.app.brainmap.domain.dto.wallet.SystemWalletTotalsResponse;
 import com.app.brainmap.domain.entities.SystemWallet;
 import com.app.brainmap.domain.entities.Transaction;
 import com.app.brainmap.domain.entities.User;
@@ -120,8 +121,15 @@ public class SystemWalletServiceImpl implements SystemWalletService {
     public Page<SystemWalletResponse> getAllWallets(Pageable pageable) {
         Page<SystemWallet> wallets = systemWalletRepository.findAllByOrderByUpdatedAtDesc(pageable);
         
-        log.info("✅ Found {} total wallets", wallets.getTotalElements());
+        log.info("Found {} total wallets", wallets.getTotalElements());
         return wallets.map(this::mapToResponse);
+    }
+
+    @Override
+    public SystemWalletTotalsResponse getTotals() {
+        SystemWalletTotalsResponse totals = systemWalletRepository.getTotals();
+        log.info("Computed wallet totals");
+        return totals;
     }
     
     private SystemWalletResponse mapToResponse(SystemWallet wallet) {
