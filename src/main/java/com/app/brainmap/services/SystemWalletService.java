@@ -16,4 +16,10 @@ public interface SystemWalletService {
     SystemWalletResponse getWallet(UUID domainExpertId);
     Page<SystemWalletResponse> getAllWallets(Pageable pageable);
     SystemWalletTotalsResponse getTotals();
+
+    /**
+     * Withdraw released funds for a domain expert.
+     * Decreases releasedAmount and increases withdrawnAmount atomically.
+     */
+    SystemWalletResponse withdraw(UUID domainExpertId, Integer amount);
 }

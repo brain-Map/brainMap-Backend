@@ -131,6 +131,35 @@ public class SystemWalletServiceImpl implements SystemWalletService {
         log.info("Computed wallet totals");
         return totals;
     }
+
+    @Override
+    public SystemWalletResponse withdraw(UUID domainExpertId, Integer amount) {
+        if (amount == null || amount <= 0) {
+            throw new IllegalArgumentException("Withdrawal amount must be greater than 0");
+        }
+
+        SystemWallet wallet = systemWalletRepository.findByBelongsToId(domainExpertId)
+                .orElseThrow(() -> new EntityNotFoundException("Wallet not found for domain expert: " + domainExpertId));
+
+        Integer released = wallet.getReleasedAmount();
+        if (released == null) released = 0;
+
+        if (released < amount) {
+            throw new IllegalStateException("Insufficient released balance for withdrawal");
+        }
+
+        // Update amounts
+        wallet.setReleasedAmount(released - amount);
+        Integer withdrawn = wallet.getWithdrawnAmount() != null ? wallet.getWithdrawnAmount() : 0;
+        wallet.setWithdrawnAmount(withdrawn + amount);
+        wallet.setUpdatedAt(LocalDateTime.now());
+
+        wallet = systemWalletRepository.save(wallet);
+        log.info("✅ Withdrawn {} for domain expert {}. Released now: {}, Withdrawn total: {}",
+                amount, domainExpertId, wallet.getReleasedAmount(), wallet.getWithdrawnAmount());
+
+        return mapToResponse(wallet);
+    }
     
     private SystemWalletResponse mapToResponse(SystemWallet wallet) {
         User domainExpert = wallet.getBelongsTo();
@@ -140,6 +169,7 @@ public class SystemWalletServiceImpl implements SystemWalletService {
                 .holdAmount(wallet.getHoldAmount())
                 .releasedAmount(wallet.getReleasedAmount())
                 .systemCharged(wallet.getSystemCharged() != null ? wallet.getSystemCharged() : 0)
+        .withdrawnAmount(wallet.getWithdrawnAmount() != null ? wallet.getWithdrawnAmount() : 0)
                 .belongsTo(domainExpert.getId())
                 .domainExpertName(domainExpert.getFirstName() + " " + domainExpert.getLastName())
                 .status(wallet.getStatus())
