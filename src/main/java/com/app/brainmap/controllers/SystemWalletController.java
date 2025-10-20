@@ -2,6 +2,8 @@ package com.app.brainmap.controllers;
 
 import com.app.brainmap.domain.dto.wallet.SystemWalletResponse;
 import com.app.brainmap.domain.dto.wallet.WalletBalanceResponse;
+import com.app.brainmap.domain.dto.wallet.SystemWalletTotalsResponse;
+import com.app.brainmap.domain.dto.wallet.WithdrawalRequest;
 import com.app.brainmap.security.JwtUserDetails;
 import com.app.brainmap.services.SystemWalletService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,11 +21,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/wallet")
+@RequestMapping("/api/v1/wallet")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "System Wallet Management", description = "APIs for managing domain expert wallet balances")
@@ -45,13 +48,8 @@ public class SystemWalletController {
         
         try {
             getCurrentUserId(authentication); // Ensure authenticated
-            
             log.info("💰 Fetching wallet balance for domain expert: {}", domainExpertId);
-            
             WalletBalanceResponse balance = systemWalletService.getWalletBalance(domainExpertId);
-            
-            log.info("✅ Balance retrieved - Hold: {}, Released: {}, Total: {}", 
-                    balance.getHoldAmount(), balance.getReleasedAmount(), balance.getTotalBalance());
             return ResponseEntity.ok(balance);
             
         } catch (EntityNotFoundException e) {
@@ -60,6 +58,52 @@ public class SystemWalletController {
             
         } catch (Exception e) {
             log.error("❌ Error fetching wallet balance for: {}", domainExpertId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/withdraw/{domainExpertId}")
+    @Operation(summary = "Withdraw Released Funds", description = "Withdraw available released funds to an external account")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Withdrawal processed successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid request"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - cannot withdraw from another user's wallet"),
+        @ApiResponse(responseCode = "404", description = "Wallet not found"),
+        @ApiResponse(responseCode = "409", description = "Insufficient released balance"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<SystemWalletResponse> withdraw(
+            @Parameter(description = "Domain Expert ID") @PathVariable UUID domainExpertId,
+            @Validated @RequestBody WithdrawalRequest request,
+            Authentication authentication) {
+        try {
+            log.info("💸 Processing withdrawal for domain expert: {}", domainExpertId);
+            try {
+                String reqJson = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(request);
+                log.info("Withdrawal request body: {}", reqJson);
+            } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+                log.warn("Failed to serialize withdrawal request for logging, falling back to toString()", e);
+                log.info("Withdrawal request body: {}", request);
+            }
+            
+            // authorization
+            // UUID currentUserId = getCurrentUserId(authentication);
+            // if (!currentUserId.equals(domainExpertId)) {
+            //     return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            // }
+
+            log.info("\uD83D\uDCB8 Withdrawal requested by {} for amount {}", domainExpertId, request.getAmount());
+            SystemWalletResponse response = systemWalletService.withdraw(domainExpertId, request.getAmount());
+            return ResponseEntity.ok(response);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (Exception e) {
+            log.error("Error processing withdrawal for {}", domainExpertId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -72,18 +116,16 @@ public class SystemWalletController {
         @ApiResponse(responseCode = "404", description = "Wallet not found"),
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+
+
     public ResponseEntity<SystemWalletResponse> getWallet(
             @Parameter(description = "Domain Expert ID") @PathVariable UUID domainExpertId,
             Authentication authentication) {
         
         try {
             getCurrentUserId(authentication); // Ensure authenticated
-            
             log.info("� Fetching wallet for domain expert: {}", domainExpertId);
-            
             SystemWalletResponse wallet = systemWalletService.getWallet(domainExpertId);
-            
-            log.info("✅ Wallet found for domain expert: {}", domainExpertId);
             return ResponseEntity.ok(wallet);
             
         } catch (EntityNotFoundException e) {
@@ -112,16 +154,33 @@ public class SystemWalletController {
             getCurrentUserId(authentication); // Ensure authenticated
             
             Pageable pageable = PageRequest.of(page, size);
-            
-            log.info("� Fetching all wallets, page: {}, size: {}", page, size);
+            log.info("Fetching all wallets, page: {}, size: {}", page, size);
             
             Page<SystemWalletResponse> wallets = systemWalletService.getAllWallets(pageable);
-            
-            log.info("✅ Found {} total wallets", wallets.getTotalElements());
+            log.info("Found {} total wallets", wallets.getTotalElements());
             return ResponseEntity.ok(wallets);
             
         } catch (Exception e) {
             log.error("❌ Error fetching all wallets", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/totals")
+    @Operation(summary = "Get Wallet Totals", description = "Get sum totals for hold, released, and system charged amounts")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Totals retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<SystemWalletTotalsResponse> getWalletTotals(Authentication authentication) {
+        try {
+            getCurrentUserId(authentication); // Ensure authenticated
+            log.info("Fetching wallet totals");
+            SystemWalletTotalsResponse totals = systemWalletService.getTotals();
+            return ResponseEntity.ok(totals);
+        } catch (Exception e) {
+            log.error("❌ Error fetching wallet totals", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

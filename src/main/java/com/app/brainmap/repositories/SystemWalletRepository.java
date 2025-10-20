@@ -1,39 +1,27 @@
 package com.app.brainmap.repositories;
 
 import com.app.brainmap.domain.entities.SystemWallet;
+import com.app.brainmap.domain.dto.wallet.SystemWalletTotalsResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface SystemWalletRepository extends JpaRepository<SystemWallet, UUID> {
-    
-    /**
-     * Find wallet for a specific domain expert
-     * Each domain expert has only ONE wallet
-     */
     Optional<SystemWallet> findByBelongsToId(UUID domainExpertId);
-    
-    /**
-     * Get all wallets with pagination
-     */
     Page<SystemWallet> findAllByOrderByUpdatedAtDesc(Pageable pageable);
-    
-    /**
-     * Get wallets by status
-     */
     Page<SystemWallet> findByStatusOrderByUpdatedAtDesc(String status, Pageable pageable);
-    
-    /**
-     * Check if wallet exists for domain expert
-     */
     boolean existsByBelongsToId(UUID domainExpertId);
+
+    @Query("SELECT new com.app.brainmap.domain.dto.wallet.SystemWalletTotalsResponse("
+        + "COALESCE(SUM(sw.holdAmount), 0L), "
+        + "COALESCE(SUM(sw.releasedAmount), 0L), "
+        + "COALESCE(SUM(sw.systemCharged), 0L)) "
+        + "FROM SystemWallet sw")
+    SystemWalletTotalsResponse getTotals();
 }
