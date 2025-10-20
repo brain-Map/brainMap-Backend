@@ -17,10 +17,9 @@ public class ServiceListingOffer {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_listing_id")
+    @JoinColumn(name = "service_id")
     private ServiceListing serviceListing;
 
     private String title;
     private String description;
 }
-

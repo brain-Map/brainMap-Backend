@@ -21,11 +21,11 @@ public class Inquiry {
     private UUID inquiryId;
 
     @ManyToOne
-    @JoinColumn(name = "UserId", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "ResolverId")
+    @JoinColumn(name = "resolver_id", foreignKey = @ForeignKey(name = "fk_inquiry_resolver", foreignKeyDefinition = "FOREIGN KEY (resolver_id) REFERENCES users(id) ON DELETE SET NULL"))
     private User resolver;
 
     @Enumerated(EnumType.STRING)

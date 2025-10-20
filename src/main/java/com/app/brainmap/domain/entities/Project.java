@@ -3,6 +3,7 @@ package com.app.brainmap.domain.entities;
 import com.app.brainmap.domain.ProjctStatus;
 import com.app.brainmap.domain.ProjectPriority;
 import com.app.brainmap.domain.ProjectPrivacy;
+import com.app.brainmap.domain.entities.Chat.Group;
 import jakarta.persistence.*;
 import lombok.*;
 

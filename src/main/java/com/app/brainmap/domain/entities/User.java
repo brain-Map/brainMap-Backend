@@ -5,12 +5,18 @@ import com.app.brainmap.domain.UserStatus;
 import com.app.brainmap.domain.entities.Community.CommunityComment;
 import com.app.brainmap.domain.entities.Community.CommunityPost;
 import com.app.brainmap.domain.entities.DomainExpert.DomainExperts;
+import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
+import com.app.brainmap.domain.entities.DomainExpert.ServiceListing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import com.app.brainmap.domain.entities.Chat.Message;
+import com.app.brainmap.domain.entities.Wallet;
+import com.app.brainmap.domain.entities.SystemWallet;
+import com.app.brainmap.domain.entities.Moderator;
 
 @Entity
 @Table(name = "users")
@@ -64,6 +70,15 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private ProjectMember projectMember;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Wallet wallet;
+
+    @OneToOne(mappedBy = "belongsTo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private SystemWallet systemWallet;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Moderator moderator;
+
     @Column(name ="avatar", columnDefinition = "TEXT")
     private String avatar;
 
@@ -84,6 +99,45 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private DomainExperts domainExpert;
+
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notifications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Event> events = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PaymentSession> paymentSessions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ServiceBooking> serviceBookings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ServiceListing> serviceListings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> sentTransactions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> receivedTransactions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "senderId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> sentMessages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "receiverId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> receivedMessages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Inquiry> inquiries = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviewsAsMember = new ArrayList<>();
+
+    @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviewsAsMentor = new ArrayList<>();
+
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Meeting> meetings = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

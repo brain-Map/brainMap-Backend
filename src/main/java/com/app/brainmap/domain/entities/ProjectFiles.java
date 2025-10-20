@@ -1,17 +1,10 @@
 package com.app.brainmap.domain.entities;
 
-import com.app.brainmap.domain.ProjctStatus;
-import com.app.brainmap.domain.ProjectPriority;
-import com.app.brainmap.domain.ProjectPrivacy;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 
@@ -31,10 +24,10 @@ public class ProjectFiles {
 
     @ManyToOne
     @JoinColumn(name = "project_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
 
     @Column(name = "file_url", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private String url;
 
 }
