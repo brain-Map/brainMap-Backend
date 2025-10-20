@@ -4,11 +4,13 @@ import com.app.brainmap.domain.ProjectCollaboratorAccept;
 import com.app.brainmap.domain.ProjectPositionType;
 import com.app.brainmap.domain.dto.DomainExpert.ServiceBookingResponseDto;
 import com.app.brainmap.domain.dto.EventProjectDto;
+import com.app.brainmap.domain.dto.ProjectFileDto;
 import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
 import com.app.brainmap.domain.entities.*;
 import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
 import com.app.brainmap.mappers.BookingMapper;
 import com.app.brainmap.mappers.EventProjectMapper;
+import com.app.brainmap.mappers.ProjectFilesMapper;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.ProjectService;
 import org.springframework.data.domain.Page;
@@ -32,8 +34,10 @@ public class projectServiceImpl implements ProjectService {
     private final BookingMapper bookingMapper;
     private final EventProjectRepository eventProjectRepository;
     private final EventProjectMapper eventProjectMapper;
+    private final ProjectFileRepository projectFileRepository;
+    private final ProjectFilesMapper projectFilesMapper;
 
-    public projectServiceImpl(ProjectRepositiory projectRepositiory, KanbanBoardRepository kanbanBoardRepository, KanbanColumnRepository kanbanColumnRepository, UserProjectRepository userProjectRepository, ServiceBookingRepository serviceBookingRepository, BookingMapper bookingMapper, EventProjectRepository eventProjectRepository, EventProjectMapper eventProjectMapper) {
+    public projectServiceImpl(ProjectRepositiory projectRepositiory, KanbanBoardRepository kanbanBoardRepository, KanbanColumnRepository kanbanColumnRepository, UserProjectRepository userProjectRepository, ServiceBookingRepository serviceBookingRepository, BookingMapper bookingMapper, EventProjectRepository eventProjectRepository, EventProjectMapper eventProjectMapper, ProjectFileRepository projectFileRepository, ProjectFilesMapper projectFilesMapper) {
         this.projectRepositiory = projectRepositiory;
         this.kanbanBoardRepository = kanbanBoardRepository;
         this.kanbanColumnRepository = kanbanColumnRepository;
@@ -43,6 +47,8 @@ public class projectServiceImpl implements ProjectService {
         this.bookingMapper = bookingMapper;
         this.eventProjectRepository = eventProjectRepository;
         this.eventProjectMapper = eventProjectMapper;
+        this.projectFileRepository = projectFileRepository;
+        this.projectFilesMapper = projectFilesMapper;
     }
 
     @Override
@@ -251,6 +257,31 @@ public class projectServiceImpl implements ProjectService {
                 .orElseThrow(() -> new NoSuchElementException("No event found with id " + eventId));
 
         eventProjectRepository.delete(eventProject);
+    }
+
+    @Override
+    public void saveProjectFile(UUID projectId, String fileUrl) {
+        Project project = projectRepositiory.findById(projectId)
+                .orElseThrow(() -> new NoSuchElementException("No project found with id " + projectId));
+
+        projectFileRepository.save(new ProjectFiles(
+                null,
+                project,
+                fileUrl
+        ));
+    }
+
+    @Override
+    public List<ProjectFileDto> getProjectFile(UUID projectId) {
+        List<ProjectFiles> projectFiles = projectFileRepository.findAllByProject_Id(projectId);
+
+        if (projectFiles == null || projectFiles.isEmpty()) {
+            throw new NoSuchElementException("No files Found for project " + projectId);
+        }
+
+        return projectFiles.stream()
+                .map(projectFilesMapper::toDto)
+                .toList();
     }
 
     @Override
