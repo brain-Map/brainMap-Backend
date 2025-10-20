@@ -3,9 +3,7 @@ package com.app.brainmap.domain.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
@@ -26,7 +24,9 @@ public class Transaction {
     private Integer amount;
 
     @ManyToOne
-    @JoinColumn(name = "sender_id", nullable = false)
+    @JoinColumn(name = "sender_id", nullable = true,
+        foreignKey = @ForeignKey(name = "fk3ly4r8r6ubt0blftudix2httv",
+            foreignKeyDefinition = "FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE SET NULL"))
     private User sender;
 
     @ManyToOne
@@ -44,6 +44,8 @@ public class Transaction {
     private Boolean amountReleased = false;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id", referencedColumnName = "payment_id")
+    @JoinColumn(name = "payment_id", referencedColumnName = "payment_id",
+        foreignKey = @ForeignKey(name = "fk77po2p01taou9d3ssrhnq1wxi",
+            foreignKeyDefinition = "FOREIGN KEY (payment_id) REFERENCES payment_sessions(payment_id) ON DELETE SET NULL"))
     private PaymentSession paymentSession;
 }

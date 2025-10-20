@@ -20,6 +20,8 @@ public class ProjectMember {
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "id") // uses same column as primary key
+    @JoinColumn(name = "id", // uses same column as primary key
+        foreignKey = @ForeignKey(name = "fkk7gcnxww33tirr1eke7g5aoq4",
+            foreignKeyDefinition = "FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE"))
     private User user;
 }
