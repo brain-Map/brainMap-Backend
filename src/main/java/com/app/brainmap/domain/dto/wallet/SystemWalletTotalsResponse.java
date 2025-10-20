@@ -13,4 +13,5 @@ public class SystemWalletTotalsResponse {
     private Long holdTotal;
     private Long releasedTotal;
     private Long systemChargedTotal;
+    private Long withdrawnTotal;
 }
