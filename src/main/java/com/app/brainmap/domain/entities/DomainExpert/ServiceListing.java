@@ -17,6 +17,7 @@ import java.util.UUID;
 @Builder
 public class ServiceListing {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "service_id", updatable = false, nullable = false)
