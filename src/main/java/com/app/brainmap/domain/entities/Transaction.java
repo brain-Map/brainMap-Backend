@@ -1,11 +1,10 @@
 package com.app.brainmap.domain.entities;
 
 import jakarta.persistence.*;
+import com.app.brainmap.domain.PaymentType;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
@@ -35,6 +34,10 @@ public class Transaction {
 
     @Column(name = "status", nullable = false)
     private String status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_type")
+    private PaymentType paymentType; // PAYMENT, WITHDRAWAL, REFUND
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

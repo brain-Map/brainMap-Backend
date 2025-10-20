@@ -6,7 +6,9 @@ import com.app.brainmap.domain.dto.wallet.SystemWalletTotalsResponse;
 import com.app.brainmap.domain.entities.SystemWallet;
 import com.app.brainmap.domain.entities.Transaction;
 import com.app.brainmap.domain.entities.User;
+import com.app.brainmap.domain.PaymentType;
 import com.app.brainmap.repositories.SystemWalletRepository;
+import com.app.brainmap.repositories.TransactionRepository;
 import com.app.brainmap.services.SystemWalletService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -27,6 +29,7 @@ import java.util.UUID;
 public class SystemWalletServiceImpl implements SystemWalletService {
     
     private final SystemWalletRepository systemWalletRepository;
+    private final TransactionRepository transactionRepository;
     
     @Override
     public SystemWalletResponse addToWallet(Transaction transaction) {
@@ -157,6 +160,23 @@ public class SystemWalletServiceImpl implements SystemWalletService {
         wallet = systemWalletRepository.save(wallet);
         log.info("✅ Withdrawn {} for domain expert {}. Released now: {}, Withdrawn total: {}",
                 amount, domainExpertId, wallet.getReleasedAmount(), wallet.getWithdrawnAmount());
+
+        // Record withdrawal as a transaction (sender and receiver are the same)
+        try {
+            Transaction withdrawalTx = Transaction.builder()
+                    .amount(amount)
+                    .sender(wallet.getBelongsTo())
+                    .receiver(wallet.getBelongsTo())
+                    .status("COMPLETED")
+                    .paymentType(PaymentType.WITHDRAWAL)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            transactionRepository.save(withdrawalTx);
+            log.info("🧾 Withdrawal transaction recorded: {} for user {}", withdrawalTx.getTransactionId(), domainExpertId);
+        } catch (Exception e) {
+            // Do not fail the withdrawal if transaction logging fails; just log error
+            log.error("Failed to record withdrawal transaction for user {}", domainExpertId, e);
+        }
 
         return mapToResponse(wallet);
     }
