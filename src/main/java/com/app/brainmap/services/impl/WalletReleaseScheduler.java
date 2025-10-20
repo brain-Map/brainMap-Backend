@@ -28,35 +28,28 @@ public class WalletReleaseScheduler {
     private final TransactionRepository transactionRepository;
     private final SystemWalletRepository systemWalletRepository;
 
-    // FOR TESTING: 30 minutes hold period
-    // FOR PRODUCTION: Change back to 14 days
-    private static final int HOLD_PERIOD_DAYS = 14;
-    private static final int HOLD_PERIOD_MINUTES = 30; // FOR TESTING ONLY
+    // Hold period for releasing funds
+    private static final int HOLD_PERIOD_DAYS = 14; // Production: 14 days
 
     /**
-     * Scheduled task that runs every 5 minutes (FOR TESTING)
-     * Checks for transactions older than 30 minutes (FOR TESTING) and releases the held amounts
-     * 
-     * NOTE: For production:
-     * - Change cron to "0 0 2 * * *" (daily at 2:00 AM)
-     * - Use HOLD_PERIOD_DAYS instead of HOLD_PERIOD_MINUTES
+     * Scheduled task that runs daily at 2:00 AM
+     * Checks for transactions older than the hold period in days and releases the held amounts
      */
-    @Scheduled(cron = "0 */5 * * * *") // Every 5 minutes (FOR TESTING)
+    @Scheduled(cron = "0 0 2 * * *") // Daily at 2:00 AM
     @Transactional
     public void releaseHeldAmounts() {
         log.info("════════════════════════════════════════════════════════════════");
         log.info("🕐 [SCHEDULED RELEASE] Starting automatic wallet release job");
         log.info("   Time: {}", LocalDateTime.now());
-        log.info("   Hold Period: {} minutes (TESTING MODE)", HOLD_PERIOD_MINUTES);
+        log.info("   Hold Period: {} days", HOLD_PERIOD_DAYS);
         log.info("════════════════════════════════════════════════════════════════");
 
-        // Calculate cutoff date (30 minutes ago FOR TESTING)
-        // FOR PRODUCTION: Use minusDays(HOLD_PERIOD_DAYS)
-        LocalDateTime cutoffDate = LocalDateTime.now().minusMinutes(HOLD_PERIOD_MINUTES);
+        // Calculate cutoff date (HOLD_PERIOD_DAYS ago)
+        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(HOLD_PERIOD_DAYS);
         log.info("📅 Cutoff Date: {}", cutoffDate);
         log.info("   Transactions created before this date will be released");
 
-        // Find all unreleased transactions older than 14 days
+        // Find all unreleased transactions older than hold period
         List<Transaction> transactionsToRelease = transactionRepository
                 .findUnreleasedTransactionsOlderThan(cutoffDate);
 

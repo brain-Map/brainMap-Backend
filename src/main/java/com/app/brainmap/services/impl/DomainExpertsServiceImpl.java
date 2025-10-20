@@ -4,18 +4,17 @@ import com.app.brainmap.domain.DomainExpertStatus;
 import com.app.brainmap.domain.dto.DomainExpert.*;
 import com.app.brainmap.domain.entities.DomainExpert.*;
 import com.app.brainmap.domain.entities.User;
-import com.app.brainmap.mappers.BookingMapper;
 import com.app.brainmap.repositories.*;
 import com.app.brainmap.services.DomainExpertsService;
 import com.app.brainmap.services.FileStorageService;
-import com.app.brainmap.services.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,7 +24,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DomainExpertsServiceImpl implements DomainExpertsService {
     private final DomainExpertRepository domainExpertRepository;
-    private final UserRepository userRepository;
     private final ExpertiseAreaRepository expertiseAreaRepository;
     private final DomainExpertEducationRepository domainExpertEducationRepository;
     private final DomainExpertVerificationDocumentRepository domainExpertVerificationDocumentRepository;
@@ -86,6 +84,7 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
                         .size(d.getSize())
                         .status(d.getStatus())
                         .uploadedAt(d.getUploadedAt())
+                        .reviewNotes(d.getReviewNotes())
                         .build())
                 .collect(Collectors.toList()));
         return  dto;
@@ -262,6 +261,92 @@ public class DomainExpertsServiceImpl implements DomainExpertsService {
         dto.setCompletedBookingsCount(completed);
 
         return dto;
+    }
+
+    // --- new methods: verification document retrieval and resubmission ---
+
+    @Override
+    @Transactional(readOnly = true)
+    public VerificationDocumentDto getVerificationDocument(UUID expertId, UUID documentId) {
+        DomainExpertVerificationDocument doc = domainExpertVerificationDocumentRepository.findById(documentId)
+                .orElseThrow(() -> new RuntimeException("Verification document not found"));
+
+        if (doc.getDomainExpert() == null || !expertId.equals(doc.getDomainExpert().getId())) {
+            throw new RuntimeException("Document does not belong to the given expert");
+        }
+
+        return VerificationDocumentDto.builder()
+                .id(doc.getId())
+                .fileName(doc.getFileName())
+                .fileUrl(doc.getFileUrl())
+                .contentType(doc.getContentType())
+                .size(doc.getSize())
+                .status(doc.getStatus())
+                .uploadedAt(doc.getUploadedAt())
+                .reviewNotes(doc.getReviewNotes())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public VerificationDocumentDto resubmitVerificationDocument(UUID expertId, UUID documentId, MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new RuntimeException("File must be provided");
+        }
+
+        DomainExpertVerificationDocument doc = domainExpertVerificationDocumentRepository.findById(documentId)
+                .orElseThrow(() -> new RuntimeException("Verification document not found"));
+
+        if (doc.getDomainExpert() == null || !expertId.equals(doc.getDomainExpert().getId())) {
+            throw new RuntimeException("Document does not belong to the given expert");
+        }
+
+        DomainExperts experts = domainExpertRepository.findById(expertId)
+                .orElseThrow(() -> new RuntimeException("Domain expert not found"));
+        // store new file and update fields
+        String url = fileStorageService.store(file, "experts/" + expertId + "/verification");
+        doc.setFileName(file.getOriginalFilename());
+        doc.setFileUrl(url);
+        doc.setContentType(file.getContentType());
+        doc.setSize(file.getSize());
+        doc.setUploadedAt(LocalDateTime.now());
+        doc.setStatus("PENDING");
+        doc.setReviewNotes(null);
+
+        experts.setStatus(DomainExpertStatus.PENDING);
+        domainExpertRepository.save(experts);
+
+        DomainExpertVerificationDocument saved = domainExpertVerificationDocumentRepository.save(doc);
+
+        return VerificationDocumentDto.builder()
+                .id(saved.getId())
+                .fileName(saved.getFileName())
+                .fileUrl(saved.getFileUrl())
+                .contentType(saved.getContentType())
+                .size(saved.getSize())
+                .status(saved.getStatus())
+                .uploadedAt(saved.getUploadedAt())
+                .reviewNotes(saved.getReviewNotes())
+                .build();
+    }
+
+    // --- NEW: fetch all verification documents for an expert ---
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<VerificationDocumentDto> getAllVerificationDocuments(UUID expertId) {
+        List<DomainExpertVerificationDocument> docs = domainExpertVerificationDocumentRepository.findByDomainExpertId(expertId);
+        return docs.stream()
+                .map(d -> VerificationDocumentDto.builder()
+                        .id(d.getId())
+                        .fileName(d.getFileName())
+                        .fileUrl(d.getFileUrl())
+                        .contentType(d.getContentType())
+                        .size(d.getSize())
+                        .status(d.getStatus())
+                        .uploadedAt(d.getUploadedAt())
+                        .reviewNotes(d.getReviewNotes())
+                        .build())
+                .collect(Collectors.toList());
     }
 
 }

@@ -272,11 +272,30 @@ public class ProjectController {
         }
     }
 
+
     @GetMapping(path = "/get-files/{projectId}")
     public ResponseEntity<List<ProjectFileDto>> getProjectFiles(@PathVariable("projectId") UUID projectId) {
         List<ProjectFileDto> projectFile = projectService.getProjectFile(projectId);
         return ResponseEntity.ok(projectFile);
     }
+
+
+    @DeleteMapping(path="/{serviceId}/cancel")
+    public ResponseEntity<MessageResponse> cancelServiceBooking(@PathVariable("serviceId") UUID serviceId){
+        projectService.cancelServiceBooking(serviceId);
+        return ResponseEntity.ok(new MessageResponse("Service booking cancelled successfully"));
+    }
+
+
+
+    @PutMapping(path="/payment/{serviceId}")
+    public ResponseEntity<MessageResponse> updatePaymentStatus(@PathVariable("serviceId") UUID serviceId,
+                                                                @RequestParam("status") String status) {
+        projectService.updateBookingServiceStatus(serviceId, status);
+
+        return ResponseEntity.ok(new MessageResponse("Service booking Payment successfully"));
+    }
+
 
 
 

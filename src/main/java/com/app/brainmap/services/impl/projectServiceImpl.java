@@ -8,6 +8,7 @@ import com.app.brainmap.domain.dto.ProjectFileDto;
 import com.app.brainmap.domain.dto.ProjectMember.BookingDetailsDto;
 import com.app.brainmap.domain.entities.*;
 import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
+import com.app.brainmap.domain.entities.DomainExpert.ServiceBookingStatus;
 import com.app.brainmap.mappers.BookingMapper;
 import com.app.brainmap.mappers.EventProjectMapper;
 import com.app.brainmap.mappers.ProjectFilesMapper;
@@ -300,6 +301,27 @@ public class projectServiceImpl implements ProjectService {
     @Override
     public Page<Project> getAllProjects(Pageable pageable) {
         return projectRepositiory.findAll(pageable);
+    }
+
+    @Override
+    public void cancelServiceBooking(UUID serviceId) {
+        ServiceBooking serviceBooking = serviceBookingRepository.findById(serviceId)
+                .orElseThrow(() -> new NoSuchElementException("No service booking found with id " + serviceId));
+        serviceBookingRepository.delete(serviceBooking);
+    }
+
+
+    @Override
+    public void updateBookingServiceStatus(UUID serviceId, String status) {
+        ServiceBooking serviceBooking = serviceBookingRepository.findById(serviceId)
+                .orElseThrow(() -> new NoSuchElementException("No service booking found with id " + serviceId));
+
+        String statusUpper = status.toUpperCase();
+        if (statusUpper.equals("PENDING")) {
+            serviceBooking.setStatus(ServiceBookingStatus.CONFIRMED);
+            serviceBookingRepository.save(serviceBooking);
+        }
+
     }
 
 }
