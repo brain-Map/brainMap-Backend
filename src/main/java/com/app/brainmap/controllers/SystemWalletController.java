@@ -62,7 +62,7 @@ public class SystemWalletController {
         }
     }
 
-    @PostMapping("/{domainExpertId}/withdraw")
+    @PostMapping("/withdraw/{domainExpertId}")
     @Operation(summary = "Withdraw Released Funds", description = "Withdraw available released funds to an external account")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Withdrawal processed successfully"),
@@ -79,7 +79,16 @@ public class SystemWalletController {
             Authentication authentication) {
         try {
             log.info("💸 Processing withdrawal for domain expert: {}", domainExpertId);
-            UUID currentUserId = getCurrentUserId(authentication);
+            try {
+                String reqJson = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(request);
+                log.info("Withdrawal request body: {}", reqJson);
+            } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+                log.warn("Failed to serialize withdrawal request for logging, falling back to toString()", e);
+                log.info("Withdrawal request body: {}", request);
+            }
+            
+            // authorization
+            // UUID currentUserId = getCurrentUserId(authentication);
             // if (!currentUserId.equals(domainExpertId)) {
             //     return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             // }
@@ -116,7 +125,6 @@ public class SystemWalletController {
         try {
             getCurrentUserId(authentication); // Ensure authenticated
             log.info("� Fetching wallet for domain expert: {}", domainExpertId);
-            
             SystemWalletResponse wallet = systemWalletService.getWallet(domainExpertId);
             return ResponseEntity.ok(wallet);
             
