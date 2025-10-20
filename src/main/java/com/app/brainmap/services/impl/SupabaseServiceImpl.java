@@ -35,7 +35,7 @@ public class SupabaseServiceImpl implements SupabaseService {
         body.put("password", request.getPassword());
 
         Map<String, Object> metadata = new HashMap<>();
-        metadata.put("role", request.getUserRole());
+        metadata.put("user_role", request.getUserRole());
         metadata.put("username", request.getUsername());
         body.put("user_metadata", metadata);
         body.put("email_confirm", true);
