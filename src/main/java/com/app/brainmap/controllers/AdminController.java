@@ -145,13 +145,25 @@ public class AdminController {
     }
 
     @DeleteMapping("/deleteUser/{userId}")
-    public ResponseEntity<Valid> deleteUser(@PathVariable UUID userId) {
-        // delete from supabase auth
-        supabaseService.deleteUser(userId);
-        // delete from local users table
-        userService.deleteUser(userId);
-        log.info("Deleting user: {}", userId);
-
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+        // 1) Only after successful local deletion, delete from Supabase auth
+        try {
+            supabaseService.deleteUser(userId);
+            log.info("Supabase auth user deleted successfully: {}", userId);
+        } catch (Exception e) {
+            // Local deletion succeeded but auth deletion failed
+            log.error("Local deletion succeeded but failed to delete user from Supabase auth: {}", userId, e);
+            // You can choose a different status if you want to signal partial success
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        // 2) Delete from local users table first. If this fails, DO NOT delete from auth.
+        try {
+            userService.deleteUser(userId);
+            log.info("Local user deleted successfully: {}", userId);
+        } catch (Exception e) {
+            log.error("Failed to delete user from local users table: {}. Aborting auth deletion.", userId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
         return ResponseEntity.noContent().build();
     }
 
