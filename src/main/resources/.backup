@@ -1,0 +1,21 @@
+### JWT Configuration
+jwt.secret=Hpxhzd2ipHmKblQozmCMeMbIwWK4Ggoxcczqa4jJgRbzt/7hTWiee35FtU5YyzxHi/D9tde4ul8CPcBUiIps3Q==
+
+### Configure for Supabase
+server.port= 8082
+spring.datasource.url=jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?user=postgres.uvekrjsbsjxvaveqtbnu&password=brainMap123!
+# Configure for local PostgreSQL database
+#spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
+#spring.datasource.username=postgres
+#spring.datasource.password=postgres
+
+spring.jpa.hibernate.ddl-auto=create
+supabase.project.url=https://uvekrjsbsjxvaveqtbnu.supabase.co
+supabase.service.role.key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2ZWtyanNic2p4dmF2ZXF0Ym51Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MTA2MzA2NiwiZXhwIjoyMDY2NjM5MDY2fQ.Q3MpbVkBpX4LbqvGtJrUrXGfDTGiIIaEFZxooCsRF8c
+
+supabase.bucket=uploads
+spring.datasource.hikari.maximum-pool-size=10
+spring.datasource.hikari.minimum-idle=2
+spring.datasource.hikari.idle-timeout=30000
+spring.datasource.hikari.max-lifetime=600000
+spring.datasource.hikari.data-source-properties.prepareThreshold=0
