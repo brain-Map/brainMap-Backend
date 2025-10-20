@@ -4,5 +4,5 @@ public enum DomainExpertStatus {
     VERIFIED,
     PENDING,
     UNVERIFIED,
-    REJECTED
+    REJECTED,
 }

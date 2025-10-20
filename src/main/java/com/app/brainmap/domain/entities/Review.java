@@ -40,7 +40,7 @@ public class Review {
 
 
     @OneToOne
-    @JoinColumn(name = "booked_id", nullable = false, foreignKey = @ForeignKey(name = "fk_booked_review", foreignKeyDefinition = "FOREIGN KEY (booked_id) REFERENCES serviceBooking(id) ON DELETE CASCADE"))
+    @JoinColumn(name = "booked_id", nullable = false, foreignKey = @ForeignKey(name = "fk_booked_review", foreignKeyDefinition = "FOREIGN KEY (booked_id) REFERENCES service_bookings(id) ON DELETE CASCADE"))
     private ServiceBooking serviceBooking;
 
 

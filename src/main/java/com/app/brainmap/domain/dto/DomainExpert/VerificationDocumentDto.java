@@ -17,5 +17,5 @@ public class VerificationDocumentDto {
     private Long size;
     private String status;
     private LocalDateTime uploadedAt;
+    private String reviewNotes;
 }
-
