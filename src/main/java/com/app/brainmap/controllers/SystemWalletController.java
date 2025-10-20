@@ -45,13 +45,8 @@ public class SystemWalletController {
         
         try {
             getCurrentUserId(authentication); // Ensure authenticated
-            
             log.info("💰 Fetching wallet balance for domain expert: {}", domainExpertId);
-            
             WalletBalanceResponse balance = systemWalletService.getWalletBalance(domainExpertId);
-            
-            log.info("✅ Balance retrieved - Hold: {}, Released: {}, Total: {}", 
-                    balance.getHoldAmount(), balance.getReleasedAmount(), balance.getTotalBalance());
             return ResponseEntity.ok(balance);
             
         } catch (EntityNotFoundException e) {
@@ -72,18 +67,17 @@ public class SystemWalletController {
         @ApiResponse(responseCode = "404", description = "Wallet not found"),
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+
+
     public ResponseEntity<SystemWalletResponse> getWallet(
             @Parameter(description = "Domain Expert ID") @PathVariable UUID domainExpertId,
             Authentication authentication) {
         
         try {
             getCurrentUserId(authentication); // Ensure authenticated
-            
             log.info("� Fetching wallet for domain expert: {}", domainExpertId);
             
             SystemWalletResponse wallet = systemWalletService.getWallet(domainExpertId);
-            
-            log.info("✅ Wallet found for domain expert: {}", domainExpertId);
             return ResponseEntity.ok(wallet);
             
         } catch (EntityNotFoundException e) {
@@ -112,11 +106,9 @@ public class SystemWalletController {
             getCurrentUserId(authentication); // Ensure authenticated
             
             Pageable pageable = PageRequest.of(page, size);
-            
             log.info("� Fetching all wallets, page: {}, size: {}", page, size);
             
             Page<SystemWalletResponse> wallets = systemWalletService.getAllWallets(pageable);
-            
             log.info("✅ Found {} total wallets", wallets.getTotalElements());
             return ResponseEntity.ok(wallets);
             
