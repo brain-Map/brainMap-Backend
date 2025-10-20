@@ -2,6 +2,7 @@ package com.app.brainmap.services.impl;
 
 import com.app.brainmap.services.FileStorageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FileStorageServiceImpl implements FileStorageService {
 
     @Value("${app.storage.base-path:uploads}")
@@ -59,6 +61,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 
 @Override
 public String store(MultipartFile file, String subFolder) {
+        log.info("Storing file: {}", file.getOriginalFilename());
     String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
     String pathInBucket = subFolder + "/" + fileName;
 
@@ -76,7 +79,7 @@ public String store(MultipartFile file, String subFolder) {
     } catch (IOException e) {
         throw new RuntimeException("Failed to read file bytes", e);
     }
-
+log.info("Stored file: {}", supabaseUrl + "/storage/v1/object/public/" + bucketName + "/" + pathInBucket);
     return supabaseUrl + "/storage/v1/object/public/" + bucketName + "/" + pathInBucket;
 }
 
