@@ -46,35 +46,24 @@ public class TransactionController {
     public ResponseEntity<TransactionResponse> recordTransaction(
             @Valid @RequestBody TransactionRequest request,
             Authentication authentication) {
-        
         try {
             UUID authenticatedUserId = getCurrentUserId(authentication);
-            
-            log.info("📥 Recording transaction - Amount: {}, Sender: {}, Receiver: {}, Status: {}, Authenticated User: {}", 
-                    request.getAmount(), request.getSenderId(), request.getReceiverId(), 
-                    request.getStatus(), authenticatedUserId);
-            
             TransactionResponse response = transactionService.createTransaction(request, authenticatedUserId);
-            
-            log.info("✅ Transaction recorded successfully - ID: {}, Amount: {}", 
-                    response.getTransactionId(), response.getAmount());
-            
+            log.info("✅ Transaction recorded: {}", response.getTransactionId());
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-            
         } catch (EntityNotFoundException e) {
             log.error("❌ User not found: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            
         } catch (IllegalArgumentException e) {
             log.error("❌ Invalid request: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            
         } catch (Exception e) {
             log.error("❌ Error recording transaction", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+
+
     @GetMapping("/{transactionId}")
     @Operation(summary = "Get Transaction", description = "Get transaction details by ID")
     @ApiResponses(value = {
@@ -105,7 +94,8 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+
+
     @GetMapping("/user/{userId}")
     @Operation(summary = "Get User Transactions", description = "Get all transactions for a user (sent and received)")
     @ApiResponses(value = {
@@ -120,16 +110,10 @@ public class TransactionController {
         
         try {
             getCurrentUserId(authentication); // Ensure authenticated
-            
             Pageable pageable = PageRequest.of(page, size);
-            
-            log.info("📋 Fetching transactions for user: {}, page: {}, size: {}", userId, page, size);
-            
             Page<TransactionResponse> transactions = transactionService.getUserTransactions(userId, pageable);
-            
             log.info("✅ Found {} transactions for user: {}", transactions.getTotalElements(), userId);
             return ResponseEntity.ok(transactions);
-            
         } catch (Exception e) {
             log.error("❌ Error fetching transactions for user: {}", userId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -150,21 +134,16 @@ public class TransactionController {
         
         try {
             getCurrentUserId(authentication); // Ensure authenticated
-            
             Pageable pageable = PageRequest.of(page, size);
-            
-            log.info("📤 Fetching sent transactions for user: {}, page: {}, size: {}", senderId, page, size);
-            
             Page<TransactionResponse> transactions = transactionService.getSentTransactions(senderId, pageable);
-            
             log.info("✅ Found {} sent transactions for user: {}", transactions.getTotalElements(), senderId);
             return ResponseEntity.ok(transactions);
-            
         } catch (Exception e) {
             log.error("❌ Error fetching sent transactions for user: {}", senderId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     
     @GetMapping("/received/{receiverId}")
     @Operation(summary = "Get Received Transactions", description = "Get all transactions received by a user")
@@ -180,13 +159,8 @@ public class TransactionController {
         
         try {
             getCurrentUserId(authentication); // Ensure authenticated
-            
             Pageable pageable = PageRequest.of(page, size);
-            
-            log.info("📥 Fetching received transactions for user: {}, page: {}, size: {}", receiverId, page, size);
-            
             Page<TransactionResponse> transactions = transactionService.getReceivedTransactions(receiverId, pageable);
-            
             log.info("✅ Found {} received transactions for user: {}", transactions.getTotalElements(), receiverId);
             return ResponseEntity.ok(transactions);
             
@@ -195,6 +169,7 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
     @GetMapping("/details/user/{userId}")
     @Operation(summary = "Get Detailed Transaction Information",
@@ -212,16 +187,10 @@ public class TransactionController {
 
         try {
             getCurrentUserId(authentication); // Ensure authenticated
-
             Pageable pageable = PageRequest.of(page, size);
-
-            log.info("📊 Fetching detailed transaction info for user: {}, page: {}, size: {}", userId, page, size);
-
             Page<TransactionDetailsDto> transactionDetails = transactionService.getTransactionDetails(userId, pageable);
-
             log.info("✅ Found {} detailed transactions for user: {}", transactionDetails.getTotalElements(), userId);
             return ResponseEntity.ok(transactionDetails);
-
         } catch (Exception e) {
             log.error("❌ Error fetching detailed transactions for user: {}", userId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -243,16 +212,10 @@ public class TransactionController {
 
         try {
             getCurrentUserId(authentication); // Ensure authenticated
-
             Pageable pageable = PageRequest.of(page, size);
-
-            log.info("📊 Fetching all detailed transaction info, page: {}, size: {}", page, size);
-
             Page<TransactionDetailsDto> transactionDetails = transactionService.getAllTransactionDetails(pageable);
-
             log.info("✅ Found {} total detailed transactions", transactionDetails.getTotalElements());
             return ResponseEntity.ok(transactionDetails);
-
         } catch (Exception e) {
             log.error("❌ Error fetching all detailed transactions", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -271,14 +234,9 @@ public class TransactionController {
             Authentication authentication) {
         try {
             getCurrentUserId(authentication); // Ensure authenticated
-
-            log.info("📊 Fetching all detailed transaction info (no pagination)");
-
             List<TransactionDetailsDto> transactionDetails = transactionService.getAllTransactionDetails();
-
             log.info("✅ Found {} total detailed transactions (no pagination)", transactionDetails.size());
             return ResponseEntity.ok(transactionDetails);
-
         } catch (Exception e) {
             log.error("❌ Error fetching all detailed transactions (no pagination)", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -290,7 +248,6 @@ public class TransactionController {
         if (authentication == null || !(authentication.getPrincipal() instanceof JwtUserDetails)) {
             throw new IllegalStateException("User authentication required");
         }
-        
         JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
         return userDetails.getUserId();
     }
