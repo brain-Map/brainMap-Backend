@@ -21,7 +21,8 @@ public interface SystemWalletRepository extends JpaRepository<SystemWallet, UUID
     @Query("SELECT new com.app.brainmap.domain.dto.wallet.SystemWalletTotalsResponse("
         + "COALESCE(SUM(sw.holdAmount), 0L), "
         + "COALESCE(SUM(sw.releasedAmount), 0L), "
-        + "COALESCE(SUM(sw.systemCharged), 0L)) "
+        + "COALESCE(SUM(sw.systemCharged), 0L), "
+        + "COALESCE(SUM(sw.withdrawnAmount), 0L)) "
         + "FROM SystemWallet sw")
     SystemWalletTotalsResponse getTotals();
 }
