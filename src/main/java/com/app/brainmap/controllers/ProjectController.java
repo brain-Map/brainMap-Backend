@@ -284,6 +284,7 @@ public class ProjectController {
         return ResponseEntity.ok(new MessageResponse("Service booking cancelled successfully"));
     }
 
+
     @PutMapping(path="/payment/{serviceId}")
     public ResponseEntity<MessageResponse> updatePaymentStatus(@PathVariable("serviceId") UUID serviceId,
                                                                 @RequestParam("status") String status) {
