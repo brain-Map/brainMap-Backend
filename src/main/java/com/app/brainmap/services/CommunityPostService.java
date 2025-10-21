@@ -11,6 +11,7 @@ public interface CommunityPostService {
     List<CommunityPost> getAllPosts();
     CommunityPost getPostById(UUID id);
     List<CommunityPost> getAllPostsByTag(UUID tagId);
+    List<CommunityPost> getPostsByAuthor(UUID authorId);
     CommunityPost createPost(User user, CreateCommunityPostRequest request);
     Void deletePostById(UUID postId, UUID userId ) throws IllegalArgumentException;
     CommunityPost updatePostById(UUID postId, UUID userId, CreateCommunityPostRequest request);

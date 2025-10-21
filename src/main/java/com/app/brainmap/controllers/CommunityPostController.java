@@ -47,6 +47,18 @@ public class CommunityPostController {
         return ResponseEntity.ok(postDtos);
     }
 
+    @GetMapping(path = "/me")
+    public ResponseEntity<List<CommunityPostDto>> getMyPosts() {
+        UUID currentUserId = getCurrentUserId();
+        if (currentUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        List<CommunityPost> posts = communityPostService.getPostsByAuthor(currentUserId);
+        List<CommunityPostDto> postDtos = convertPostsToDto(posts);
+        return ResponseEntity.ok(postDtos);
+    }
+
     @GetMapping(path = "/{postId}")
     public ResponseEntity<CommunityPostDto> getPostById(@PathVariable UUID postId) {
         log.info("Fetching post with ID: {}", postId);
