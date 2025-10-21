@@ -32,6 +32,11 @@ public class CommunityPostServiceImpl implements CommunityPostService {
     }
 
     @Override
+    public List<CommunityPost> getPostsByAuthor(UUID authorId) {
+        return communityPostRepository.findAllByAuthor_Id(authorId);
+    }
+
+    @Override
     @Transactional
     public List<CommunityPost> getAllPostsByTag(UUID tagId) {
         CommunityTag tag = communityTagService.getTagById(tagId);
