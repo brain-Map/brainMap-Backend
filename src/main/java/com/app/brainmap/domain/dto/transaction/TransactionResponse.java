@@ -21,5 +21,6 @@ public class TransactionResponse {
     private UUID receiverId;
     private String receiverName;
     private String status;
+    private String paymentType; // PAYMENT, WITHDRAWAL, REFUND
     private LocalDateTime createdAt;
 }

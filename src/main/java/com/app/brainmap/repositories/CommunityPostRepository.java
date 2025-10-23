@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface CommunityPostRepository extends JpaRepository<CommunityPost, UUID> {
     List<CommunityPost> findAllByTags(CommunityTag tag);
+    List<CommunityPost> findAllByAuthor_Id(UUID authorId);
 }

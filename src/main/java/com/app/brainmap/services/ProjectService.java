@@ -48,5 +48,6 @@ public interface ProjectService {
 
     // New: admin - get all projects (paginated)
     Page<Project> getAllProjects(Pageable pageable);
-
+    void cancelServiceBooking(UUID serviceId);
+    void updateBookingServiceStatus(UUID serviceId, String status);
 }

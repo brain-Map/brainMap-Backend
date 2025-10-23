@@ -3,6 +3,7 @@ package com.app.brainmap.domain.entities;
 import com.app.brainmap.domain.ProjctStatus;
 import com.app.brainmap.domain.ProjectPriority;
 import com.app.brainmap.domain.ProjectPrivacy;
+import com.app.brainmap.domain.entities.Chat.Group;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,7 +33,9 @@ public class Project {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "owner_id")
+    @JoinColumn(name = "owner_id", nullable = true,
+        foreignKey = @ForeignKey(name = "fkmueqy6cpcwpfl8gnnag4idjt9",
+            foreignKeyDefinition = "FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE SET NULL"))
     private User user;
 
     @Column(name = "status")

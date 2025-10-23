@@ -18,6 +18,7 @@ public class SystemWalletResponse {
     private Integer holdAmount; // Amount on hold (within 14 days)
     private Integer releasedAmount; // Amount released (after 14 days, available for withdrawal)
     private Integer systemCharged; // Accumulated system charges (5% of transactions)
+    private Integer withdrawnAmount; // Total amount withdrawn by the domain expert
     private UUID belongsTo; // Domain expert ID
     private String domainExpertName;
     private String status;

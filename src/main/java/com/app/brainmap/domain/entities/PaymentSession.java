@@ -2,16 +2,13 @@ package com.app.brainmap.domain.entities;
 
 import com.app.brainmap.domain.PaymentStatus;
 import com.app.brainmap.domain.entities.DomainExpert.ServiceBooking;
-import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -39,7 +36,9 @@ public class PaymentSession {
     private String orderId;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = true,
+        foreignKey = @ForeignKey(name = "fktjlirs9ky9hnj2q23daepr5wu",
+            foreignKeyDefinition = "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL"))
     private User user;
     
     @Column(nullable = false, precision = 10, scale = 2)

@@ -28,3 +28,4 @@ public class KanbanColumn {
                     foreignKeyDefinition = "FOREIGN KEY (kanban_id) REFERENCES kanaban_boards(kanban_id) ON DELETE CASCADE"))
     private KanbanBoard kanbanBoard;
 }
+

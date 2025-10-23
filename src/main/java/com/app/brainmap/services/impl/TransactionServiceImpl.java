@@ -92,6 +92,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .sender(sender)
                 .receiver(receiver)
                 .status(request.getStatus())
+                .paymentType(com.app.brainmap.domain.PaymentType.PAYMENT)
                 .createdAt(LocalDateTime.now())
                 .paymentSession(paymentSession)  // Set the PaymentSession
                 .build();
@@ -205,6 +206,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .receiverId(transaction.getReceiver().getId())
                 .receiverName(transaction.getReceiver().getFirstName() + " " + transaction.getReceiver().getLastName())
                 .status(transaction.getStatus())
+                .paymentType(transaction.getPaymentType() != null ? transaction.getPaymentType().name() : null)
                 .createdAt(transaction.getCreatedAt())
                 .build();
     }

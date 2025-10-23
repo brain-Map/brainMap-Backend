@@ -1,5 +1,7 @@
 package com.app.brainmap.domain.entities.DomainExpert;
 
+import com.app.brainmap.domain.entities.PaymentSession;
+import com.app.brainmap.domain.entities.Review;
 import com.app.brainmap.domain.entities.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -23,11 +25,15 @@ public class ServiceBooking {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_id")
+    @JoinColumn(name = "service_id",
+        foreignKey = @ForeignKey(name = "fk_service_bookings_service",
+            foreignKeyDefinition = "FOREIGN KEY (service_id) REFERENCES Service_listing(service_id) ON DELETE CASCADE"))
     private ServiceListing service;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",
+        foreignKey = @ForeignKey(name = "fkfbw5j7tsj8lyy13khwyulhmch",
+            foreignKeyDefinition = "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL"))
     @JsonIgnore
     private User user;
 
@@ -37,7 +43,9 @@ public class ServiceBooking {
     private DomainExperts domainExpert;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "selected_pricing_id")
+    @JoinColumn(name = "selected_pricing_id",
+        foreignKey = @ForeignKey(name = "fk_service_bookings_selected_pricing",
+            foreignKeyDefinition = "FOREIGN KEY (selected_pricing_id) REFERENCES service_listing_pricing(pricing_id) ON DELETE SET NULL"))
     private ServiceListingPricing selectedPricing;
 
     private int duration;
@@ -87,5 +95,11 @@ public class ServiceBooking {
     private String reason;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @OneToOne(mappedBy = "serviceBooking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private PaymentSession paymentSession;
+
+    @OneToOne(mappedBy = "serviceBooking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Review review;
 
 }

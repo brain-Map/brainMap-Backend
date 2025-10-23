@@ -71,7 +71,8 @@ public interface TransactionMapper {
         if (paymentSession != null) {
             builder.amount(paymentSession.getAmount())
                    .status(paymentSession.getStatus())
-                   .paymentType(determinePaymentType(paymentSession));
+                   // When payment session exists (payment_id not null), treat as PAYMENT
+                   .paymentType(PaymentType.PAYMENT);
 
             // Map service listing information from booking
             ServiceBooking booking = paymentSession.getServiceBooking();
@@ -88,7 +89,8 @@ public interface TransactionMapper {
             }
             // Parse status from transaction status string
             builder.status(parsePaymentStatus(transaction.getStatus()));
-            builder.paymentType(PaymentType.PAYMENT);
+            // payment_id is null -> take payment type from transaction table
+            builder.paymentType(transaction.getPaymentType() != null ? transaction.getPaymentType() : PaymentType.PAYMENT);
         }
 
         return builder.build();
@@ -107,15 +109,8 @@ public interface TransactionMapper {
         return "Unknown";
     }
 
-    default PaymentType determinePaymentType(PaymentSession paymentSession) {
-        // For service bookings, it's typically a payment
-        // You can extend this logic based on your business requirements
-        if (paymentSession.getServiceBooking() != null) {
-            return PaymentType.PAYMENT;
-        }
-        // Default to PAYMENT for regular transactions
-        return PaymentType.PAYMENT;
-    }
+    // Note: payment type is now sourced from Transaction when payment session is null,
+    // and assumed PAYMENT when a payment session exists.
 
     default PaymentStatus parsePaymentStatus(String status) {
         if (status == null) return PaymentStatus.PENDING;

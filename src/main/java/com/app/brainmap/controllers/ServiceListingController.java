@@ -32,6 +32,9 @@ public class ServiceListingController {
             @RequestPart("service") ServiceListingRequestDto serviceListingRequestDto,
             @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
     ) {
+        log.info("Creating service listing for userId: " + userId);
+        log.info("Service listing request: " + serviceListingRequestDto);
+        log.info("Thumbnail: " + thumbnail);
         try {
             if (thumbnail != null) serviceListingRequestDto.setThumbnail(thumbnail);
             ServiceListing created = serviceListingService.createServiceListing(serviceListingRequestDto, userId);
